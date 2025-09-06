@@ -1,0 +1,26 @@
+Package: h3sdm
+Type: Package
+Title: Species Distribution Modeling with H3 Grids
+Version: 0.1.0
+Authors@R: 
+    person(given = "Manuel",
+           family = "Spínola",
+           role = c("aut", "cre"),
+           email = "mspinola10@gmail.com")
+Description: Functions to retrieve species records, create H3 hexagonal grids, calculate landscape metrics, and prepare data for SDM modeling.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: R (>= 4.1)
+Imports:
+    sf,
+    spocc,
+    h3jsr,
+    dplyr,
+    tidyr,
+    landscapemetrics,
+    terra,
+    spatialsample,
+    tidymodels,
+    ecospat
