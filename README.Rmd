@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r hexsticker, echo=FALSE, out.width="180px", fig.align="right"}
+```{r hexsticker, echo=FALSE, out.width="20%", fig.align="left"}
 knitr::include_graphics("man/figures/h3sdm_logo_a.png")
 ```
 

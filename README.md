@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src="man/figures/h3sdm_logo_a.png" width="180px" style="display: block; margin: auto 0 auto auto;" />
+<img src="man/figures/h3sdm_logo_a.png" width="20%" style="display: block; margin: auto auto auto 0;" />
 
 # h3sdm
 
