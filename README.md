@@ -1,7 +1,19 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src="man/figures/h3sdm_logo_a.png" width="20%" style="display: block; margin: auto auto auto 0;" />
+<div style="display: flex; align-items: center;">
+
+<img src="man/figures/h3sdm_logo_a.png" width="120" style="margin-right: 20px;"/>
+
+<h1>
+
+h3sdm
+</h1>
+
+</div>
+
+**h3sdm**: Machine Learnig based species distribution modeling with H3
+spatial grids.
 
 # h3sdm
 
