@@ -30,6 +30,7 @@ knitr::opts_chunk$set(
 ## Overview
 
 **h3sdm** is an R package for **species distribution modeling (SDM)** and **habitat analysis** using hexagonal grids based on [H3](https://h3geo.org/).  
+
 It provides a consistent spatial framework to combine species occurrence data with environmental predictors and landscape metrics, enabling both ecological modeling and habitat characterization.
 
 Key features include:  
@@ -47,19 +48,19 @@ By leveraging H3 grids, **h3sdm** makes it easy to bridge **species distribution
 
 ## Installation
 
-You can install the development version of **h3sdm from** [GitHub](https://github.com/) with:
+You can install the development version of **h3sdm from** [GitHub](https://github.com/) using one of the following methods::
 
-```{r}
+```{r, eval = FALSE}
 # install.packages("pak")
 pak::pak("ManuelSpinola/h3sdm")
 ```
 
-```{r}
+```{r, eval = FALSE}
 # install.packages("remotes")
 remotes::install_github("ManuelSpinola/h3sdm")
 ```
 
-```{r}
+```{r, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("ManuelSpinola/h3sdm")
 ```
