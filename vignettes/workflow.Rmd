@@ -1,0 +1,32 @@
+---
+title: "h3sdm workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r setup}
+# The following example requires the 'paisaje' package from GitHub
+# install.packages("remotes")
+# remotes::install_github("ManuelSpinola/paisaje")
+library(h3sdm)
+```
+
+
+
+
+
+
+
+
+

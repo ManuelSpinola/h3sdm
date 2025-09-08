@@ -25,3 +25,7 @@ Imports:
     spatialsample,
     tidymodels,
     ecospat
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

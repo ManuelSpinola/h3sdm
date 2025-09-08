@@ -22,32 +22,53 @@ knitr::opts_chunk$set(
 
 <br>
 
-**h3sdm**: Machine learning based spatial species distribution modeling with H3 spatial grids.
+**h3sdm**: Machine learning–based spatial species distribution modeling and habitat/landscape analysis using H3 spatial grids.
 
 
 # h3sdm
 
-<!-- badges: start -->
-<!-- badges: end -->
+## Overview
 
-The goal of h3sdm is to ...
+**h3sdm** is an R package for **species distribution modeling (SDM)** and **habitat analysis** using hexagonal grids based on [H3](https://h3geo.org/).  
+It provides a consistent spatial framework to combine species occurrence data with environmental predictors and landscape metrics, enabling both ecological modeling and habitat characterization.
+
+Key features include:  
+
+- Conversion of point occurrence data into H3-based spatial grids.  
+- Extraction of environmental and landscape predictors at different resolutions.  
+
+- Support for multiple modeling approaches (e.g., logistic regression, GAMs, Random Forest, XGBoost).  
+
+- Tools for visualizing model predictions and habitat structure.  
+
+By leveraging H3 grids, **h3sdm** makes it easy to bridge **species distribution modeling** and **landscape ecology** in a scalable way.
+
+---
 
 ## Installation
 
-You can install the development version of h3sdm from [GitHub](https://github.com/) with:
+You can install the development version of **h3sdm from** [GitHub](https://github.com/) with:
 
-``` r
+```{r}
 # install.packages("pak")
 pak::pak("ManuelSpinola/h3sdm")
 ```
 
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-library(h3sdm)
-## basic example code
+```{r}
+# install.packages("remotes")
+remotes::install_github("ManuelSpinola/h3sdm")
 ```
+
+```{r}
+# install.packages("devtools")
+devtools::install_github("ManuelSpinola/h3sdm")
+```
+
+
+
+## Get Started
+
+See the full workflow in the [h3sdm vignette](https://manuelspinola.github.io/h3sdm/articles/workflow.html).
+
 
 
