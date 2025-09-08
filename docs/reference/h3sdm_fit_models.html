@@ -79,11 +79,11 @@ a comparative metrics table.</p>
 
 
 <dl><dt id="arg-workflows">workflows<a class="anchor" aria-label="anchor" href="#arg-workflows"></a></dt>
-<dd><p>A named list of tidymodels workflows created with <code>h3sdm_workflow</code> or manually.</p></dd>
+<dd><p>A named list of tidymodels workflows created with <code><a href="h3sdm_workflow.html">h3sdm_workflow()</a></code> or manually.</p></dd>
 
 
 <dt id="arg-data-split">data_split<a class="anchor" aria-label="anchor" href="#arg-data-split"></a></dt>
-<dd><p>A resampling object (e.g., created with <code>vfold_cv</code> or <code>spatial_block_cv</code>) for cross-validation.</p></dd>
+<dd><p>A resampling object (e.g., from <code>vfold_cv()</code> or <code><a href="h3sdm_spatial_cv.html">h3sdm_spatial_cv()</a></code>) for cross-validation.</p></dd>
 
 
 <dt id="arg-presence-data">presence_data<a class="anchor" aria-label="anchor" href="#arg-presence-data"></a></dt>
@@ -94,14 +94,14 @@ a comparative metrics table.</p>
 <dd><p>Character. Name of the column containing true presence/absence values (default <code>"presence"</code>).</p></dd>
 
 
-<dt id="arg-id-col">id_col<a class="anchor" aria-label="anchor" href="#arg-id-col"></a></dt>
-<dd><p>Character. Name of the column identifying spatial units (default <code>"h3_address"</code>).</p></dd>
+<dt id="arg-pred-col">pred_col<a class="anchor" aria-label="anchor" href="#arg-pred-col"></a></dt>
+<dd><p>Character. Name of the column containing predicted probabilities (default <code>".pred_1"</code>).</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     <p>A list with two elements:</p><dl><dt>models</dt>
-<dd><p>A list of fitted models returned by <code>fit_resamples</code>.</p></dd>
+<dd><p>A list of fitted models returned by <code><a href="h3sdm_fit_model.html">h3sdm_fit_model()</a></code>.</p></dd>
 
 <dt>metrics</dt>
 <dd><p>A tibble with one row per model per metric, including standard yardstick metrics, TSS, and Boyce index.</p></dd>
@@ -112,13 +112,23 @@ a comparative metrics table.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># Define workflows for different models</span></span></span>
+<span class="r-in"><span><span class="va">mod_log</span> <span class="op">&lt;-</span> <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span></span>
+<span class="r-in"><span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glm"</span><span class="op">)</span> <span class="op">%&gt;%</span></span></span>
+<span class="r-in"><span>  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">mod_rf</span> <span class="op">&lt;-</span> <span class="fu">rand_forest</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span></span>
+<span class="r-in"><span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op">%&gt;%</span></span></span>
+<span class="r-in"><span>  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">workflows_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  logistic <span class="op">=</span> <span class="fu"><a href="h3sdm_workflow.html">h3sdm_workflow</a></span><span class="op">(</span><span class="va">mod_log</span>, <span class="va">my_recipe</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  rf       <span class="op">=</span> <span class="fu"><a href="h3sdm_workflow.html">h3sdm_workflow</a></span><span class="op">(</span><span class="va">mod_rf</span>, <span class="va">my_recipe</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">h3sdm_fit_models</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  workflows <span class="op">=</span> <span class="va">workflows_list</span>,</span></span>
-<span class="r-in"><span>  data_split <span class="op">=</span> <span class="va">my_cv_folds</span>,</span></span>
+<span class="r-in"><span>  workflows     <span class="op">=</span> <span class="va">workflows_list</span>,</span></span>
+<span class="r-in"><span>  data_split    <span class="op">=</span> <span class="va">my_cv_folds</span>,</span></span>
 <span class="r-in"><span>  presence_data <span class="op">=</span> <span class="va">presence_sf</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">metrics_table</span> <span class="op">&lt;-</span> <span class="va">results</span><span class="op">$</span><span class="va">metrics</span></span></span>
