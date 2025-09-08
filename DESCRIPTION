@@ -8,12 +8,14 @@ Authors@R:
            role = c("aut", "cre"),
            email = "mspinola10@gmail.com")
 Description: Functions to retrieve species records, create H3 hexagonal grids, calculate landscape metrics, and prepare data for SDM modeling.
-URL: https://manuelspinola.github.io/h3sdm/
+URL: https://github.com/ManuelSpinola/h3sdm
+BugReports: https://github.com/ManuelSpinola/h3sdm/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Depends: R (>= 4.1)
+Config/Needs/website: tidyverse/tidytemplate
 Imports:
     sf,
     spocc,

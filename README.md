@@ -2,18 +2,12 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 <img src="man/figures/h3sdm_logo_a.png"
-style="float:left; margin-right:20px;" width="120" />
-
-<br>
+style="float:left; margin-right:20px;" width="145" />
 
 # h3sdm
-
-<br>
 
 **h3sdm**: Machine learning–based spatial species distribution modeling
 and habitat/landscape analysis using H3 spatial grids.
-
-# h3sdm
 
 ## Overview
 
@@ -64,5 +58,7 @@ devtools::install_github("ManuelSpinola/h3sdm")
 
 ## Get Started
 
-See the full workflow in the [h3sdm
-vignette](https://manuelspinola.github.io/h3sdm/articles/workflow.html).
+Explore full workflows and examples for **h3sdm** in the
+[Articles](https://manuelspinola.github.io/h3sdm/articles/) section.  
+Each vignette demonstrates different aspects of species distribution and
+habitat analysis using H3 grids.

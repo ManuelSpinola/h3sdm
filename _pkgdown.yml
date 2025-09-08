@@ -1,0 +1,15 @@
+title: "h3sdm"
+url: https://manuelspinola.github.io/h3sdm
+
+# Logo y favicon
+logo: man/figures/h3sdm_logo_a.png
+favicon: man/figures/favicon.png
+
+template:
+  package: tidytemplate
+  bootstrap: 5    # usa Bootstrap 5
+  bslib:
+    danger: "#CA225E"
+    primary: "#CA225E"
+
+

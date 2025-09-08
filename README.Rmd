@@ -14,35 +14,26 @@ knitr::opts_chunk$set(
 ```
 
 
-![](man/figures/h3sdm_logo_a.png){width=120px style="float:left; margin-right:20px;"}
-
-<br>
+![](man/figures/h3sdm_logo_a.png){width=145px style="float:left; margin-right:20px;"} 
 
 # h3sdm
 
-<br>
-
-**h3sdm**: Machine learning–based spatial species distribution modeling and habitat/landscape analysis using H3 spatial grids.
-
-
-# h3sdm
+**h3sdm**: Machine learning–based spatial species distribution modeling and habitat/landscape analysis using H3 spatial index grids.
 
 ## Overview
 
-**h3sdm** is an R package for **species distribution modeling (SDM)** and **habitat analysis** using hexagonal grids based on [H3](https://h3geo.org/).  
+**h3sdm** is an R package for **species distribution modeling (SDM)** and **habitat analysis** using hexagonal spatial index grids based on [H3](https://h3geo.org/).
 
-It provides a consistent spatial framework to combine species occurrence data with environmental predictors and landscape metrics, enabling both ecological modeling and habitat characterization.
+It provides a consistent spatial framework to combine species occurrence data with environmental predictors and landscape metrics, enabling both ecological modeling and habitat characterization. The modeling framework is built on **tidymodels**, offering flexibility to use different approaches (e.g., logistic regression, GAMs, Random Forest, XGBoost).
 
-Key features include:  
+Key features include:
 
-- Conversion of point occurrence data into H3-based spatial grids.  
-- Extraction of environmental and landscape predictors at different resolutions.  
+- Conversion of point occurrence data into **H3-based spatial grids**
+- Extraction of environmental and landscape predictors at different resolutions
+- Support for multiple modeling approaches through **tidymodels**
+- Tools for visualizing model predictions and habitat structure
 
-- Support for multiple modeling approaches (e.g., logistic regression, GAMs, Random Forest, XGBoost).  
-
-- Tools for visualizing model predictions and habitat structure.  
-
-By leveraging H3 grids, **h3sdm** makes it easy to bridge **species distribution modeling** and **landscape ecology** in a scalable way.
+By leveraging **H3 grids** and the **tidymodels** ecosystem, **h3sdm** makes it easy to bridge **species distribution modeling** and **landscape ecology** in a scalable way.
 
 ---
 
@@ -69,7 +60,8 @@ devtools::install_github("ManuelSpinola/h3sdm")
 
 ## Get Started
 
-See the full workflow in the [h3sdm vignette](https://manuelspinola.github.io/h3sdm/articles/workflow.html).
+Explore full workflows and examples for **h3sdm** in the [Articles](https://manuelspinola.github.io/h3sdm/articles/) section.  
+Each vignette demonstrates different aspects of species distribution and habitat analysis using H3 grids.
 
 
 
