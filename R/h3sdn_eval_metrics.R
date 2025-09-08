@@ -1,9 +1,31 @@
 #' @name h3sdm_eval_metrics
-#' @title Evaluate a single fitted model
-#' @description A helper function to calculate all metrics for a single fitted model.
-#' @param fitted_model The fitted model object.
-#' @param presence_data A tibble with the true presence locations.
-#' @return A tibble with all evaluation metrics.
+#' @title Evaluate a single fitted H3SDM model
+#' @description
+#' Computes performance metrics for a single fitted model, including standard
+#' yardstick metrics (ROC AUC, accuracy, sensitivity, specificity, F1-score, Kappa),
+#' as well as TSS (True Skill Statistic) and Boyce index. Designed as a helper function
+#' for evaluating models produced by `h3sdm_fit_model` or `h3sdm_fit_models`.
+#'
+#' @param fitted_model A fitted model object, typically the result of `h3sdm_fit_model()`.
+#' @param presence_data Optional. An `sf` object or tibble containing presence locations
+#'   to compute the Boyce index.
+#' @param truth_col Character. Name of the column with true presence/absence values (default `"presence"`).
+#' @param pred_col Character. Name of the column with predicted probabilities (default `".pred_1"`).
+#'
+#' @return A tibble with one row per metric, including:
+#' \describe{
+#'   \item{.metric}{Metric name (e.g., "roc_auc", "tss", "boyce").}
+#'   \item{.estimator}{Estimator type (usually "binary").}
+#'   \item{mean}{Metric value.}
+#'   \item{std_err}{Standard error (NA for TSS and Boyce).}
+#'   \item{conf_low}{Lower 95% confidence interval (NA for TSS and Boyce).}
+#'   \item{conf_high}{Upper 95% confidence interval (NA for TSS and Boyce).}
+#' }
+#'
+#' @importFrom tune collect_metrics collect_predictions
+#' @importFrom yardstick sens_vec spec_vec
+#' @importFrom dplyr mutate bind_rows select
+#' @importFrom tibble tibble
 #' @export
 
 h3sdm_eval_metrics <- function(fitted_model, presence_data = NULL,

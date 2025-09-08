@@ -13,20 +13,20 @@ h3sdm_fit_models(
 )
 }
 \arguments{
-\item{workflows}{A named list of tidymodels workflows created with \code{h3sdm_workflow} or manually.}
+\item{workflows}{A named list of tidymodels workflows created with \code{h3sdm_workflow()} or manually.}
 
-\item{data_split}{A resampling object (e.g., created with \code{vfold_cv} or \code{spatial_block_cv}) for cross-validation.}
+\item{data_split}{A resampling object (e.g., from \code{vfold_cv()} or \code{h3sdm_spatial_cv()}) for cross-validation.}
 
 \item{presence_data}{An \code{sf} object or tibble with presence locations to compute the Boyce index (optional).}
 
 \item{truth_col}{Character. Name of the column containing true presence/absence values (default \code{"presence"}).}
 
-\item{id_col}{Character. Name of the column identifying spatial units (default \code{"h3_address"}).}
+\item{pred_col}{Character. Name of the column containing predicted probabilities (default \code{".pred_1"}).}
 }
 \value{
 A list with two elements:
 \describe{
-\item{models}{A list of fitted models returned by \code{fit_resamples}.}
+\item{models}{A list of fitted models returned by \code{h3sdm_fit_model()}.}
 \item{metrics}{A tibble with one row per model per metric, including standard yardstick metrics, TSS, and Boyce index.}
 }
 }
@@ -39,13 +39,23 @@ a comparative metrics table.
 }
 \examples{
 \dontrun{
+# Define workflows for different models
+mod_log <- logistic_reg() \%>\%
+  set_engine("glm") \%>\%
+  set_mode("classification")
+
+mod_rf <- rand_forest() \%>\%
+  set_engine("ranger") \%>\%
+  set_mode("classification")
+
 workflows_list <- list(
   logistic = h3sdm_workflow(mod_log, my_recipe),
   rf       = h3sdm_workflow(mod_rf, my_recipe)
 )
+
 results <- h3sdm_fit_models(
-  workflows = workflows_list,
-  data_split = my_cv_folds,
+  workflows     = workflows_list,
+  data_split    = my_cv_folds,
   presence_data = presence_sf
 )
 metrics_table <- results$metrics

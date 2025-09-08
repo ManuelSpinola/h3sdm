@@ -7,49 +7,38 @@
 h3sdm_recipe(data)
 }
 \arguments{
-\item{data}{An \code{sf} object, typically the result of the \code{h3sdm_data()}
-function, which includes species presence-absence data, H3 addresses, and
-environmental predictors. The geometry must be of type \code{MULTIPOLYGON}.}
+\item{data}{An \code{sf} object, typically the output of \code{h3sdm_data()},
+including species presence-absence, H3 addresses, and environmental predictors.
+The geometry must be of type \code{MULTIPOLYGON}.}
 }
 \value{
-A \code{tidymodels} recipe object ready to be used in a modeling workflow.
-It includes a custom class of \code{"h3sdm_recipe"}.
+A \code{tidymodels} recipe object (class \code{"h3sdm_recipe"}) ready for modeling.
 }
 \description{
-This function prepares an sf object with H3 hexagonal data for
-modeling with the \code{tidymodels} ecosystem. It automatically extracts
-centroid coordinates and assigns appropriate roles to the variables.
+Prepares an \code{sf} object with H3 hexagonal data for modeling with the
+\code{tidymodels} ecosystem. Extracts centroid coordinates and assigns appropriate
+roles to the variables automatically.
 }
 \details{
-The function handles several key data preparation steps:
+This function performs key data preparation steps for spatial species
+distribution modeling:
 \itemize{
-\item It extracts the centroid coordinates (x and y) from the polygon
-geometries to be used as spatial predictors in the model.
-\item It removes the geometry column, as \code{tidymodels} works with
-tabular data.
-\item It explicitly assigns roles to key columns:
+\item Extracts centroid coordinates (\code{x} and \code{y}) from polygon geometries.
+\item Removes the geometry column, as \code{tidymodels} works with tabular data.
+\item Assigns roles to columns:
 \itemize{
-\item \strong{\code{presence}}: Assigned the \code{"outcome"} role, as it's the
-variable to be predicted.
-\item \strong{\code{h3_address}}: Assigned the \code{"id"} role, ensuring it is
-kept in the dataset but not used as a predictor. This is essential
-for later joining with prediction results.
-\item \strong{\code{x} and \code{y}}: Assigned the \code{"spatial_predictor"} role.
+\item \code{presence} → \code{"outcome"} (target variable)
+\item \code{h3_address} → \code{"id"} (kept for joining with predictions)
+\item \code{x} and \code{y} → \code{"spatial_predictor"}
 }
+\item All other columns are assigned \code{"predictor"} role.
 }
-All other columns are automatically assigned the default \code{"predictor"} role.
 }
 \examples{
 \dontrun{
 # Assuming `combined_data` is an sf object from h3sdm_data()
-# with a 'presence' variable and other predictors.
-
-# Create the tidymodels recipe
 sdm_recipe <- h3sdm_recipe(combined_data)
-
-# View the recipe's structure
-sdm_recipe
-
-# You can now use `sdm_recipe` in a tidymodels workflow.
+sdm_recipe  # inspect the recipe
 }
+
 }

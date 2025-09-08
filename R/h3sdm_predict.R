@@ -1,15 +1,24 @@
 #' @name h3sdm_predict
-#' @title Predict species distribution with H3 hexagons
-#' @description Uses a fitted tidymodels workflow to predict species
-#'   presence probability on a new spatial grid. This function
-#'   automatically handles the creation of 'x' and 'y' coordinates
-#'   if they are not present in the input data.
-#' @param sdm_workflow A fitted `tidymodels` workflow object,
-#'   typically the result of `workflows::fit()`.
-#' @param new_data An `sf` object containing the spatial grid and
-#'   the same predictor variables used for model training.
-#' @return An `sf` object with a new column named `prediction` containing
+#' @title Predict species presence probability using H3 hexagons
+#' @description
+#' Uses a fitted tidymodels workflow (from `h3sdm_fit_model` or a standalone workflow)
+#' to predict species presence probabilities on a new spatial H3 grid.
+#' Automatically generates `x` and `y` coordinates from polygon centroids if missing.
+#'
+#' @param fit_object A fitted `tidymodels` workflow or the output list from `h3sdm_fit_model`.
+#' @param new_data An `sf` object containing the spatial grid and the same predictor variables used for model training.
+#'
+#' @return An `sf` object with the original geometry and a new column `prediction` containing
 #'   the predicted probability of presence for each hexagon.
+#'
+#' @examples
+#' \dontrun{
+#' # Assuming 'fitted_model' is the result of h3sdm_fit_model()
+#' # and 'grid_sf' is an sf object with predictor variables
+#' predictions_sf <- h3sdm_predict(fit_object = fitted_model,
+#'                                 new_data   = grid_sf)
+#' }
+#'
 #' @importFrom sf st_drop_geometry st_centroid st_coordinates
 #' @importFrom dplyr mutate
 #' @export

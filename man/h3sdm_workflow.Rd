@@ -7,20 +7,28 @@
 h3sdm_workflow(model_spec, sdm_recipe)
 }
 \arguments{
-\item{model_spec}{A \code{tidymodels} model specification (e.g., \code{logistic_reg()}).}
+\item{model_spec}{A \code{tidymodels} model specification (e.g., \code{logistic_reg()}, \code{rand_forest()}, or \code{boost_tree()}).}
 
-\item{sdm_recipe}{A \code{tidymodels} recipe object, typically from \code{h3sdm_recipe()}.}
+\item{sdm_recipe}{A \code{tidymodels} recipe object, typically created with \code{h3sdm_recipe()}.}
 }
 \value{
-A \code{workflow} object.
+A \code{workflow} object ready to be used for model fitting with \code{fit()} or cross-validation.
 }
 \description{
-This function combines a model specification with a prepared recipe
-into a single tidymodels workflow.
+Combines a model specification and a prepared recipe into a single \code{tidymodels} workflow
+suitable for species distribution modeling with H3 hexagonal grids.
 }
 \examples{
-# Assuming a model spec and recipe are defined
-# my_model_spec <- logistic_reg()
-# my_recipe <- h3sdm_recipe(...)
-# sdm_wf <- h3sdm_workflow(my_model_spec, my_recipe)
+\dontrun{
+library(parsnip)
+# Create model specification
+my_model_spec <- logistic_reg() \%>\% set_mode("classification") \%>\% set_engine("glm")
+
+# Prepare recipe
+my_recipe <- h3sdm_recipe(combined_data)
+
+# Create workflow
+sdm_wf <- h3sdm_workflow(model_spec = my_model_spec, sdm_recipe = my_recipe)
+}
+
 }

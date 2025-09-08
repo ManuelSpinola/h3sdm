@@ -1,14 +1,19 @@
 #' @name h3sdm_predictors
-#' @title Extract Predictors by Hexagonal Grid
-#' @description Generates an H3 hexagonal grid over an AOI and extracts numeric, categorical,
-#'   and landscape predictors for each hexagon using functions from the 'paisaje' package.
-#' @param aoi_sf An sf object (POLYGON or MULTIPOLYGON) defining the AOI.
-#' @param res H3 resolution (default = 6).
-#' @param num_rasters A SpatRaster or list of SpatRasters with numeric variables (optional).
-#' @param cat_rasters A named list of SpatRasters with categorical variables (optional).
-#' @param landscape_raster A SpatRaster with landscape categories (optional, for metrics).
-#' @param expand_factor Factor to expand the AOI when creating grid (default = 0.1).
-#' @return An sf object (hexagonal grid) with predictor columns added.
+#' @title Extract Predictors for Hexagonal Grids
+#' @description
+#' Generates an H3 hexagonal grid over a specified area of interest (AOI) and extracts
+#' numeric, categorical, and landscape predictors for each hexagon. Uses functions
+#' from the 'paisaje' package to calculate landscape metrics when `landscape_raster` is provided.
+#'
+#' @param aoi_sf An `sf` object (POLYGON or MULTIPOLYGON) defining the area of interest.
+#' @param res Integer. H3 resolution (default = 6).
+#' @param num_rasters A `SpatRaster` or list of `SpatRaster`s with numeric variables to extract (optional).
+#' @param cat_rasters A named list of `SpatRaster`s with categorical variables to extract (optional).
+#' @param landscape_raster A `SpatRaster` for calculating landscape metrics (optional).
+#' @param expand_factor Numeric. Factor to expand the AOI when creating the H3 grid (default = 0.1).
+#'
+#' @return An `sf` object (MULTIPOLYGON) representing the H3 grid, with predictor columns added.
+#'
 #' @examples
 #' \dontrun{
 #' library(terra)
@@ -17,13 +22,16 @@
 #' lc  <- rast("landcover.tif")
 #' cr  <- cr_outline_c
 #'
-#' pred_sf <- H3SDM_predictors(
+#' pred_sf <- h3sdm_predictors(
 #'   aoi_sf = cr,
 #'   res = 6,
 #'   num_rasters = bio,
 #'   cat_rasters = list(landcover = lc)
 #' )
 #' }
+#'
+#' @importFrom sf st_as_sf st_make_valid st_cast
+#' @importFrom terra vect merge
 #' @export
 
 h3sdm_predictors <- function(aoi_sf,

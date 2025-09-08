@@ -2,7 +2,7 @@
 % Please edit documentation in R/h3sdm_fit_model.R
 \name{h3sdm_fit_model}
 \alias{h3sdm_fit_model}
-\title{Fit a tidymodels workflow with spatial data}
+\title{Fit a single H3SDM species distribution model}
 \usage{
 h3sdm_fit_model(
   sdm_workflow,
@@ -13,20 +13,37 @@ h3sdm_fit_model(
 )
 }
 \arguments{
-\item{sdm_workflow}{A \code{workflow} object from \code{h3sdm_workflow()}.}
+\item{sdm_workflow}{A \code{workflow} object from \code{h3sdm_workflow()} or manually created.}
 
-\item{data_split}{An \code{rsplit} object from \code{h3sdm_split()}.}
+\item{data_split}{A resampling object (e.g., from \code{vfold_cv()} or \code{h3sdm_spatial_cv()}) for cross-validation.}
+
+\item{presence_data}{Optional \code{sf} or tibble with presence locations to compute Boyce index.}
+
+\item{truth_col}{Character. Name of the column containing the true presence/absence values (default \code{"presence"}).}
+
+\item{pred_col}{Character. Name of the column containing predicted probabilities (default \code{".pred_1"}).}
 }
 \value{
-An \code{rsample_results} object with performance metrics for each fold.
+A list with:
+\describe{
+\item{cv_model}{Results of cross-validation (\code{tune_results}).}
+\item{final_model}{Fitted workflow on full data.}
+\item{metrics}{Tibble with performance metrics including ROC AUC, accuracy, sensitivity,
+specificity, F1-score, Kappa, TSS, and Boyce index.}
+}
 }
 \description{
-This function trains a tidymodels workflow using a spatial split,
-calculating performance metrics for each fold.
+Trains a single tidymodels workflow using a spatial split, computes performance metrics
+for each fold, and fits the final model to the full dataset. Optionally computes
+post-hoc metrics like TSS and the Boyce index.
 }
 \examples{
-# Assuming a workflow and a data split are defined
-# sdm_wf <- h3sdm_workflow(...)
-# spatial_split <- h3sdm_split(...)
-# fitted_model <- h3sdm_fit(sdm_wf, spatial_split)
+\dontrun{
+fitted <- h3sdm_fit_model(
+  sdm_workflow  = my_workflow,
+  data_split    = my_cv,
+  presence_data = my_presence_sf
+)
+}
+
 }

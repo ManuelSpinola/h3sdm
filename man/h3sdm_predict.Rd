@@ -2,24 +2,30 @@
 % Please edit documentation in R/h3sdm_predict.R
 \name{h3sdm_predict}
 \alias{h3sdm_predict}
-\title{Predict species distribution with H3 hexagons}
+\title{Predict species presence probability using H3 hexagons}
 \usage{
 h3sdm_predict(fit_object, new_data)
 }
 \arguments{
-\item{new_data}{An \code{sf} object containing the spatial grid and
-the same predictor variables used for model training.}
+\item{fit_object}{A fitted \code{tidymodels} workflow or the output list from \code{h3sdm_fit_model}.}
 
-\item{sdm_workflow}{A fitted \code{tidymodels} workflow object,
-typically the result of \code{workflows::fit()}.}
+\item{new_data}{An \code{sf} object containing the spatial grid and the same predictor variables used for model training.}
 }
 \value{
-An \code{sf} object with a new column named \code{prediction} containing
+An \code{sf} object with the original geometry and a new column \code{prediction} containing
 the predicted probability of presence for each hexagon.
 }
 \description{
-Uses a fitted tidymodels workflow to predict species
-presence probability on a new spatial grid. This function
-automatically handles the creation of 'x' and 'y' coordinates
-if they are not present in the input data.
+Uses a fitted tidymodels workflow (from \code{h3sdm_fit_model} or a standalone workflow)
+to predict species presence probabilities on a new spatial H3 grid.
+Automatically generates \code{x} and \code{y} coordinates from polygon centroids if missing.
+}
+\examples{
+\dontrun{
+# Assuming 'fitted_model' is the result of h3sdm_fit_model()
+# and 'grid_sf' is an sf object with predictor variables
+predictions_sf <- h3sdm_predict(fit_object = fitted_model,
+                                new_data   = grid_sf)
+}
+
 }

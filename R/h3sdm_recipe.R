@@ -1,53 +1,42 @@
 #' @name h3sdm_recipe
 #' @title Create a tidymodels recipe for H3-based SDMs
-#' @description This function prepares an sf object with H3 hexagonal data for
-#'   modeling with the `tidymodels` ecosystem. It automatically extracts
-#'   centroid coordinates and assigns appropriate roles to the variables.
+#' @description
+#' Prepares an `sf` object with H3 hexagonal data for modeling with the
+#' `tidymodels` ecosystem. Extracts centroid coordinates and assigns appropriate
+#' roles to the variables automatically.
 #'
-#' @param data An `sf` object, typically the result of the `h3sdm_data()`
-#'   function, which includes species presence-absence data, H3 addresses, and
-#'   environmental predictors. The geometry must be of type `MULTIPOLYGON`.
+#' @param data An `sf` object, typically the output of `h3sdm_data()`,
+#'   including species presence-absence, H3 addresses, and environmental predictors.
+#'   The geometry must be of type `MULTIPOLYGON`.
 #'
-#' @details The function handles several key data preparation steps:
-#'   \itemize{
-#'     \item It extracts the centroid coordinates (x and y) from the polygon
-#'       geometries to be used as spatial predictors in the model.
-#'     \item It removes the geometry column, as `tidymodels` works with
-#'       tabular data.
-#'     \item It explicitly assigns roles to key columns:
-#'       \itemize{
-#'         \item \strong{`presence`}: Assigned the `"outcome"` role, as it's the
-#'           variable to be predicted.
-#'         \item \strong{`h3_address`}: Assigned the `"id"` role, ensuring it is
-#'           kept in the dataset but not used as a predictor. This is essential
-#'           for later joining with prediction results.
-#'         \item \strong{`x` and `y`}: Assigned the `"spatial_predictor"` role.
-#'       }
-#'   }
-#'   All other columns are automatically assigned the default `"predictor"` role.
+#' @details
+#' This function performs key data preparation steps for spatial species
+#' distribution modeling:
+#' \itemize{
+#'   \item Extracts centroid coordinates (`x` and `y`) from polygon geometries.
+#'   \item Removes the geometry column, as `tidymodels` works with tabular data.
+#'   \item Assigns roles to columns:
+#'     \itemize{
+#'       \item `presence` → `"outcome"` (target variable)
+#'       \item `h3_address` → `"id"` (kept for joining with predictions)
+#'       \item `x` and `y` → `"spatial_predictor"`
+#'     }
+#'   \item All other columns are assigned `"predictor"` role.
+#' }
 #'
-#' @return A `tidymodels` recipe object ready to be used in a modeling workflow.
-#'   It includes a custom class of `"h3sdm_recipe"`.
-#'
-#' @importFrom recipes recipe
-#' @importFrom dplyr mutate
-#' @importFrom sf st_coordinates st_centroid st_drop_geometry
+#' @return A `tidymodels` recipe object (class `"h3sdm_recipe"`) ready for modeling.
 #'
 #' @examples
 #' \dontrun{
 #' # Assuming `combined_data` is an sf object from h3sdm_data()
-#' # with a 'presence' variable and other predictors.
-#'
-#' # Create the tidymodels recipe
 #' sdm_recipe <- h3sdm_recipe(combined_data)
-#'
-#' # View the recipe's structure
-#' sdm_recipe
-#'
-#' # You can now use `sdm_recipe` in a tidymodels workflow.
+#' sdm_recipe  # inspect the recipe
 #' }
+#'
+#' @importFrom recipes recipe
+#' @importFrom dplyr mutate
+#' @importFrom sf st_coordinates st_centroid st_geometry st_drop_geometry
 #' @export
-
 
 
 h3sdm_recipe <- function(data) {

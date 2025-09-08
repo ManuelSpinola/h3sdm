@@ -7,25 +7,32 @@
 h3sdm_spatial_cv(data, method = "block", v = 5, ...)
 }
 \arguments{
-\item{data}{An \code{sf} object, typically the result of \code{h3sdm_data()}.}
+\item{data}{An \code{sf} object, typically the output of \code{h3sdm_data()}.}
 
-\item{method}{A character string specifying the spatial sampling method.
-Options are "block" for \code{spatial_block_cv} or "cluster" for \code{spatial_cluster_cv}.}
+\item{method}{Character. The spatial resampling method to use:
+\describe{
+\item{"block"}{Use \code{spatial_block_cv} for block-based spatial CV.}
+\item{"cluster"}{Use \code{spatial_cluster_cv} for cluster-based spatial CV.}
+}}
 
-\item{v}{The number of folds for cross-validation.}
+\item{v}{Integer. Number of folds (default = 5).}
 
 \item{...}{Additional arguments passed to the underlying \code{spatialsample} function.}
 }
 \value{
-A \code{rsplit} object from \code{rsample} with a spatial data split.
+An \code{rsplit} object (from \code{rsample}) representing the spatial CV folds.
 }
 \description{
-This function creates a spatial-aware data split using \code{spatialsample},
-which is crucial for avoiding inflated model performance due to spatial autocorrelation.
+Generates a spatially aware data split using the \code{spatialsample} package.
+This helps avoid inflated model performance estimates due to spatial autocorrelation.
 }
 \examples{
-# Use block cross-validation
-# spatial_cv_block <- h3sdm_spatial_cv(combined_data, method = "block")
-# Use cluster cross-validation
-# spatial_cv_cluster <- h3sdm_spatial_cv(combined_data, method = "cluster", v = 10)
+\dontrun{
+# Block spatial cross-validation
+spatial_cv_block <- h3sdm_spatial_cv(combined_data, method = "block")
+
+# Cluster spatial cross-validation with 10 folds
+spatial_cv_cluster <- h3sdm_spatial_cv(combined_data, method = "cluster", v = 10)
+}
+
 }

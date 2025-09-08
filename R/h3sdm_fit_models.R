@@ -7,32 +7,45 @@
 #' and the Boyce index for model evaluation. Returns both the fitted models and
 #' a comparative metrics table.
 #'
-#' @param workflows A named list of tidymodels workflows created with `h3sdm_workflow` or manually.
-#' @param data_split A resampling object (e.g., created with `vfold_cv` or `spatial_block_cv`) for cross-validation.
+#' @param workflows A named list of tidymodels workflows created with `h3sdm_workflow()` or manually.
+#' @param data_split A resampling object (e.g., from `vfold_cv()` or `h3sdm_spatial_cv()`) for cross-validation.
 #' @param presence_data An `sf` object or tibble with presence locations to compute the Boyce index (optional).
-#' @param id_col Character. Name of the column identifying spatial units (default `"h3_address"`).
 #' @param truth_col Character. Name of the column containing true presence/absence values (default `"presence"`).
+#' @param pred_col Character. Name of the column containing predicted probabilities (default `".pred_1"`).
 #'
 #' @return A list with two elements:
 #' \describe{
-#'   \item{models}{A list of fitted models returned by `fit_resamples`.}
+#'   \item{models}{A list of fitted models returned by `h3sdm_fit_model()`.}
 #'   \item{metrics}{A tibble with one row per model per metric, including standard yardstick metrics, TSS, and Boyce index.}
 #' }
 #'
 #' @examples
 #' \dontrun{
+#' # Define workflows for different models
+#' mod_log <- logistic_reg() %>%
+#'   set_engine("glm") %>%
+#'   set_mode("classification")
+#'
+#' mod_rf <- rand_forest() %>%
+#'   set_engine("ranger") %>%
+#'   set_mode("classification")
+#'
 #' workflows_list <- list(
 #'   logistic = h3sdm_workflow(mod_log, my_recipe),
 #'   rf       = h3sdm_workflow(mod_rf, my_recipe)
 #' )
+#'
 #' results <- h3sdm_fit_models(
-#'   workflows = workflows_list,
-#'   data_split = my_cv_folds,
+#'   workflows     = workflows_list,
+#'   data_split    = my_cv_folds,
 #'   presence_data = presence_sf
 #' )
 #' metrics_table <- results$metrics
 #' }
 #'
+#' @importFrom purrr imap map2_dfr
+#' @importFrom dplyr mutate
+#' @importFrom tibble tibble
 #' @export
 
 h3sdm_fit_models <- function(workflows, data_split, presence_data = NULL,

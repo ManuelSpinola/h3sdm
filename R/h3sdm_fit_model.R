@@ -1,17 +1,40 @@
 #' @name h3sdm_fit_model
-#' @title Fit a tidymodels workflow with spatial data
-#' @description This function trains a tidymodels workflow using a spatial split,
-#'   calculating performance metrics for each fold.
-#' @param sdm_workflow A `workflow` object from `h3sdm_workflow()`.
-#' @param data_split An `rsplit` object from `h3sdm_split()`.
-#' @return An `rsample_results` object with performance metrics for each fold.
-#' @importFrom tune fit_resamples
-#' @importFrom yardstick roc_auc_vec
+#' @title Fit a single H3SDM species distribution model
+#' @description
+#' Trains a single tidymodels workflow using a spatial split, computes performance metrics
+#' for each fold, and fits the final model to the full dataset. Optionally computes
+#' post-hoc metrics like TSS and the Boyce index.
+#'
+#' @param sdm_workflow A `workflow` object from `h3sdm_workflow()` or manually created.
+#' @param data_split A resampling object (e.g., from `vfold_cv()` or `h3sdm_spatial_cv()`) for cross-validation.
+#' @param presence_data Optional `sf` or tibble with presence locations to compute Boyce index.
+#' @param truth_col Character. Name of the column containing the true presence/absence values (default `"presence"`).
+#' @param pred_col Character. Name of the column containing predicted probabilities (default `".pred_1"`).
+#'
+#' @return A list with:
+#' \describe{
+#'   \item{cv_model}{Results of cross-validation (`tune_results`).}
+#'   \item{final_model}{Fitted workflow on full data.}
+#'   \item{metrics}{Tibble with performance metrics including ROC AUC, accuracy, sensitivity,
+#'                 specificity, F1-score, Kappa, TSS, and Boyce index.}
+#' }
+#'
+#' @importFrom tune fit_resamples control_resamples
+#' @importFrom yardstick roc_auc_vec accuracy_vec sens_vec spec_vec f_meas_vec kap_vec
+#' @importFrom workflows fit
+#' @importFrom rsample analysis
+#' @importFrom purrr imap map2_dfr
+#' @importFrom dplyr mutate
+#' @importFrom tibble tibble
 #' @examples
-#' # Assuming a workflow and a data split are defined
-#' # sdm_wf <- h3sdm_workflow(...)
-#' # spatial_split <- h3sdm_split(...)
-#' # fitted_model <- h3sdm_fit(sdm_wf, spatial_split)
+#' \dontrun{
+#' fitted <- h3sdm_fit_model(
+#'   sdm_workflow  = my_workflow,
+#'   data_split    = my_cv,
+#'   presence_data = my_presence_sf
+#' )
+#' }
+#'
 #' @export
 
 h3sdm_fit_model <- function(sdm_workflow, data_split, presence_data = NULL,

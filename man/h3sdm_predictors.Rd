@@ -2,7 +2,7 @@
 % Please edit documentation in R/h3sdm_predictors.R
 \name{h3sdm_predictors}
 \alias{h3sdm_predictors}
-\title{Extract Predictors by Hexagonal Grid}
+\title{Extract Predictors for Hexagonal Grids}
 \usage{
 h3sdm_predictors(
   aoi_sf,
@@ -14,24 +14,25 @@ h3sdm_predictors(
 )
 }
 \arguments{
-\item{aoi_sf}{An sf object (POLYGON or MULTIPOLYGON) defining the AOI.}
+\item{aoi_sf}{An \code{sf} object (POLYGON or MULTIPOLYGON) defining the area of interest.}
 
-\item{res}{H3 resolution (default = 6).}
+\item{res}{Integer. H3 resolution (default = 6).}
 
-\item{num_rasters}{A SpatRaster or list of SpatRasters with numeric variables (optional).}
+\item{num_rasters}{A \code{SpatRaster} or list of \code{SpatRaster}s with numeric variables to extract (optional).}
 
-\item{cat_rasters}{A named list of SpatRasters with categorical variables (optional).}
+\item{cat_rasters}{A named list of \code{SpatRaster}s with categorical variables to extract (optional).}
 
-\item{landscape_raster}{A SpatRaster with landscape categories (optional, for metrics).}
+\item{landscape_raster}{A \code{SpatRaster} for calculating landscape metrics (optional).}
 
-\item{expand_factor}{Factor to expand the AOI when creating grid (default = 0.1).}
+\item{expand_factor}{Numeric. Factor to expand the AOI when creating the H3 grid (default = 0.1).}
 }
 \value{
-An sf object (hexagonal grid) with predictor columns added.
+An \code{sf} object (MULTIPOLYGON) representing the H3 grid, with predictor columns added.
 }
 \description{
-Generates an H3 hexagonal grid over an AOI and extracts numeric, categorical,
-and landscape predictors for each hexagon using functions from the 'paisaje' package.
+Generates an H3 hexagonal grid over a specified area of interest (AOI) and extracts
+numeric, categorical, and landscape predictors for each hexagon. Uses functions
+from the 'paisaje' package to calculate landscape metrics when \code{landscape_raster} is provided.
 }
 \examples{
 \dontrun{
@@ -41,11 +42,12 @@ bio <- rast("cr_bio/bio.tif")
 lc  <- rast("landcover.tif")
 cr  <- cr_outline_c
 
-pred_sf <- H3SDM_predictors(
+pred_sf <- h3sdm_predictors(
   aoi_sf = cr,
   res = 6,
   num_rasters = bio,
   cat_rasters = list(landcover = lc)
 )
 }
+
 }
