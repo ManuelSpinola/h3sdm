@@ -7,32 +7,31 @@ style="float:left; margin-right:20px;" width="145" />
 # h3sdm
 
 **h3sdm**: Machine learning–based spatial species distribution modeling
-and habitat/landscape analysis using H3 spatial grids.
+and habitat/landscape analysis using H3 spatial index grids.
 
 ## Overview
 
 **h3sdm** is an R package for **species distribution modeling (SDM)**
-and **habitat analysis** using hexagonal grids based on
+and **habitat analysis** using hexagonal spatial index grids based on
 [H3](https://h3geo.org/).
 
 It provides a consistent spatial framework to combine species occurrence
 data with environmental predictors and landscape metrics, enabling both
-ecological modeling and habitat characterization.
+ecological modeling and habitat characterization. The modeling framework
+is built on **tidymodels**, offering flexibility to use different
+approaches (e.g., logistic regression, GAMs, Random Forest, XGBoost).
 
 Key features include:
 
-- Conversion of point occurrence data into H3-based spatial grids.  
-
+- Conversion of point occurrence data into **H3-based spatial grids**
 - Extraction of environmental and landscape predictors at different
-  resolutions.
+  resolutions
+- Support for multiple modeling approaches through **tidymodels**
+- Tools for visualizing model predictions and habitat structure
 
-- Support for multiple modeling approaches (e.g., logistic regression,
-  GAMs, Random Forest, XGBoost).
-
-- Tools for visualizing model predictions and habitat structure.
-
-By leveraging H3 grids, **h3sdm** makes it easy to bridge **species
-distribution modeling** and **landscape ecology** in a scalable way.
+By leveraging **H3 grids** and the **tidymodels** ecosystem, **h3sdm**
+makes it easy to bridge **species distribution modeling** and
+**landscape ecology** in a scalable way.
 
 ------------------------------------------------------------------------
 
