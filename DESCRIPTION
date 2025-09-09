@@ -26,7 +26,10 @@ Imports:
     terra,
     spatialsample,
     tidymodels,
-    ecospat
+    ecospat,
+    paisaje
+Remotes:
+    ManuelSpinola/paisaje
 Suggests: 
     knitr,
     rmarkdown

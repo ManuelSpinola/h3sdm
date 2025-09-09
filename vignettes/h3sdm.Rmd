@@ -2,7 +2,7 @@
 title: "h3sdm workflow for species distribution modeling using a single model"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{workflow}
+  %\VignetteIndexEntry{h3sdm}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -32,7 +32,9 @@ remotes::install_github("ManuelSpinola/paisaje")
 #| warning: false
 # Load the required packages
 library(h3sdm)
-library(paisaje)
+if (requireNamespace("paisaje", quietly = TRUE)) {
+  library(paisaje)
+}
 library(crgeo)
 library(tidyverse)
 library(here)
