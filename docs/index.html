@@ -33,11 +33,12 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/h3sdm.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/workflow.html">h3sdm workflow</a></li>
+<li><a class="dropdown-item" href="articles/multi_model_workflow.html">multi_model_workflow</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -58,20 +59,22 @@
 <div class="section level1">
 <div class="page-header"><h1 id="h3sdm">h3sdm<a class="anchor" aria-label="anchor" href="#h3sdm"></a>
 </h1></div>
-<p><strong>h3sdm</strong>: Machine learning–based spatial species distribution modeling and habitat/landscape analysis using H3 spatial grids.</p>
+<p><strong>h3sdm</strong>: Machine learning–based spatial species distribution modeling and habitat/landscape analysis using H3 spatial index grids.</p>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><strong>h3sdm</strong> is an R package for <strong>species distribution modeling (SDM)</strong> and <strong>habitat analysis</strong> using hexagonal grids based on <a href="https://h3geo.org/" class="external-link">H3</a>.</p>
-<p>It provides a consistent spatial framework to combine species occurrence data with environmental predictors and landscape metrics, enabling both ecological modeling and habitat characterization.</p>
+<p><strong>h3sdm</strong> is an R package for <strong>species distribution modeling (SDM)</strong> and <strong>habitat analysis</strong> using hexagonal spatial index grids based on <a href="https://h3geo.org/" class="external-link">H3</a>.</p>
+<p>It provides a consistent spatial framework to combine species occurrence data with environmental predictors and landscape metrics, enabling both ecological modeling and habitat characterization. The modeling framework is built on <strong>tidymodels</strong>, offering flexibility to use different approaches (e.g., logistic regression, GAMs, Random Forest, XGBoost).</p>
 <p>Key features include:</p>
 <ul>
-<li><p>Conversion of point occurrence data into H3-based spatial grids.</p></li>
-<li><p>Extraction of environmental and landscape predictors at different resolutions.</p></li>
-<li><p>Support for multiple modeling approaches (e.g., logistic regression, GAMs, Random Forest, XGBoost).</p></li>
-<li><p>Tools for visualizing model predictions and habitat structure.</p></li>
+<li>Conversion of point occurrence data into <strong>H3-based spatial grids</strong>
+</li>
+<li>Extraction of environmental and landscape predictors at different resolutions</li>
+<li>Support for multiple modeling approaches through <strong>tidymodels</strong>
+</li>
+<li>Tools for visualizing model predictions and habitat structure</li>
 </ul>
-<p>By leveraging H3 grids, <strong>h3sdm</strong> makes it easy to bridge <strong>species distribution modeling</strong> and <strong>landscape ecology</strong> in a scalable way.</p>
+<p>By leveraging <strong>H3 grids</strong> and the <strong>tidymodels</strong> ecosystem, <strong>h3sdm</strong> makes it easy to bridge <strong>species distribution modeling</strong> and <strong>landscape ecology</strong> in a scalable way.</p>
 <hr>
 </div>
 <div class="section level2">

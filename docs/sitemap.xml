@@ -2,7 +2,9 @@
 <url><loc>https://manuelspinola.github.io/h3sdm/404.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/LICENSE-text.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/LICENSE.html</loc></url>
+<url><loc>https://manuelspinola.github.io/h3sdm/articles/h3sdm.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/articles/index.html</loc></url>
+<url><loc>https://manuelspinola.github.io/h3sdm/articles/multi_model_workflow.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/articles/workflow.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/authors.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/index.html</loc></url>
@@ -11,6 +13,7 @@
 <url><loc>https://manuelspinola.github.io/h3sdm/reference/h3sdm_compare_models.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/reference/h3sdm_data.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/reference/h3sdm_eval_metrics.html</loc></url>
+<url><loc>https://manuelspinola.github.io/h3sdm/reference/h3sdm_explain.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_models.html</loc></url>
 <url><loc>https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.html</loc></url>

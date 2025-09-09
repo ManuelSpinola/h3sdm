@@ -1,5 +1,5 @@
 ---
-title: "h3sdm workflow for a species distribution modeling for a species using a single model"
+title: "h3sdm workflow for species distribution modeling using a single model"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{workflow}
