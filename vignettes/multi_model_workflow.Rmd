@@ -2,7 +2,7 @@
 title: "Multi model workflow"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{multi_model_workflow}
+  %\VignetteIndexEntry{Multi model workflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

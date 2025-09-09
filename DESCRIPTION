@@ -27,11 +27,18 @@ Imports:
     spatialsample,
     tidymodels,
     ecospat,
+    exactextractr,
+    workflowsets,
+    DALEX,
+    DALEXtra,
+    ingredients,
     paisaje
 Remotes:
     ManuelSpinola/paisaje
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    here,
+    themis
 VignetteBuilder: knitr
 LazyData: true
