@@ -32,10 +32,7 @@ remotes::install_github("ManuelSpinola/paisaje")
 #| warning: false
 # Load the required packages
 library(h3sdm)
-if (requireNamespace("paisaje", quietly = TRUE)) {
-  library(paisaje)
-}
-library(crgeo)
+library(paisaje)
 library(tidyverse)
 library(here)
 library(tidymodels)
