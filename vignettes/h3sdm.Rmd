@@ -337,5 +337,5 @@ This tutorial demonstrated a complete SDM workflow for a single species:
 
 -	Assessing variable importance
 
-This workflow can be adapted for multiple or more complex models.
+This workflow demonstrates modeling for a single species using one model. It can be easily adapted to handle multiple species or more complex modeling scenarios, as illustrated in the Articles section.
 

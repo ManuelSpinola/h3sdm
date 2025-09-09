@@ -1,5 +1,5 @@
 ---
-title: "multi_model_workflow"
+title: "Multi model workflow"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{multi_model_workflow}
