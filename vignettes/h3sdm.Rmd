@@ -69,7 +69,9 @@ bio <- terra::rast(system.file("extdata", "bio_cr.tif", package = "h3sdm"))
 
 ## 3. Load Species Occurrence Data
 
-Here we obtain presence-absence data for the species of interest (Silverstoneia flotator). We are using the `h3sdm_pa` function to get both presence and pseudo-absence records. The limit is set to 10,000 records and 300 pseudo-absences are generated.  There are various methods for generating pseudo-absences; here we use random sampling. The limit of 10,000 is only to ensure that all presence records are retrieved. Since there are approximately 100 positive hexagons at resolution 7, we request three times that number (i.e., 300) of pseudo-absences.
+Here we obtain presence–absence data for the species of interest (Silverstoneia flotator). We use the h3sdm_pa function to generate both presence and pseudo-absence records. A limit of 10,000 records is set to ensure that all presence records are retrieved, and 300 pseudo-absences are generated.
+
+There are different methods for generating pseudo-absences; here, we rely on random sampling. Since there are approximately 100 positive hexagons at resolution 7, we request three times that number (i.e., 300) of pseudo-absences. At this resolution, H3 hexagons are about 5.16 ha in size. These parameters can be adjusted depending on your specific needs and the characteristics of the species being modeled.
 
 
 ```{r}
