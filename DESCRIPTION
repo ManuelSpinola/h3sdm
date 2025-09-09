@@ -34,7 +34,8 @@ Imports:
     ingredients,
     paisaje
 Remotes:
-    ManuelSpinola/paisaje
+    ManuelSpinola/paisaje,
+    Nowosad/spDataLarge
 Suggests: 
     knitr,
     rmarkdown,
