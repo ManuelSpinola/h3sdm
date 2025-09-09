@@ -18,10 +18,13 @@
 #' \dontrun{
 #' library(terra)
 #' library(sf)
-#' bio <- rast("cr_bio/bio.tif")
-#' lc  <- rast("landcover.tif")
-#' cr  <- cr_outline_c
 #'
+#' # Cargar rasters de ejemplo
+#' bio <- rast("cr_bio/bio.tif")           # raster numérico
+#' lc  <- rast("landcover.tif")            # raster categórico
+#' cr  <- cr_outline_c                      # área de interés (sf POLYGON/MULTIPOLYGON)
+#'
+#' # Extraer predictores
 #' pred_sf <- h3sdm_predictors(
 #'   aoi_sf = cr,
 #'   res = 6,
@@ -35,11 +38,11 @@
 #' @export
 
 h3sdm_predictors <- function(aoi_sf,
-                       res = 6,
-                       num_rasters = NULL,
-                       cat_rasters = NULL,
-                       landscape_raster = NULL,
-                       expand_factor = 0.1) {
+                             res = 6,
+                             num_rasters = NULL,
+                             cat_rasters = NULL,
+                             landscape_raster = NULL,
+                             expand_factor = 0.1) {
 
   # 1️⃣ Crear grilla H3
   grid_sf <- get_h3_grid(aoi_sf, resolution = res, expand_factor = expand_factor)
@@ -48,12 +51,10 @@ h3sdm_predictors <- function(aoi_sf,
   # Convertir la grilla inicial a SpatVector de terra
   grid_sv <- terra::vect(grid_sf)
 
-  # Función para procesar y unir los datos
+  # Función interna para procesar y unir los datos
   join_and_clean <- function(extracted_sf, current_sv) {
-    # Convertir a SpatVector y limpiar las columnas duplicadas
     extracted_sv <- terra::vect(extracted_sf)
     extracted_sv <- extracted_sv[, c("plot_id", names(extracted_sv)[!names(extracted_sv) %in% c("h3_address", "plot_id")])]
-    # Unir los SpatVectors
     merged_sv <- terra::merge(current_sv, extracted_sv, by = "plot_id")
     return(merged_sv)
   }
@@ -92,8 +93,8 @@ h3sdm_predictors <- function(aoi_sf,
 
   # 5️⃣ Convertir el SpatVector final a sf y forzar MULTIPOLYGON
   grid_sf_final <- sf::st_as_sf(grid_sv)
-  grid_sf_final <- sf::st_make_valid(grid_sf_final)       # asegurar geometrías válidas
-  grid_sf_final <- sf::st_cast(grid_sf_final, "MULTIPOLYGON")  # forzar tipo
+  grid_sf_final <- sf::st_make_valid(grid_sf_final)
+  grid_sf_final <- sf::st_cast(grid_sf_final, "MULTIPOLYGON")
 
   # 6️⃣ Borrar columna plot_id
   grid_sf_final$plot_id <- NULL

@@ -38,10 +38,13 @@ from the 'paisaje' package to calculate landscape metrics when \code{landscape_r
 \dontrun{
 library(terra)
 library(sf)
-bio <- rast("cr_bio/bio.tif")
-lc  <- rast("landcover.tif")
-cr  <- cr_outline_c
 
+# Cargar rasters de ejemplo
+bio <- rast("cr_bio/bio.tif")           # raster numérico
+lc  <- rast("landcover.tif")            # raster categórico
+cr  <- cr_outline_c                      # área de interés (sf POLYGON/MULTIPOLYGON)
+
+# Extraer predictores
 pred_sf <- h3sdm_predictors(
   aoi_sf = cr,
   res = 6,
