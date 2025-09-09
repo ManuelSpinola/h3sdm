@@ -1,41 +1,25 @@
 #' @name h3sdm_pa
-#' @title Generate presence-absence datasets using H3 hexagons
+#' @title Sample Presence-Absence Data for a Species in Hexagonal Grid
 #' @description
-#' Generates a spatial presence-absence dataset for a given species using H3 hexagons.
-#' Records are obtained from one or more data providers, aggregated into hexagons, and pseudo-absence hexagons are sampled.
+#' Generates presence-absence points for a species over a specified AOI using H3 hexagons.
+#' Retrieves occurrence records, aggregates them by hexagon, and samples pseudo-absences.
 #'
-#' @param species Character. Species name (e.g., "Panthera onca").
-#' @param aoi_sf An `sf` polygon defining the area of interest.
-#' @param res Integer. H3 resolution for the hexagonal grid (default 6).
-#' @param n_neg Integer. Number of pseudo-absence hexagons to sample (default 500).
-#' @param providers Optional. Data providers for `get_records_by_hexagon()`.
-#' @param remove_duplicates Logical. Whether to remove duplicate occurrence records (default FALSE).
-#' @param date Optional. Date filter for species records (default NULL).
-#' @param expand_factor Numeric. Buffer factor to expand the grid beyond the AOI (default 0.1).
-#'
-#' @return An `sf` object with:
-#' \describe{
-#'   \item{h3_address}{H3 hexagon index.}
-#'   \item{presence}{Factor with levels "0" (absence) and "1" (presence).}
-#'   \item{geometry}{Hexagon geometry.}
-#' }
-#'
+#' @param species Character. Species name.
+#' @param aoi_sf `sf` polygon of the area of interest (AOI).
+#' @param res Integer. H3 resolution (1–16). Default 6.
+#' @param n_neg Integer. Number of pseudo-absence hexagons to sample. Default 500.
+#' @param providers Character vector of data sources (e.g., "gbif").
+#' @param remove_duplicates Logical. Remove duplicate geometries. Default FALSE.
+#' @param date Character vector c("start","end") to filter by date.
+#' @param limit Integer. Maximum number of occurrence records to download. Default 500.
+#' @param expand_factor Numeric. Expand AOI bbox for full hex coverage. Default 0.1.
+#' @return `sf` object with columns `h3_address`, `presence` (factor 0/1), and `geometry`.
+#' @export
 #' @examples
 #' \dontrun{
-#' library(sf)
-#' my_aoi <- st_read("my_aoi.shp")
-#' pa_data <- h3sdm_pa(
-#'   species = "Panthera onca",
-#'   aoi_sf  = my_aoi,
-#'   res     = 6,
-#'   n_neg   = 500
-#' )
+#' cr <- sf::st_read(system.file("shape/nc.shp", package="sf"))
+#' rec_sf <- h3sdm_pa("Lynx rufus", cr, res = 6, n_neg = 300, limit = 1000)
 #' }
-#'
-#' @importFrom dplyr mutate filter slice_sample bind_rows
-#' @importFrom sf st_as_sf
-#' @export
-
 h3sdm_pa <- function(species,
                      aoi_sf,
                      res = 6,
@@ -43,15 +27,20 @@ h3sdm_pa <- function(species,
                      providers = NULL,
                      remove_duplicates = FALSE,
                      date = NULL,
+                     limit = 500,
                      expand_factor = 0.1) {
 
   # hex grid + records
-  rec <- get_records_by_hexagon(species_names = species,
-                                aoi_sf = aoi_sf,
-                                res = res,
-                                providers = providers,
-                                remove_duplicates = remove_duplicates,
-                                expand_factor = expand_factor)
+  rec <- get_records_by_hexagon(
+    species_names = species,
+    aoi_sf = aoi_sf,
+    res = res,
+    providers = providers,
+    remove_duplicates = remove_duplicates,
+    date = date,
+    limit = limit,
+    expand_factor = expand_factor
+  )
 
   # presence variable
   col_name <- gsub(" ", "_", species)
@@ -61,7 +50,6 @@ h3sdm_pa <- function(species,
 
   # Pseudo-absences
   n_total_neg <- nrow(dplyr::filter(rec, presence == 0))
-
   neg_hex <- rec %>%
     dplyr::filter(presence == 0) %>%
     dplyr::slice_sample(n = min(n_neg, n_total_neg)) %>%
@@ -71,7 +59,7 @@ h3sdm_pa <- function(species,
 
   dataset_sf <- dplyr::bind_rows(pos_hex, neg_hex)
 
-  # The key change: convert the 'presence' variable to a factor
+  # Convert presence to factor
   dataset_sf$presence <- factor(dataset_sf$presence, levels = c("0", "1"))
 
   return(dataset_sf)

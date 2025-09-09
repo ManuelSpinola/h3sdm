@@ -24,14 +24,14 @@
 #' spatial_cv_cluster <- h3sdm_spatial_cv(combined_data, method = "cluster", v = 10)
 #' }
 #'
-#' @importFrom spatialsample spatial_block_cv spatial_cluster_cv
+#' @importFrom spatialsample spatial_block_cv spatial_clustering_cv
 #' @export
 
 h3sdm_spatial_cv <- function(data, method = "block", v = 5, ...) {
   if (method == "block") {
     split <- spatialsample::spatial_block_cv(data, v = v, ...)
   } else if (method == "cluster") {
-    split <- spatialsample::spatial_cluster_cv(data, v = v, ...)
+    split <- spatialsample::spatial_clustering_cv(data, v = v, ...)
   } else {
     stop("Invalid method. Choose 'block' or 'cluster'.")
   }

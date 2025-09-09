@@ -2,7 +2,7 @@
 % Please edit documentation in R/h3sdm_pa.R
 \name{h3sdm_pa}
 \alias{h3sdm_pa}
-\title{Generate presence-absence datasets using H3 hexagons}
+\title{Sample Presence-Absence Data for a Species in Hexagonal Grid}
 \usage{
 h3sdm_pa(
   species,
@@ -12,48 +12,39 @@ h3sdm_pa(
   providers = NULL,
   remove_duplicates = FALSE,
   date = NULL,
+  limit = 500,
   expand_factor = 0.1
 )
 }
 \arguments{
-\item{species}{Character. Species name (e.g., "Panthera onca").}
+\item{species}{Character. Species name.}
 
-\item{aoi_sf}{An \code{sf} polygon defining the area of interest.}
+\item{aoi_sf}{\code{sf} polygon of the area of interest (AOI).}
 
-\item{res}{Integer. H3 resolution for the hexagonal grid (default 6).}
+\item{res}{Integer. H3 resolution (1–16). Default 6.}
 
-\item{n_neg}{Integer. Number of pseudo-absence hexagons to sample (default 500).}
+\item{n_neg}{Integer. Number of pseudo-absence hexagons to sample. Default 500.}
 
-\item{providers}{Optional. Data providers for \code{get_records_by_hexagon()}.}
+\item{providers}{Character vector of data sources (e.g., "gbif").}
 
-\item{remove_duplicates}{Logical. Whether to remove duplicate occurrence records (default FALSE).}
+\item{remove_duplicates}{Logical. Remove duplicate geometries. Default FALSE.}
 
-\item{date}{Optional. Date filter for species records (default NULL).}
+\item{date}{Character vector c("start","end") to filter by date.}
 
-\item{expand_factor}{Numeric. Buffer factor to expand the grid beyond the AOI (default 0.1).}
+\item{limit}{Integer. Maximum number of occurrence records to download. Default 500.}
+
+\item{expand_factor}{Numeric. Expand AOI bbox for full hex coverage. Default 0.1.}
 }
 \value{
-An \code{sf} object with:
-\describe{
-\item{h3_address}{H3 hexagon index.}
-\item{presence}{Factor with levels "0" (absence) and "1" (presence).}
-\item{geometry}{Hexagon geometry.}
-}
+\code{sf} object with columns \code{h3_address}, \code{presence} (factor 0/1), and \code{geometry}.
 }
 \description{
-Generates a spatial presence-absence dataset for a given species using H3 hexagons.
-Records are obtained from one or more data providers, aggregated into hexagons, and pseudo-absence hexagons are sampled.
+Generates presence-absence points for a species over a specified AOI using H3 hexagons.
+Retrieves occurrence records, aggregates them by hexagon, and samples pseudo-absences.
 }
 \examples{
 \dontrun{
-library(sf)
-my_aoi <- st_read("my_aoi.shp")
-pa_data <- h3sdm_pa(
-  species = "Panthera onca",
-  aoi_sf  = my_aoi,
-  res     = 6,
-  n_neg   = 500
-)
+cr <- sf::st_read(system.file("shape/nc.shp", package="sf"))
+rec_sf <- h3sdm_pa("Lynx rufus", cr, res = 6, n_neg = 300, limit = 1000)
 }
-
 }

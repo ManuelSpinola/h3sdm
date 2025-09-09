@@ -20,14 +20,14 @@ h3sdm_data <- function(pa_sf, predictors_sf) {
   if (!inherits(pa_sf, "sf") || !"h3_address" %in% names(pa_sf)) {
     stop("pa_sf must be a valid sf object with an 'h3_address' column.")
   }
-  if (!inherits(pred_sf, "sf") || !"h3_address" %in% names(pred_sf)) {
+  if (!inherits(predictors_sf, "sf") || !"h3_address" %in% names(predictors_sf)) {
     stop("pred_sf must be a valid sf object with an 'h3_address' column.")
   }
 
   # Unir los dataframes por la columna 'h3_address'.
   combined_sf <- pa_sf %>%
     dplyr::left_join(
-      sf::st_drop_geometry(pred_sf),
+      sf::st_drop_geometry(predictors_sf),
       by = "h3_address"
     )
 
