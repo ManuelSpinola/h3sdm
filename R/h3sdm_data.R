@@ -3,7 +3,7 @@
 #' @description Combines species presence-absence data with environmental predictors.
 #'   It also calculates the centroid coordinates (x and y) for each hexagon.
 #' @param pa_sf An sf object from the h3sdm_pa function containing species presence-absence data.
-#' @param pred_sf An sf object from the h3sdm_pred function with environmental predictors.
+#' @param predictors_sf An sf object from the h3sdm_pred function with environmental predictors.
 #' @return An sf object containing species, environmental, and spatial data.
 #' @importFrom dplyr left_join
 #' @importFrom sf st_drop_geometry st_centroid st_coordinates

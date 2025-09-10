@@ -4,3 +4,14 @@
 ^README\.Rmd$
 ^doc$
 ^Meta$
+^\.github$
+^\.git$
+^\.github$
+^\.Rhistory$
+^\.RData$
+^\.Ruserdata$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^data-raw$
+^inst/doc$

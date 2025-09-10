@@ -7,21 +7,13 @@
 h3sdm_compare_models(h3sdm_results)
 }
 \arguments{
-\item{h3sdm_results}{A workflow set or list of fitted models returned by \code{h3sdm_fit_models} or \code{workflow_map}.}
-
-\item{presence_data}{An \code{sf} object or tibble containing the presence points for computing the Boyce index.}
-
-\item{id_col}{Character. Name of the column identifying spatial units (default \code{"h3_address"}).}
-
-\item{pred_col}{Character. Name of the predicted probability column (default \code{".pred_presence"}).}
-
-\item{truth_col}{Character. Name of the column with true presence/absence values (default \code{"presence"}).}
+\item{h3sdm_results}{A list or workflow set containing fitted models with a \code{metrics} tibble.}
 }
 \value{
 A tibble with one row per model per metric, containing:
 \describe{
 \item{model}{Model name}
-\item{.metric}{Metric name (ROC AUC, accuracy, TSS, Boyce, etc.)}
+\item{.metric}{Metric name (ROC AUC, TSS, Boyce, etc.)}
 \item{.estimator}{Metric type (usually "binary")}
 \item{mean}{Metric value}
 }
@@ -29,15 +21,19 @@ A tibble with one row per model per metric, containing:
 \description{
 Computes and combines performance metrics for multiple species distribution models
 created with \code{h3sdm_fit} or similar workflows. Metrics include standard yardstick
-metrics (ROC AUC, accuracy, etc.), TSS (True Skill Statistic), and Boyce index.
-Returns a tibble summarizing model performance across all metrics.
+metrics (ROC AUC, TSS, Boyce index, etc.). Returns a tibble summarizing model performance.
 }
 \examples{
-\dontrun{
-metrics_table <- h3sdm_compare_models(
-  h3sdm_results = h3sdm_models_fitted,
-  presence_data = presence_sf
+\donttest{
+# Minimal reproducible example
+example_metrics <- tibble::tibble(
+  model = c("model1", "model2"),
+  .metric = c("roc_auc", "tss_max"),
+  .estimator = c("binary", "binary"),
+  mean = c(0.85, 0.7)
 )
+example_results <- list(metrics = example_metrics)
+h3sdm_compare_models(example_results)
 }
 
 }

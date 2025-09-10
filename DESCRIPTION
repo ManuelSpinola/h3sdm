@@ -18,20 +18,24 @@ Depends: R (>= 4.1)
 Config/Needs/website: tidyverse/tidytemplate
 Imports:
     sf,
+    paisaje,
     spocc,
-    h3jsr,
     dplyr,
     tidyr,
-    landscapemetrics,
+    purrr,
+    tibble,
+    rlang,
     terra,
     spatialsample,
     tidymodels,
+    recipes,
+    rsample,
+    tune,
+    workflows,
+    yardstick,
     ecospat,
-    exactextractr,
     workflowsets,
     DALEX,
-    DALEXtra,
-    ingredients,
     paisaje
 Remotes:
     ManuelSpinola/paisaje,
@@ -40,6 +44,14 @@ Suggests:
     knitr,
     rmarkdown,
     here,
-    themis
+    themis,
+    parsnip,
+    DALEXtra,
+    ingredients,
+    exactextractr,
+    landscapemetrics,
+    h3jsr,
+    tidyterra,
+    tidyverse
 VignetteBuilder: knitr
 LazyData: true

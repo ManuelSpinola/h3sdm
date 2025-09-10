@@ -35,7 +35,9 @@
 #'
 #' @importFrom sf st_as_sf st_make_valid st_cast
 #' @importFrom terra vect merge
+#' @importFrom paisaje get_h3_grid extract_num_raster extract_cat_raster calculate_it_metrics
 #' @export
+
 
 h3sdm_predictors <- function(aoi_sf,
                              res = 6,
@@ -46,15 +48,29 @@ h3sdm_predictors <- function(aoi_sf,
 
   # 1️⃣ Crear grilla H3
   grid_sf <- get_h3_grid(aoi_sf, resolution = res, expand_factor = expand_factor)
-  grid_sf$plot_id <- seq_len(nrow(grid_sf))
 
-  # Convertir la grilla inicial a SpatVector de terra
+  # Asegurar que plot_id exista
+  if(!"plot_id" %in% names(grid_sf)) {
+    grid_sf$plot_id <- seq_len(nrow(grid_sf))
+  }
+
+  # Convertir a SpatVector de terra
   grid_sv <- terra::vect(grid_sf)
 
-  # Función interna para procesar y unir los datos
+  # Función interna para procesar y unir datos
   join_and_clean <- function(extracted_sf, current_sv) {
     extracted_sv <- terra::vect(extracted_sf)
-    extracted_sv <- extracted_sv[, c("plot_id", names(extracted_sv)[!names(extracted_sv) %in% c("h3_address", "plot_id")])]
+
+    # Asegurar que plot_id esté presente en el SpatVector extraído
+    if(!"plot_id" %in% names(extracted_sv)) {
+      extracted_sv$plot_id <- seq_len(nrow(extracted_sv))
+    }
+
+    # Seleccionar columnas para merge
+    col_to_keep <- c("plot_id", setdiff(names(extracted_sv), c("h3_address", "plot_id")))
+    extracted_sv <- extracted_sv[, col_to_keep]
+
+    # Merge con SpatVector actual
     merged_sv <- terra::merge(current_sv, extracted_sv, by = "plot_id")
     return(merged_sv)
   }
@@ -68,6 +84,12 @@ h3sdm_predictors <- function(aoi_sf,
     for (i in seq_along(num_rasters)) {
       r <- num_rasters[[i]]
       extracted_sf <- extract_num_raster(r, grid_sf)
+
+      # Asegurar plot_id en extracted_sf
+      if(!"plot_id" %in% names(extracted_sf)) {
+        extracted_sf$plot_id <- grid_sf$plot_id
+      }
+
       grid_sv <- join_and_clean(extracted_sf, grid_sv)
     }
   }
@@ -81,6 +103,11 @@ h3sdm_predictors <- function(aoi_sf,
     for (name in names(cat_rasters)) {
       r <- cat_rasters[[name]]
       extracted_sf <- extract_cat_raster(r, grid_sf)
+
+      if(!"plot_id" %in% names(extracted_sf)) {
+        extracted_sf$plot_id <- grid_sf$plot_id
+      }
+
       grid_sv <- join_and_clean(extracted_sf, grid_sv)
     }
   }
@@ -88,6 +115,11 @@ h3sdm_predictors <- function(aoi_sf,
   # 4️⃣ Extraer métricas de paisaje (IT metrics)
   if (!is.null(landscape_raster)) {
     extracted_sf <- calculate_it_metrics(landscape_raster, grid_sf)
+
+    if(!"plot_id" %in% names(extracted_sf)) {
+      extracted_sf$plot_id <- grid_sf$plot_id
+    }
+
     grid_sv <- join_and_clean(extracted_sf, grid_sv)
   }
 

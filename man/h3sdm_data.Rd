@@ -9,7 +9,7 @@ h3sdm_data(pa_sf, predictors_sf)
 \arguments{
 \item{pa_sf}{An sf object from the h3sdm_pa function containing species presence-absence data.}
 
-\item{pred_sf}{An sf object from the h3sdm_pred function with environmental predictors.}
+\item{predictors_sf}{An sf object from the h3sdm_pred function with environmental predictors.}
 }
 \value{
 An sf object containing species, environmental, and spatial data.

@@ -32,7 +32,7 @@ h3sdm_pa <- function(species,
 
   # hex grid + records
   rec <- get_records_by_hexagon(
-    species_names = species,
+    species = species,
     aoi_sf = aoi_sf,
     res = res,
     providers = providers,

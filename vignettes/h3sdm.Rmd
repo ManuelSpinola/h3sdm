@@ -1,8 +1,8 @@
 ---
-title: "h3sdm"
+title: "h3sdm workflow for a single model"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{h3sdm}
+  %\VignetteIndexEntry{h3sdm workflow for a single model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

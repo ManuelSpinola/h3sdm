@@ -27,13 +27,25 @@
 #' \donttest{
 #' library(h3sdm)
 #' library(DALEX)
+#' library(parsnip)
 #'
-#' # Assume dat is your prepared h3sdm dataset
-#' # and f$final_model is a fitted workflow
-#' expl <- h3sdm_explain(f$final_model, data = dat)
-#' feature_importance(ex)
+#' # Dataset de ejemplo con factor
+#' dat <- data.frame(
+#'   x1 = rnorm(20),
+#'   x2 = rnorm(20),
+#'   presence = factor(sample(0:1, 20, replace = TRUE))
+#' )
+#'
+#' # Modelo simple
+#' f <- list(
+#'   final_model = logistic_reg() |>
+#'     fit(presence ~ x1 + x2, data = dat)
+#' )
+#'
+#' # Explainer
+#' expl <- h3sdm_explain(f$final_model, data = dat, response = "presence")
+#' feature_importance(expl)
 #' }
-#'
 #' @export
 h3sdm_explain <- function(model, data, response = "presence", label = "h3sdm workflow") {
 
