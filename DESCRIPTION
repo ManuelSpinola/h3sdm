@@ -19,31 +19,27 @@ Config/Needs/website: tidyverse/tidytemplate
 Imports:
     sf,
     paisaje,
-    spocc,
     dplyr,
-    tidyr,
     purrr,
     tibble,
     rlang,
     terra,
     spatialsample,
-    tidymodels,
     recipes,
     rsample,
     tune,
     workflows,
     yardstick,
     ecospat,
-    workflowsets,
     DALEX,
     paisaje
 Remotes:
     ManuelSpinola/paisaje,
-    Nowosad/spDataLarge
 Suggests: 
     knitr,
     rmarkdown,
     here,
+    tidyr,
     themis,
     parsnip,
     DALEXtra,
@@ -52,6 +48,8 @@ Suggests:
     landscapemetrics,
     h3jsr,
     tidyterra,
+    spocc,
+    tidymodels,
+    workflowsets,
     tidyverse
-VignetteBuilder: knitr
 LazyData: true

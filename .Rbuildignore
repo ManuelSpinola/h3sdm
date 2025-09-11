@@ -15,3 +15,4 @@
 ^pkgdown$
 ^data-raw$
 ^inst/doc$
+^vignettes/

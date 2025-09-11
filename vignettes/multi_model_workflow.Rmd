@@ -1,21 +1,345 @@
 ---
-title: "Multi model workflow"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Multi model workflow}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+title: "h3sdm workflow for multiple models"
+author: "Manuel Spínola"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_document
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
-```{r setup}
+
+
+```{r}
+#| message: false
+#| warning: false
+# Load the required packages
 library(h3sdm)
+library(paisaje)
+library(tidyverse)
+library(here)
+library(tidymodels)
+library(spatialsample)
+library(sf)
+library(terra)
+library(tidyterra)
+library(DALEX)
+library(DALEXtra)
+library(ingredients)
+library(exactextractr)
+library(workflowsets)
+library(themis)
 ```
 
-# In development
+
+## 1. Define the Area of Interest
+
+We start by defining the geographical area for modeling. Here we use Costa Rica as an example. The file is includesd in the 'h3sdm' package.
+
+```{r}
+cr <- cr_outline_c
+```
+
+
+## 2. Load Environmental Predictors
+
+We use WorldClim historic bioclimatic variables as environmental predictors. The data is included in the 'h3sdm' package.
+
+```{r}
+bio <- terra::rast(system.file("extdata", "bio_cr.tif", package = "h3sdm"))
+```
+
+## 3. Load Species Occurrence Data
+
+Here we obtain presence–absence data for the species of interest (Silverstoneia flotator). We use the h3sdm_pa function to generate both presence and pseudo-absence records. A limit of 10,000 records is set to ensure that all presence records are retrieved, and 300 pseudo-absences are generated.
+
+There are different methods for generating pseudo-absences; here, we rely on random sampling. Since there are approximately 100 positive hexagons at resolution 7, we request three times that number (i.e., 300) of pseudo-absences. At this resolution, H3 hexagons are about 5.16 ha in size. These parameters can be adjusted depending on your specific needs and the characteristics of the species being modeled.
+
+
+```{r}
+records <- h3sdm_pa("Silverstoneia flotator", cr, res = 7, limit = 10000, n_neg = 300)
+```
+
+```{r}
+head(records)
+```
+
+```{r}
+table(records$presence)
+```
+
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = records, aes(fill = presence))
+```
+
+## 4. Prepare Predictors
+
+Prepare environmental predictors by extracting values for each hexagon in the study area. 
+
+```{r}
+predictors <- h3sdm_predictors(cr, 
+                    res = 7, 
+                    num_rasters = bio)
+```
+
+Because the name of the bioclimatic variables are long, we rename them to a shorter format (e.g., Bio1, Bio2, ..., Bio19).
+
+```{r}
+predictors <- predictors |>
+  rename_with(
+    .cols = contains("bio_"),
+    .fn = ~ paste0("Bio", str_extract(., "\\d+$"))
+  )
+```
+
+In this case we select Bio1 (Annual Mean Temperature), Bio12 (Annual Precipitation), and Bio15 (Precipitation Seasonality).
+
+```{r}
+predictors <- predictors |>
+  dplyr::select(h3_address, Bio1, Bio12, Bio15, geometry)
+```
+
+We can visualize one of the predictors, for example Bio1.
+
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = predictors, aes(fill = Bio1)) +
+  scale_fill_viridis_c(option = "B")
+```
+
+
+## 5. Combine Records and Predictors
+
+Merge species occurrence records with environmental predictors.
+
+```{r}
+dat <- h3sdm_data(records, predictors)
+```
+
+
+## 6. Spatial Cross-Validation
+
+Define spatial blocks for cross-validation to account for spatial autocorrelation.
+
+```{r}
+scv <- h3sdm_spatial_cv(dat, v = 5, repeats = 1)
+```
+
+Plot the spatial blocks.
+
+```{r}
+autoplot(scv)
+```
+
+
+## 7. Define Recipe and Models (multiple models)
+
+Create a modeling recipe and specify the classification model. We start with presence–absence data aggregated in hexagonal cells. From the initial data, we obtained roughly 100 hexagons with presence (presence = 1). For pseudo-absences, we sampled about three times more absence hexagons (presence = 0) to ensure sufficient coverage.
+
+This results in an imbalanced dataset, which can bias the model toward predicting absences. To correct for this, we use step_downsample(presence) from the themis package.
+
+```{r}
+receta <- h3sdm_recipe(dat) |>
+  themis::step_downsample(presence) |>
+  step_dummy(all_nominal_predictors())
+```
+
+Key points:
+
+-	Only the majority class (pseudo-absence hexagons) is reduced.
+
+-	The minority class (presence hexagons) remains unchanged.
+
+-	After down-sampling, the dataset is balanced, improving model training and evaluation.
+
+In our case, down-sampling ensures that the 100 presence hexagons and a comparable number of pseudo-absence hexagons are used for modeling, preventing bias toward absences while retaining the full presence information.
+
+
+Now we define more than one model using the `parsnip` package, from the tidymodels framework.
+
+
+```{r}
+# Define your models using parsnip
+# Modelos con defaults
+mod_log <- logistic_reg() %>%
+  set_engine("glm") %>%
+  set_mode("classification")
+
+mod_rf <- rand_forest() %>%
+  set_engine("ranger") %>%
+  set_mode("classification")
+
+mod_xgb <- boost_tree() %>%        # usa defaults
+  set_engine("xgboost") %>%
+  set_mode("classification")
+
+# Create a named list of the models
+my_models <- list(
+  reg_log = mod_log,
+  random_forest = mod_rf,
+  xgboost = mod_xgb
+)
+```
+
+## 8. Create Workflows
+
+```{r}
+wfs <- h3sdm_workflows(my_models, receta)
+```
+
+```{r}
+wfs
+```
+
+## 9. Fit the Models
+
+Before fitting the model, we need to extract the presence data from the dataset. This ensures that metrics, cross-validation, and evaluation focus correctly on the locations where the species is actually present.
+
+```{r}
+presence_data <- dat %>%
+  dplyr::filter(presence == 1)
+```
+
+Next, we fit the models using the spatial cross-validation scheme. Spatial CV accounts for spatial autocorrelation by partitioning the data into spatially distinct folds, providing a more realistic assessment of model performance compared to random CV.
+
+```{r}
+several <- h3sdm_fit_models(wfs, scv, presence_data)
+```
+
+## 10. Evaluate and Compare Models
+
+```{r}
+compare <- h3sdm_compare_models(several)
+compare
+```
+
+1.	ROC AUC (roc_auc) → evaluates the model’s ability to discriminate between presence and absence/pseudo-absence, regardless of the threshold. It is the standard metric for probabilistic classification.
+
+2.	Maximum TSS (tss_max) → combines sensitivity and specificity into a single threshold-dependent value, showing how well the model predicts presences and absences simultaneously.
+
+3.	Boyce index (boyce) → measures the model’s ability to predict species distribution continuously and assesses whether areas with higher predicted values coincide with observed presences.
+
+```{r}
+ggplot(compare, aes(.metric, mean)) +
+  geom_col(width = 0.03) +
+  geom_point(size = 2) +
+  facet_wrap(~model)
+```
+
+## 11. Select the Best Model and make Predictions
+
+```{r}
+p_rf <- h3sdm_predict(several$models$random_forest, predictors)
+```
+
+```{r}
+p_rf
+```
+
+## 12. Map 
+
+Now we can visualize the predictions in a map.
+
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = p_rf, aes(fill = prediction)) +
+  scale_fill_viridis_c(name = "Habitat \nsuitability",option = "B", direction = -1)
+```
+
+The map represents habitat suitability for the species across the hexagons. The values (usually between 0 and 1 for a logistic model) indicate the habitat suitability of each hexagon for the species.
+
+Interpretation of the prediction values:
+
+-	Higher values → more suitable habitat
+-	Lower values → less suitable habitat
+
+## 13. Model Interpretation: Feature Importance & Partial Dependence
+
+Finallly, we interpret the model to understand which predictors are most influential and how they affect predictions.
+
+First, we extract the fitted random forest model from the list of models.
+
+
+```{r}
+rf_fitted <- several$models$random_forest$final_model
+```
+
+
+Then we create an explainer object using the DALEX package.
+
+```{r}
+e <- h3sdm_explain(rf_fitted, data = dat)
+```
+
+
+### Feature Importance
+
+We evaluate the importance of each predictor variable using permutation importance. This method assesses how much the model's performance decreases when the values of a predictor are randomly shuffled, indicating its contribution to the model.
+
+We need to specify the predictor variables to evaluate, excluding non-predictor columns.
+
+```{r}
+predictors_to_evaluate <- setdiff(names(e$data), c("h3_address", "x", "y", "presence"))
+```
+
+Now we compute variable importance.
+
+```{r}
+var_imp <- model_parts(
+  explainer = e,
+  variables = predictors_to_evaluate
+)
+```
+
+We can visualize the variable importance.
+
+```{r}
+plot(var_imp)
+```
+
+### Partial Dependence Plots
+
+We create partial dependence plots (PDPs) to visualize the relationship between key predictors and the predicted habitat suitability. PDPs show how the predicted outcome changes as a single predictor varies, while averaging out the effects of other predictors.
+
+```{r}
+pdp_glm <- partial_dependence(e, variables = c("Bio12", "Bio1", "Bio15"))
+```
+
+Now we can plot the PDPs.
+
+```{r}
+plot(pdp_glm)
+```
+
+All predictors show a positive relationship with habitat suitability, but Bio12 (annual precipitation) and Bio1 (mean annual temperature) stand out with higher importance and stronger positive effects. In contrast, Bio15 (precipitation seasonality) has a weaker positive effect, suggesting that while areas with variable rainfall are somewhat suitable, they are less influential than Bio12 or Bio1.
+
+
+## 14. Conclusions
+
+This tutorial demonstrated a complete SDM workflow for multiple models using the `h3sdm` package. The key steps included:
+
+-	Defining the study area
+
+-	Loading and preparing environmental predictors
+
+-	Fetching species occurrence data
+
+-	Building several predictive models with spatial cross-validation
+
+-	Evaluating performance and makingpredictions
+
+-	Assessing variable importance
+
+This workflow demonstrates modeling for a single species using more than one model.
+
+

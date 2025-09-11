@@ -1,16 +1,16 @@
 ---
 title: "h3sdm workflow for a single model"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{h3sdm workflow for a single model}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+author: "Manuel Spínola"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_document
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -182,13 +182,16 @@ modelo <- parsnip::logistic_reg() %>%
   parsnip::set_mode("classification")
 ```
 
+
+## 8. Create Workflow
+
 Create a workflow combining the recipe and model.
 
 ```{r}
 wf <- h3sdm_workflow(modelo, receta)
 ```
 
-## 8. Fit the Model
+## 9. Fit the Model
 
 Before fitting the model, we need to extract the presence data from the dataset. This ensures that metrics, cross-validation, and evaluation focus correctly on the locations where the species is actually present.
 
@@ -211,7 +214,7 @@ Key points:
 
 -	The model is trained and validated using these folds, ensuring robust performance evaluation.
 
-## 9. Evaluate Model Performance
+## 10. Evaluate Model Performance
 
 After fitting the model, assess its performance using cross-validated metrics such as **ROC-AUC**, **accuracy**, **TSS**, and the **Boyce index**. The h3sdm_eval_metrics() function computes these metrics based on the fitted model and the presence data, providing a quantitative measure of how well the model distinguishes presence from absence across spatial folds.
 
@@ -244,7 +247,7 @@ ggplot(evaluation_metrics, aes(.metric, mean)) +
 ```
 
 
-## 10. Make Predictions
+## 11. Make Predictions
 
 Generate spatial predictions for the species distribution across the study area. 
 
@@ -252,7 +255,7 @@ Generate spatial predictions for the species distribution across the study area.
 p <- h3sdm_predict(f, predictors)
 ```
 
-## 11. Map 
+## 12. Map 
 
 Now we can visualize the predictions in a map.
 
@@ -270,7 +273,7 @@ Interpretation of the prediction values:
 -	Higher values → more suitable habitat
 -	Lower values → less suitable habitat
 
-## 11. Model Interpretation: Feature Importance & Partial Dependence
+## 13. Model Interpretation: Feature Importance & Partial Dependence
 
 Finallly, we interpret the model to understand which predictors are most influential and how they affect predictions.
 
@@ -322,9 +325,9 @@ plot(pdp_glm)
 All predictors show a positive relationship with habitat suitability, but Bio12 (annual precipitation) and Bio1 (mean annual temperature) stand out with higher importance and stronger positive effects. In contrast, Bio15 (precipitation seasonality) has a weaker positive effect, suggesting that while areas with variable rainfall are somewhat suitable, they are less influential than Bio12 or Bio1.
 
 
-## Conclusion
+## 14. Conclusions
 
-This tutorial demonstrated a complete SDM workflow for a single species:
+This tutorial demonstrated a complete SDM workflow for a single model using the `h3sdm` package. The key steps included:
 
 -	Defining the study area
 
@@ -334,9 +337,11 @@ This tutorial demonstrated a complete SDM workflow for a single species:
 
 -	Building a predictive model with spatial cross-validation
 
--	Evaluating performance and predictions
+-	Evaluating performance and making predictions
 
 -	Assessing variable importance
 
 This workflow demonstrates modeling for a single species using one model. It can be easily adapted to handle multiple species or more complex modeling scenarios, as illustrated in the Articles section.
+
+
 

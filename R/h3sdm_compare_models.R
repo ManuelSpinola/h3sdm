@@ -2,10 +2,11 @@
 #' @title Compare multiple H3SDM species distribution models
 #' @description
 #' Computes and combines performance metrics for multiple species distribution models
-#' created with `h3sdm_fit` or similar workflows. Metrics include standard yardstick
+#' created with `h3sdm_fit_models()` or similar workflows. Metrics include standard yardstick
 #' metrics (ROC AUC, TSS, Boyce index, etc.). Returns a tibble summarizing model performance.
 #'
 #' @param h3sdm_results A list or workflow set containing fitted models with a `metrics` tibble.
+#'   Typically, this object is the output of `h3sdm_fit_models()`.
 #'
 #' @return A tibble with one row per model per metric, containing:
 #'   \describe{
@@ -38,7 +39,7 @@ h3sdm_compare_models <- function(h3sdm_results) {
 
   # Sort the table by AUC (or any other metric you want to prioritize)
   metrics_sorted <- h3sdm_results$metrics %>%
-    dplyr::filter(.metric %in% c("roc_auc", "tss_max", "boyce")) %>%
+    dplyr::filter(.metric %in% c("roc_auc", "tss", "boyce")) %>%
     dplyr::arrange(dplyr::desc(mean))
 
   return(metrics_sorted)

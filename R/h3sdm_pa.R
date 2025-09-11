@@ -14,12 +14,14 @@
 #' @param limit Integer. Maximum number of occurrence records to download. Default 500.
 #' @param expand_factor Numeric. Expand AOI bbox for full hex coverage. Default 0.1.
 #' @return `sf` object with columns `h3_address`, `presence` (factor 0/1), and `geometry`.
-#' @export
+#' @importFrom paisaje get_records_by_hexagon
 #' @examples
 #' \dontrun{
 #' cr <- sf::st_read(system.file("shape/nc.shp", package="sf"))
 #' rec_sf <- h3sdm_pa("Lynx rufus", cr, res = 6, n_neg = 300, limit = 1000)
 #' }
+#' @export
+
 h3sdm_pa <- function(species,
                      aoi_sf,
                      res = 6,

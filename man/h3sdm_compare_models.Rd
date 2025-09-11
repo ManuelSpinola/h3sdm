@@ -7,7 +7,8 @@
 h3sdm_compare_models(h3sdm_results)
 }
 \arguments{
-\item{h3sdm_results}{A list or workflow set containing fitted models with a \code{metrics} tibble.}
+\item{h3sdm_results}{A list or workflow set containing fitted models with a \code{metrics} tibble.
+Typically, this object is the output of \code{h3sdm_fit_models()}.}
 }
 \value{
 A tibble with one row per model per metric, containing:
@@ -20,7 +21,7 @@ A tibble with one row per model per metric, containing:
 }
 \description{
 Computes and combines performance metrics for multiple species distribution models
-created with \code{h3sdm_fit} or similar workflows. Metrics include standard yardstick
+created with \code{h3sdm_fit_models()} or similar workflows. Metrics include standard yardstick
 metrics (ROC AUC, TSS, Boyce index, etc.). Returns a tibble summarizing model performance.
 }
 \examples{
