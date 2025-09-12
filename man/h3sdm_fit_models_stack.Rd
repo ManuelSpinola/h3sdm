@@ -33,7 +33,7 @@ Fit multiple workflows with resampling for stacking
 }
 \examples{
 \dontrun{
-# Assuming you have workflows wfs and a vfold_cv object scv
+# Assuming you have workflows 'wfs' and a spatial CV object 'scv'
 results <- h3sdm_fit_models_stack(wfs, scv, datos_presencia)
 results$models$random_forest$cv_model
 results$models$random_forest$workflow
