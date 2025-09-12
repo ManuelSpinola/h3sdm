@@ -48,8 +48,7 @@
 #' @importFrom tibble tibble
 #' @export
 
-h3sdm_fit_models <- function(workflows, data_split, presence_data = NULL,
-                             truth_col = "presence", pred_col = ".pred_1") {
+h3sdm_fit_models <- function(workflows, data_split, presence_data = NULL, truth_col = "presence", pred_col = ".pred_1") {
 
   results <- purrr::imap(workflows, function(wf, name) {
     fit_res <- h3sdm_fit_model(wf, data_split, presence_data, truth_col, pred_col)

@@ -35,6 +35,9 @@ library(ingredients)
 library(exactextractr)
 library(workflowsets)
 library(themis)
+library(ranger)
+library(xgboost)
+library(stacks)
 ```
 
 

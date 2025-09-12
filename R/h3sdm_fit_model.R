@@ -37,8 +37,7 @@
 #'
 #' @export
 
-h3sdm_fit_model <- function(sdm_workflow, data_split, presence_data = NULL,
-                      truth_col = "presence", pred_col = ".pred_1") {
+h3sdm_fit_model <- function(sdm_workflow, data_split, presence_data = NULL, truth_col = "presence", pred_col = ".pred_1") {
 
   sdm_metrics <- yardstick::metric_set(roc_auc, accuracy, sens, spec, f_meas, kap)
 
