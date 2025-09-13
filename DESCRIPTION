@@ -52,5 +52,6 @@ Suggests:
     spocc,
     tidymodels,
     workflowsets,
+    ranger,
     tidyverse
 LazyData: true
