@@ -41,7 +41,7 @@ h3sdm_fit_models_stack <- function(workflows, data_split, presence_data = NULL) 
     res <- fit_resamples(
       wf,
       resamples = scv,
-      control = control_stack_resamples()
+      control = stacks::control_stack_resamples()
     )
 
     # Guardamos tanto el workflow como el objeto resample (cv_model)
