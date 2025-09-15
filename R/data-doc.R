@@ -1,3 +1,6 @@
+# ---------------------------------------------
+# Costa Rica Continental Outline
+# ---------------------------------------------
 #' Costa Rica Continental Outline
 #'
 #' A simplified outline of Costa Rica as an `sf` object.
@@ -10,18 +13,22 @@
 "cr_outline_c"
 
 
-#' Current bioclimatic raster file
+#' Current bioclimatic raster
 #'
-#' A GeoTIFF with current bioclimatic variables.
+#' A GeoTIFF with current bioclimatic variables for Costa Rica.
 #'
 #' @details This file is stored in `inst/extdata/` and can be accessed with:
-#' \code{system.file("extdata", "bioclim_current.tif", package = "h3sdm")}
+#' \code{terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sdm"))}
 #'
 #' @format GeoTIFF file, readable with \code{terra::rast()}.
-"bioclim_current"
+#' @examples
+#' library(terra)
+#' bio <- terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sdm"))
+#' @name bioclim_current
+NULL
 
 
-#' Future bioclimatic raster file
+#' Future bioclimatic raster
 #'
 #' A GeoTIFF with projected bioclimatic variables for Costa Rica.
 #'
@@ -30,9 +37,12 @@
 #' - Scenario: SSP1-2.6
 #' - Period: 2021–2040
 #'
-#' The file is stored in `inst/extdata/` as
-#' \code{"cr_inm_cm4_8_ssp126_2021_2040.tif"} and can be accessed with:
-#' \code{system.file("extdata", "cr_inm_cm4_8_ssp126_2021_2040.tif", package = "h3sdm")}
+#' The file is stored in `inst/extdata/` and can be accessed with:
+#' \code{terra::rast(system.file("extdata", "bioclim_future.tif", package = "h3sdm"))}
 #'
 #' @format GeoTIFF file, readable with \code{terra::rast()}.
-"bioclim_future"
+#' @examples
+#' library(terra)
+#' bio <- terra::rast(system.file("extdata", "bioclim_future.tif", package = "h3sdm"))
+#' @name bioclim_future
+NULL

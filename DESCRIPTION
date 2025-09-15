@@ -18,7 +18,6 @@ Depends: R (>= 4.1)
 Config/Needs/website: tidyverse/tidytemplate
 Imports:
     sf,
-    paisaje,
     dplyr,
     purrr,
     tibble,
