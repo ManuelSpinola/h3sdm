@@ -53,5 +53,7 @@ Suggests:
     tidymodels,
     workflowsets,
     ranger,
+    xgboost,
+    waffle,
     tidyverse
 LazyData: true

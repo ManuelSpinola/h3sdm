@@ -48,6 +48,7 @@ library(workflowsets)
 library(themis)
 library(ranger)
 library(xgboost)
+library(waffle)
 ```
 
 
@@ -62,10 +63,10 @@ cr <- cr_outline_c
 
 ## 2. Load Environmental Predictors
 
-We use WorldClim historic bioclimatic variables as environmental predictors. The data is included in the 'h3sdm' package.
+We use WorldClim historic bioclimatic variables for Costa Rica as environmental predictors. The data is included in the 'h3sdm' package.
 
 ```{r}
-bio <- terra::rast(system.file("extdata", "bio_cr.tif", package = "h3sdm"))
+bio <- terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sdm"))
 ```
 
 ## 3. Load Species Occurrence Data
@@ -88,9 +89,11 @@ table(records$presence)
 ```
 
 ```{r}
+#| echo: false
 ggplot() +
   theme_minimal() +
-  geom_sf(data = records, aes(fill = presence))
+  geom_sf(data = records, aes(fill = presence)) +
+  scale_fill_manual(name = "Presence\nAbsence", values = c("red", "blue"), breaks = c(0,1), labels = c("Absence", "Presence"))
 ```
 
 ## 4. Prepare Predictors
@@ -123,6 +126,7 @@ predictors <- predictors |>
 We can visualize one of the predictors, for example Bio1.
 
 ```{r}
+#| echo: false
 ggplot() +
   theme_minimal() +
   geom_sf(data = predictors, aes(fill = Bio1)) +
@@ -150,7 +154,8 @@ scv <- h3sdm_spatial_cv(dat, v = 5, repeats = 1)
 Plot the spatial blocks.
 
 ```{r}
-autoplot(scv)
+#| echo: false
+autoplot(scv) + theme_minimal()
 ```
 
 
@@ -262,6 +267,7 @@ p <- h3sdm_predict(f, predictors)
 Now we can visualize the predictions in a map.
 
 ```{r}
+#| echo: false
 ggplot() +
   theme_minimal() +
   geom_sf(data = p, aes(fill = prediction)) +
@@ -291,9 +297,11 @@ We evaluate the importance of each predictor variable using permutation importan
 
 We need to specify the predictor variables to evaluate, excluding non-predictor columns.
 
+
 ```{r}
 predictors_to_evaluate <- setdiff(names(e$data), c("h3_address", "x", "y", "presence"))
 ```
+
 
 Now we compute variable importance.
 
@@ -327,7 +335,211 @@ plot(pdp_glm)
 All predictors show a positive relationship with habitat suitability, but Bio12 (annual precipitation) and Bio1 (mean annual temperature) stand out with higher importance and stronger positive effects. In contrast, Bio15 (precipitation seasonality) has a weaker positive effect, suggesting that while areas with variable rainfall are somewhat suitable, they are less influential than Bio12 or Bio1.
 
 
-## 14. Conclusions
+## 14. Categorize Habitat Suitability
+
+We can categorize the continuous habitat suitability predictions into discrete classes for easier interpretation. Here we define five categories: "Very low", "Low", "Medium", "High", and "Very high".
+
+```{r}
+p <- p %>%
+  mutate(
+    habitat_cat = cut(
+      prediction,
+      breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1),
+      labels = c("Very low", "Low", "Medium", "High", "Very high"),
+      include.lowest = TRUE
+    )
+  )
+```
+
+Now we can visualize the categorized habitat suitability in a map.
+
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = p, aes(fill = habitat_cat)) +
+  scale_fill_viridis_d(name = "Habitat \ncategory", option = "B", direction = -1, na.translate = FALSE)
+```
+
+We can also count the number of hexagons in each habitat suitability category.
+
+```{r}
+counts_current <- p |>
+  st_drop_geometry() |>
+  count(habitat_cat) |>
+  drop_na() |>
+  mutate(scenario = "Present")
+counts_current
+```
+
+Now we can create a waffle plot to visualize the distribution of habitat suitability categories.
+
+```{r}
+#| echo: false
+ggplot(counts_current, aes(fill = habitat_cat, values = n)) +
+  geom_waffle(n_rows = 40, size = 0.1, color = "white", flip = TRUE) +
+  scale_fill_manual(values = c(
+    "Very low" = "#d73027",
+    "Low" = "#fc8d59",
+    "Medium" = "#fee090",
+    "High" = "#91bfdb",
+    "Very high" = "#4575b4"
+  )) +
+  coord_equal() +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    legend.title = element_blank()
+  ) +
+  facet_wrap(~habitat_cat, 
+             nrow = 1,
+             strip.position = "bottom") +
+  theme(
+  strip.background = element_rect(fill = "gray90", color = "black"),
+  strip.text = element_text(color = "black", face = "bold",
+                            margin = margin(t = 2, r = 4, b = 2, l = 4))  # top, right, bottom, left
+)
+```
+
+
+## 15. Make predictios for a future scenario
+
+We can also make predictions for future climate scenarios. Here we use WorldClim future bioclimatic variables for Costa Rica as environmental predictors. The data is included in the 'h3sdm' package. Only three variables are included: Bio1 (Annual Mean Temperature), Bio12 (Annual Precipitation), and Bio15 (Precipitation Seasonality).
+
+
+```{r}
+bio_future <- terra::rast(system.file("extdata", "bioclim_future.tif", package = "h3sdm"))
+```
+
+Rename the layers of the raster to match the names used in the model.
+
+```{r}
+names(bio_future) <- c("Bio1", "Bio12", "Bio15") 
+```
+
+
+We prepare the future predictors by extracting values for each hexagon in the study area.
+
+```{r}
+predictors_future <- h3sdm_predictors(cr, 
+                    res = 7, 
+                    num_rasters = bio_future)
+```
+
+
+Now we can make predictions for the future scenario.
+
+```{r}
+p_future <- h3sdm_predict(f, predictors_future)
+```
+
+We can visualize the future predictions in a map.
+
+```{r}
+#| echo: false
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = p_future, aes(fill = prediction)) +
+  scale_fill_viridis_c(name = "Habitat \nsuitability",option = "B", direction = -1)
+```
+
+We can categorize the continuous habitat suitability predictions into discrete classes for easier interpretation. Here we define five categories: "Very low", "Low", "Medium", "High", and "Very high".
+
+```{r}
+p_future <- p_future %>%
+  mutate(
+    habitat_cat = cut(
+      prediction,
+      breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1),
+      labels = c("Very low", "Low", "Medium", "High", "Very high"),
+      include.lowest = TRUE
+    )
+  )
+```
+
+
+Now we can visualize the categorized habitat suitability in a map.
+
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = p_future, aes(fill = habitat_cat)) +
+  scale_fill_viridis_d(name = "Habitat \ncategory", option = "B", direction = -1, na.translate = FALSE)
+```
+
+We can also count the number of hexagons in each habitat suitability category.
+
+```{r}
+counts_future <- p_future |>
+  st_drop_geometry() |>
+  count(habitat_cat) |>
+  drop_na() |>
+  mutate(scenario = "Future")
+counts_future
+```
+
+Now we can create a waffle plot to visualize the distribution of habitat suitability categories for the future scenario.
+
+```{r}
+#| echo: false
+ggplot(counts_future, aes(fill = habitat_cat, values = n)) +
+  geom_waffle(n_rows = 40, size = 0.1, color = "white", flip = TRUE) +
+  scale_fill_manual(values = c(
+    "Very low" = "#d73027",
+    "Low" = "#fc8d59",
+    "Medium" = "#fee090",
+    "High" = "#91bfdb",
+    "Very high" = "#4575b4"
+  )) +
+  coord_equal() +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    legend.title = element_blank()
+  ) +
+  facet_wrap(~habitat_cat, 
+             nrow = 1,
+             strip.position = "bottom") +
+  theme(
+  strip.background = element_rect(fill = "gray90", color = "black"),
+  strip.text = element_text(color = "black", face = "bold",
+                            margin = margin(t = 2, r = 4, b = 2, l = 4))  # top, right, bottom, left
+)
+```
+
+```{r}
+#| include: false
+counts_all <- rbind(counts_current, counts_future) |>
+  mutate(scenario = factor(scenario, levels = c("Present", "Future")))
+```
+
+
+Now we can create a waffle plot to visualize the distribution of habitat suitability categories for both present and future scenarios.
+
+```{r}
+#| echo: false
+ggplot(counts_all, aes(fill = habitat_cat, values = n)) +
+  geom_waffle(n_rows = 60, size = 0.1, color = "white", flip = TRUE) +
+  scale_fill_manual(name = "Habitat \ncategory", values = c(
+    "Very low" = "#d73027",
+    "Low" = "#fc8d59",
+    "Medium" = "#fee090",
+    "High" = "#91bfdb",
+    "Very high" = "#4575b4"
+  )) +
+  coord_equal() +
+  theme_void() +
+  facet_wrap(~scenario, 
+             nrow = 1,
+             strip.position = "bottom") +
+  theme(
+  strip.background = element_rect(fill = "gray90", color = "black"),
+  strip.text = element_text(color = "black", face = "bold",
+                            margin = margin(t = 2, r = 4, b = 2, l = 4))  # top, right, bottom, left
+)
+```
+
+
+## 16. Conclusions
 
 This tutorial demonstrated a complete SDM workflow for a single model using the `h3sdm` package. The key steps included:
 
@@ -342,6 +554,12 @@ This tutorial demonstrated a complete SDM workflow for a single model using the 
 -	Evaluating performance and making predictions
 
 -	Assessing variable importance
+
+- Categorizing habitat suitability
+
+- Making predictions for future climate scenarios
+
+- Comparing habitat suitability between present and future scenarios
 
 This workflow demonstrates modeling for a single species using one model. It can be easily adapted to handle multiple species or more complex modeling scenarios, as illustrated in the Articles section.
 

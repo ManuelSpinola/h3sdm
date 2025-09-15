@@ -52,10 +52,10 @@ cr <- cr_outline_c
 
 ## 2. Load Environmental Predictors
 
-We use WorldClim historic bioclimatic variables as environmental predictors. The data is included in the 'h3sdm' package.
+We use WorldClim historic bioclimatic variables for Costa Rica as environmental predictors. The data is included in the 'h3sdm' package.
 
 ```{r}
-bio <- terra::rast(system.file("extdata", "bio_cr.tif", package = "h3sdm"))
+bio <- terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sdm"))
 ```
 
 ## 3. Load Species Occurrence Data
