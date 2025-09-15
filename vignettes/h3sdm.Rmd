@@ -46,9 +46,12 @@ library(ingredients)
 library(exactextractr)
 library(workflowsets)
 library(themis)
-library(ranger)
-library(xgboost)
-library(waffle)
+
+# Optional packages for advanced modeling or visualization:
+if (requireNamespace("ranger", quietly = TRUE)) library(ranger)
+if (requireNamespace("xgboost", quietly = TRUE)) library(xgboost)
+if (requireNamespace("waffle", quietly = TRUE)) library(waffle)
+
 ```
 
 
