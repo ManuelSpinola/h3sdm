@@ -35,6 +35,7 @@ Imports:
     paisaje
 Remotes:
     ManuelSpinola/paisaje,
+    hrbrmstr/waffle
 Suggests: 
     knitr,
     rmarkdown,
