@@ -32,7 +32,6 @@ Imports:
     ecospat,
     DALEX,
     stacks,
-    waffle,
     paisaje
 Remotes:
     ManuelSpinola/paisaje,
@@ -54,5 +53,6 @@ Suggests:
     workflowsets,
     ranger,
     xgboost,
+    waffle,
     tidyverse
 LazyData: true
