@@ -21,7 +21,7 @@ and generates a DALEX explainer suitable for model diagnostics."></head><body>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/multi_model_workflow.html">Multi model workflow</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/multi_model_workflow.html">h3sdm workflow for multiple models</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -122,16 +122,16 @@ for feature importance, model residuals, and other DALEX diagnostics.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -&gt; predict function  :  custom_predict </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -&gt; predicted values  :  No value for predict function target column. (  default  )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -&gt; model_info        :  package parsnip , ver. 1.3.3 , task classification (  default  ) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -&gt; predicted values  :  numerical, min =  0.29312 , mean =  0.7 , max =  0.9341789  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -&gt; predicted values  :  numerical, min =  0.04079885 , mean =  0.6 , max =  0.9990131  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -&gt; residual function :  difference between y and yhat (  default  )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   -&gt; residuals         :  numerical, min =  -0.8402535 , mean =  1.475596e-11 , max =  0.617121  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   -&gt; residuals         :  numerical, min =  -0.8074574 , mean =  5.843235e-15 , max =  0.705885  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   A new explainer has been created!  </span>
 <span class="r-in"><span><span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/model_parts.html" class="external-link">feature_importance</a></span><span class="op">(</span><span class="va">expl</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       variable mean_dropout_loss          label</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 _full_model_         0.2500000 h3sdm workflow</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           x2         0.3892857 h3sdm workflow</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3           x1         0.4035714 h3sdm workflow</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   _baseline_         0.6190476 h3sdm workflow</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 _full_model_         0.1666667 h3sdm workflow</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           x1         0.2333333 h3sdm workflow</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           x2         0.5208333 h3sdm workflow</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   _baseline_         0.5072917 h3sdm workflow</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
