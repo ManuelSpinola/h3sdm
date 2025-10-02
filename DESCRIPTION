@@ -34,8 +34,7 @@ Imports:
     stacks,
     paisaje
 Remotes:
-    ManuelSpinola/paisaje,
-    hrbrmstr/waffle
+    ManuelSpinola/paisaje
 Suggests: 
     knitr,
     rmarkdown,
@@ -54,6 +53,8 @@ Suggests:
     workflowsets,
     ranger,
     xgboost,
-    waffle,
+    ggbrick,
     tidyverse
+VignetteBuilder: 
+    knitr
 LazyData: true

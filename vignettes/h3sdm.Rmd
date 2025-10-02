@@ -1,8 +1,10 @@
 ---
 title: "h3sdm workflow for a single model"
-author: "Manuel Spínola"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_document
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{h3sdm workflow for a single model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -46,7 +48,7 @@ library(ingredients)
 library(exactextractr)
 library(workflowsets)
 library(themis)
-library(waffle)
+library(ggbrick)
 
 # Optional packages for advanced modeling or visualization:
 if (requireNamespace("ranger", quietly = TRUE)) library(ranger)
@@ -365,7 +367,7 @@ ggplot() +
 
 We can also count the number of hexagons in each habitat suitability category.
 
-```{r}
+```{r, include=TRUE}
 counts_current <- p |>
   st_drop_geometry() |>
   count(habitat_cat) |>
@@ -374,34 +376,48 @@ counts_current <- p |>
 counts_current
 ```
 
+
+```{r, include=FALSE}
+# Colores por categoría
+cols <- c(
+  "Very low"  = "#d73027",
+  "Low"       = "#fc8d59",
+  "Medium"    = "#fee090",
+  "High"      = "#91bfdb",
+  "Very high" = "#4575b4"
+)
+```
+
+
+```{r, include=FALSE}
+# Crear vector de colores repetidos por n
+fill_vec_current <- c(
+  rep(cols["Very low"], counts_current$n[counts_current$habitat_cat == "Very low"]),
+  rep(cols["Low"], counts_current$n[counts_current$habitat_cat == "Low"]),
+  rep(cols["Medium"], counts_current$n[counts_current$habitat_cat == "Medium"]),
+  rep(cols["High"], counts_current$n[counts_current$habitat_cat == "High"]),
+  rep(cols["Very high"], counts_current$n[counts_current$habitat_cat == "Very high"])
+)
+```
+
 Now we can create a waffle plot to visualize the distribution of habitat suitability categories.
 
-```{r}
-#| echo: false
-ggplot(counts_current, aes(fill = habitat_cat, values = n)) +
-  geom_waffle(n_rows = 40, size = 0.1, color = "white", flip = TRUE) +
-  scale_fill_manual(values = c(
-    "Very low" = "#d73027",
-    "Low" = "#fc8d59",
-    "Medium" = "#fee090",
-    "High" = "#91bfdb",
-    "Very high" = "#4575b4"
-  )) +
-  coord_equal() +
+```{r, echo=FALSE}
+ggplot(counts_current, aes(x = 1, y = n, fill = habitat_cat)) +
+  ggbrick::geom_waffle(bricks_per_layer = 30, color = "white", fill = fill_vec_current, size = 0.001) +
+  facet_wrap(~habitat_cat, nrow = 1, strip.position = "bottom") +
   theme_void() +
   theme(
     legend.position = "none",
-    legend.title = element_blank()
-  ) +
-  facet_wrap(~habitat_cat, 
-             nrow = 1,
-             strip.position = "bottom") +
-  theme(
-  strip.background = element_rect(fill = "gray90", color = "black"),
-  strip.text = element_text(color = "black", face = "bold",
-                            margin = margin(t = 2, r = 4, b = 2, l = 4))  # top, right, bottom, left
-)
+    strip.background = element_rect(fill = "gray90", color = "black"),
+    strip.text = element_text(
+      color = "black",
+      face = "bold",
+      margin = margin(t = 2, r = 4, b = 2, l = 4)
+    )
+  )
 ```
+
 
 
 ## 15. Make predictios for a future scenario
@@ -471,7 +487,7 @@ ggplot() +
 
 We can also count the number of hexagons in each habitat suitability category.
 
-```{r}
+```{r, include=TRUE}
 counts_future <- p_future |>
   st_drop_geometry() |>
   count(habitat_cat) |>
@@ -480,65 +496,68 @@ counts_future <- p_future |>
 counts_future
 ```
 
+```{r, include=FALSE}
+# Crear vector de colores repetidos por n
+fill_vec_future <- c(
+  rep(cols["Very low"], counts_future$n[counts_future$habitat_cat == "Very low"]),
+  rep(cols["Low"], counts_future$n[counts_future$habitat_cat == "Low"]),
+  rep(cols["Medium"], counts_future$n[counts_future$habitat_cat == "Medium"]),
+  rep(cols["High"], counts_future$n[counts_future$habitat_cat == "High"]),
+  rep(cols["Very high"], counts_future$n[counts_future$habitat_cat == "Very high"])
+)
+```
+
+
 Now we can create a waffle plot to visualize the distribution of habitat suitability categories for the future scenario.
 
-```{r}
-#| echo: false
-ggplot(counts_future, aes(fill = habitat_cat, values = n)) +
-  geom_waffle(n_rows = 40, size = 0.1, color = "white", flip = TRUE) +
-  scale_fill_manual(values = c(
-    "Very low" = "#d73027",
-    "Low" = "#fc8d59",
-    "Medium" = "#fee090",
-    "High" = "#91bfdb",
-    "Very high" = "#4575b4"
-  )) +
-  coord_equal() +
+```{r, echo=FALSE}
+ggplot(counts_future, aes(x = 1, y = n, fill = habitat_cat)) +
+  ggbrick::geom_waffle(bricks_per_layer = 30, color = "white", fill = fill_vec_future, size = 0.001) +
+  facet_wrap(~habitat_cat, nrow = 1, strip.position = "bottom") +
   theme_void() +
   theme(
     legend.position = "none",
-    legend.title = element_blank()
-  ) +
-  facet_wrap(~habitat_cat, 
-             nrow = 1,
-             strip.position = "bottom") +
-  theme(
-  strip.background = element_rect(fill = "gray90", color = "black"),
-  strip.text = element_text(color = "black", face = "bold",
-                            margin = margin(t = 2, r = 4, b = 2, l = 4))  # top, right, bottom, left
+    strip.background = element_rect(fill = "gray90", color = "black"),
+    strip.text = element_text(
+      color = "black",
+      face = "bold",
+      margin = margin(t = 2, r = 4, b = 2, l = 4)
+    )
+  )
+```
+
+```{r, include=FALSE}
+counts_all <- rbind(counts_current, counts_future) |>
+  mutate(scenario = factor(scenario, levels = c("Present", "Future")),
+         habitat_cat = factor(habitat_cat, levels = c("Very low", "Low", "Medium", "High", "Very high"))
 )
 ```
 
-```{r}
-#| include: false
-counts_all <- rbind(counts_current, counts_future) |>
-  mutate(scenario = factor(scenario, levels = c("Present", "Future")))
+```{r, include=FALSE}
+# Crear vector de colores repetidos por n para todas las filas
+fill_vec_all <- unlist(
+  lapply(1:nrow(counts_all), function(i) {
+    rep(cols[counts_all$habitat_cat[i]], counts_all$n[i])
+  })
+)
 ```
-
 
 Now we can create a waffle plot to visualize the distribution of habitat suitability categories for both present and future scenarios.
 
-```{r}
-#| echo: false
-ggplot(counts_all, aes(fill = habitat_cat, values = n)) +
-  geom_waffle(n_rows = 60, size = 0.1, color = "white", flip = TRUE) +
-  scale_fill_manual(name = "Habitat \ncategory", values = c(
-    "Very low" = "#d73027",
-    "Low" = "#fc8d59",
-    "Medium" = "#fee090",
-    "High" = "#91bfdb",
-    "Very high" = "#4575b4"
-  )) +
-  coord_equal() +
+```{r, echo=FALSE}
+ggplot(counts_all, aes(x = 1, y = n, fill = habitat_cat)) +
+  ggbrick::geom_waffle(bricks_per_layer = 60, color = "white", fill = fill_vec_all, size = 0.001) +
+  facet_wrap(~scenario, nrow = 1, strip.position = "bottom") +
   theme_void() +
-  facet_wrap(~scenario, 
-             nrow = 1,
-             strip.position = "bottom") +
   theme(
-  strip.background = element_rect(fill = "gray90", color = "black"),
-  strip.text = element_text(color = "black", face = "bold",
-                            margin = margin(t = 2, r = 4, b = 2, l = 4))  # top, right, bottom, left
-)
+    legend.position = "none",
+    strip.background = element_rect(fill = "gray90", color = "black"),
+    strip.text = element_text(
+      color = "black",
+      face = "bold",
+      margin = margin(t = 2, r = 4, b = 2, l = 4)
+    )
+  )
 ```
 
 

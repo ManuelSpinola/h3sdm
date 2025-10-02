@@ -1,7 +1,6 @@
 ---
 title: "h3sdm workflow for multiple models"
 author: "Manuel Spínola"
-date: "`r Sys.Date()`"
 output: rmarkdown::html_document
 ---
 
@@ -87,7 +86,7 @@ ggplot() +
 
 Prepare environmental predictors by extracting values for each hexagon in the study area. 
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 predictors <- h3sdm_predictors(cr, 
                     res = 7, 
                     num_rasters = bio)
