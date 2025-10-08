@@ -11,8 +11,8 @@ h3sdm_spatial_cv(data, method = "block", v = 5, ...)
 
 \item{method}{Character. The spatial resampling method to use:
 \describe{
-\item{"block"}{Use \code{spatial_block_cv} for block-based spatial CV.}
-\item{"cluster"}{Use \code{spatial_cluster_cv} for cluster-based spatial CV.}
+\item{"block"}{Use \code{spatialsample::spatial_block_cv()} for block-based spatial CV.}
+\item{"cluster"}{Use \code{spatialsample::spatial_clustering_cv()} for cluster-based spatial CV.}
 }}
 
 \item{v}{Integer. Number of folds (default = 5).}
@@ -23,15 +23,26 @@ h3sdm_spatial_cv(data, method = "block", v = 5, ...)
 An \code{rsplit} object (from \code{rsample}) representing the spatial CV folds.
 }
 \description{
-Generates a spatially aware data split using the \code{spatialsample} package.
-This helps avoid inflated model performance estimates due to spatial autocorrelation.
+Generates a spatially aware cross-validation split for species distribution modeling
+using H3 hexagonal grids. This helps avoid inflated model performance estimates
+caused by spatial autocorrelation, producing more robust model evaluation.
+}
+\details{
+Spatial cross-validation avoids overly optimistic performance estimates
+by ensuring that training and testing data are spatially separated.
+\itemize{
+\item \code{"block"}: Divides the spatial domain into contiguous blocks.
+\item \code{"cluster"}: Groups locations into spatial clusters before splitting.
+}
 }
 \examples{
 \dontrun{
-# Block spatial cross-validation
+# Example: Create spatial cross-validation splits for H3 data
+
+# Block spatial CV with default folds
 spatial_cv_block <- h3sdm_spatial_cv(combined_data, method = "block")
 
-# Cluster spatial cross-validation with 10 folds
+# Cluster spatial CV with 10 folds
 spatial_cv_cluster <- h3sdm_spatial_cv(combined_data, method = "cluster", v = 10)
 }
 

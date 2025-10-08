@@ -38,7 +38,7 @@ makes it easy to bridge **species distribution modeling** and
 ## Installation
 
 You can install the development version of **h3sdm from**
-[GitHub](https://github.com/) using one of the following methods::
+[GitHub](https://github.com/) using one of the following methods:
 
 ``` r
 # install.packages("pak")
@@ -57,7 +57,10 @@ devtools::install_github("ManuelSpinola/h3sdm")
 
 ## Get Started
 
-Explore full workflows and examples for **h3sdm** in the
-[Articles](https://manuelspinola.github.io/h3sdm/articles/) section.  
-Each vignette demonstrates different aspects of species distribution and
+Explore **h3sdm** through the [Get Started
+section](https://manuelspinola.github.io/h3sdm/) of the website, which
+provides a quick introduction to the package and its core workflows.  
+For more practical examples, visit the [Articles
+section](https://manuelspinola.github.io/h3sdm/articles/), where each
+vignette demonstrates different aspects of species distribution and
 habitat analysis using H3 grids.

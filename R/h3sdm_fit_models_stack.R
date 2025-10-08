@@ -20,13 +20,17 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Assuming you have workflows 'wfs' and a spatial CV object 'scv'
+#' # Example requires prepared workflows and resampling object:
+#' # wfs <- list(random_forest = my_workflow_rf, glmnet = my_workflow_glm)
+#' # scv <- rsample::vfold_cv(my_data, v = 5)
 #' results <- h3sdm_fit_models_stack(workflows = wfs, data_split = scv)
 #' results$models$random_forest$cv_model
 #' results$models$random_forest$workflow
 #' }
 #'
 #' @export
+
+
 h3sdm_fit_models_stack <- function(workflows, data_split, presence_data = NULL) {
 
   # Inicializamos la lista que contendrá los resultados

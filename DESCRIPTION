@@ -7,7 +7,10 @@ Authors@R:
            family = "Spínola",
            role = c("aut", "cre"),
            email = "mspinola10@gmail.com")
-Description: Functions to retrieve species records, create H3 hexagonal grids, calculate landscape metrics, and prepare data for SDM modeling.
+Description: Provides tools for species distribution modeling using H3 hexagonal grids,
+  according to Uber Technologies Inc. (2022) <https://h3geo.org>. Includes functions to retrieve species occurrence records, generate
+  H3 grids, compute landscape metrics, and prepare spatial data for modeling workflows with
+  modern SDM algorithms. Useful for biodiversity and landscape ecology research.
 URL: https://github.com/ManuelSpinola/h3sdm
 BugReports: https://github.com/ManuelSpinola/h3sdm/issues
 License: MIT + file LICENSE
@@ -58,3 +61,5 @@ Suggests:
 VignetteBuilder: 
     knitr
 LazyData: true
+Language: en-US
+

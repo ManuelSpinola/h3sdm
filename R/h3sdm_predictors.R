@@ -4,6 +4,7 @@
 #' Generates an H3 hexagonal grid over a specified area of interest (AOI) and extracts
 #' numeric, categorical, and landscape predictors for each hexagon. Uses functions
 #' from the 'paisaje' package to calculate landscape metrics when `landscape_raster` is provided.
+#' If `landscape_raster` is not supplied, only numeric and categorical predictors will be extracted.
 #'
 #' @param aoi_sf An `sf` object (POLYGON or MULTIPOLYGON) defining the area of interest.
 #' @param res Integer. H3 resolution (default = 6).
@@ -16,15 +17,14 @@
 #'
 #' @examples
 #' \dontrun{
+#' # Example: Extract numeric and categorical predictors for a study area
 #' library(terra)
 #' library(sf)
 #'
-#' # Cargar rasters de ejemplo
-#' bio <- rast("cr_bio/bio.tif")           # raster numérico
-#' lc  <- rast("landcover.tif")            # raster categórico
-#' cr  <- cr_outline_c                      # área de interés (sf POLYGON/MULTIPOLYGON)
+#' bio <- rast("cr_bio/bio.tif")           # numeric raster
+#' lc  <- rast("landcover.tif")            # categorical raster
+#' cr  <- cr_outline_c                      # area of interest (sf POLYGON/MULTIPOLYGON)
 #'
-#' # Extraer predictores
 #' pred_sf <- h3sdm_predictors(
 #'   aoi_sf = cr,
 #'   res = 6,

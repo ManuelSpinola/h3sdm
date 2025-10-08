@@ -39,7 +39,7 @@ a comparative metrics table.
 }
 \examples{
 \dontrun{
-# Define workflows for different models
+# Example requires prepared recipes and resampling objects
 mod_log <- logistic_reg() \%>\%
   set_engine("glm") \%>\%
   set_mode("classification")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/h3sdn_eval_metrics.R
 \name{h3sdm_eval_metrics}
 \alias{h3sdm_eval_metrics}
-\title{Evaluate a single fitted H3SDM model}
+\title{Evaluate performance metrics for a fitted H3SDM model}
 \usage{
 h3sdm_eval_metrics(
   fitted_model,
@@ -12,29 +12,52 @@ h3sdm_eval_metrics(
 )
 }
 \arguments{
-\item{fitted_model}{A fitted model object, typically the result of \code{h3sdm_fit_model()}.}
+\item{fitted_model}{A fitted model object, typically the output of \code{h3sdm_fit_model()}.}
 
 \item{presence_data}{Optional. An \code{sf} object or tibble containing presence locations
-to compute the Boyce index.}
+used to compute the Boyce index. If not provided, the Boyce index will not be calculated.}
 
-\item{truth_col}{Character. Name of the column with true presence/absence values (default \code{"presence"}).}
+\item{truth_col}{Character. Name of the column containing the true presence/absence values
+(default \code{"presence"}).}
 
-\item{pred_col}{Character. Name of the column with predicted probabilities (default \code{".pred_1"}).}
+\item{pred_col}{Character. Name of the column containing predicted probabilities
+(default \code{".pred_1"}).}
 }
 \value{
-A tibble with one row per metric, including:
+A tibble with one row per metric, containing:
 \describe{
 \item{.metric}{Metric name (e.g., "roc_auc", "tss", "boyce").}
 \item{.estimator}{Estimator type (usually "binary").}
 \item{mean}{Metric value.}
 \item{std_err}{Standard error (NA for TSS and Boyce).}
-\item{conf_low}{Lower 95\% confidence interval (NA for TSS and Boyce).}
-\item{conf_high}{Upper 95\% confidence interval (NA for TSS and Boyce).}
+\item{conf_low}{Lower bound of the 95\% confidence interval (NA for TSS and Boyce).}
+\item{conf_high}{Upper bound of the 95\% confidence interval (NA for TSS and Boyce).}
 }
 }
 \description{
-Computes performance metrics for a single fitted model, including standard
-yardstick metrics (ROC AUC, accuracy, sensitivity, specificity, F1-score, Kappa),
-as well as TSS (True Skill Statistic) and Boyce index. Designed as a helper function
-for evaluating models produced by \code{h3sdm_fit_model} or \code{h3sdm_fit_models}.
+Computes a set of performance metrics for a single fitted species distribution model.
+Includes standard yardstick metrics such as ROC AUC, accuracy, sensitivity,
+specificity, F1-score, Kappa, as well as ecological metrics such as the
+True Skill Statistic (TSS) and Boyce index.
+This function is designed as a helper for evaluating models produced by
+\code{h3sdm_fit_model} or \code{h3sdm_fit_models}.
+}
+\details{
+This function centralizes model evaluation for a single fitted H3SDM model,
+combining both general classification metrics and ecological indices.
+It is especially useful for systematically comparing model performance
+across species or modeling approaches.
+}
+\examples{
+\dontrun{
+# Assuming 'fitted' is the result of h3sdm_fit_model()
+metrics <- h3sdm_eval_metrics(
+  fitted_model = fitted,
+  presence_data = presence_sf,
+  truth_col = "presence",
+  pred_col = ".pred_1"
+)
+print(metrics)
+}
+
 }

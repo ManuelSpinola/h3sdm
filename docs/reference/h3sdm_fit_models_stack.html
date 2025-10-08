@@ -89,7 +89,9 @@ a list with:</p><ul><li><p><code>cv_model</code>: the resampled model (<code>tun
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># Assuming you have workflows 'wfs' and a spatial CV object 'scv'</span></span></span>
+<span class="r-in"><span><span class="co"># Example requires prepared workflows and resampling object:</span></span></span>
+<span class="r-in"><span><span class="co"># wfs &lt;- list(random_forest = my_workflow_rf, glmnet = my_workflow_glm)</span></span></span>
+<span class="r-in"><span><span class="co"># scv &lt;- rsample::vfold_cv(my_data, v = 5)</span></span></span>
 <span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">h3sdm_fit_models_stack</span><span class="op">(</span>workflows <span class="op">=</span> <span class="va">wfs</span>, data_split <span class="op">=</span> <span class="va">scv</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">results</span><span class="op">$</span><span class="va">models</span><span class="op">$</span><span class="va">random_forest</span><span class="op">$</span><span class="va">cv_model</span></span></span>
 <span class="r-in"><span><span class="va">results</span><span class="op">$</span><span class="va">models</span><span class="op">$</span><span class="va">random_forest</span><span class="op">$</span><span class="va">workflow</span></span></span>

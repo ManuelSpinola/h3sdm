@@ -16,19 +16,19 @@ A \code{tidymodels} recipe object (class \code{"h3sdm_recipe"}) ready for modeli
 }
 \description{
 Prepares an \code{sf} object with H3 hexagonal data for modeling with the
-\code{tidymodels} ecosystem. Extracts centroid coordinates and assigns appropriate
-roles to the variables automatically.
+\code{tidymodels} ecosystem. Extracts centroid coordinates, assigns appropriate
+roles to the variables automatically, and returns a ready-to-use recipe for
+modeling species distributions.
 }
 \details{
-This function performs key data preparation steps for spatial species
-distribution modeling:
+This function prepares spatial H3 grid data for species distribution modeling:
 \itemize{
-\item Extracts centroid coordinates (\code{x} and \code{y}) from polygon geometries.
-\item Removes the geometry column, as \code{tidymodels} works with tabular data.
+\item Extracts centroid coordinates (\code{x} and \code{y}) from MULTIPOLYGON geometries using sf functions.
+\item Removes the geometry column to create a purely tabular dataset for tidymodels.
 \item Assigns roles to columns:
 \itemize{
 \item \code{presence} → \code{"outcome"} (target variable)
-\item \code{h3_address} → \code{"id"} (kept for joining with predictions)
+\item \code{h3_address} → \code{"id"} (used for joining predictions later)
 \item \code{x} and \code{y} → \code{"spatial_predictor"}
 }
 \item All other columns are assigned \code{"predictor"} role.
@@ -36,9 +36,10 @@ distribution modeling:
 }
 \examples{
 \dontrun{
-# Assuming `combined_data` is an sf object from h3sdm_data()
+# Example: Prepare H3 hexagonal SDM data for modeling
+# `combined_data` is typically the output of h3sdm_data()
 sdm_recipe <- h3sdm_recipe(combined_data)
-sdm_recipe  # inspect the recipe
+sdm_recipe  # inspect the recipe object
 }
 
 }

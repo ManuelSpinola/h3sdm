@@ -7,27 +7,40 @@
 h3sdm_workflow(model_spec, sdm_recipe)
 }
 \arguments{
-\item{model_spec}{A \code{tidymodels} model specification (e.g., \code{logistic_reg()}, \code{rand_forest()}, or \code{boost_tree()}).}
+\item{model_spec}{A \code{tidymodels} model specification (e.g., \code{logistic_reg()}, \code{rand_forest()}, or \code{boost_tree()}),
+describing the model type and engine to use for fitting.}
 
-\item{sdm_recipe}{A \code{tidymodels} recipe object, typically created with \code{h3sdm_recipe()}.}
+\item{sdm_recipe}{A \code{tidymodels} recipe object, typically created with \code{h3sdm_recipe()},
+which preprocesses the data and defines predictor/response roles.}
 }
 \value{
 A \code{workflow} object ready to be used for model fitting with \code{fit()} or cross-validation.
 }
 \description{
-Combines a model specification and a prepared recipe into a single \code{tidymodels} workflow
-suitable for species distribution modeling with H3 hexagonal grids.
+Combines a model specification and a prepared recipe into a single \code{tidymodels} workflow.
+This workflow is suitable for species distribution modeling using H3 hexagonal grids
+and can be directly fitted or cross-validated.
+}
+\details{
+The function creates a \code{workflow} that combines preprocessing and modeling
+steps. This encapsulation allows consistent model training and evaluation
+with \code{tidymodels} functions like \code{fit()} or \code{fit_resamples()}, and is
+particularly useful when applying multiple models in parallel.
 }
 \examples{
 \dontrun{
 library(parsnip)
-# Create model specification
-my_model_spec <- logistic_reg() \%>\% set_mode("classification") \%>\% set_engine("glm")
+# Example: Create a tidymodels workflow for H3-based species distribution modeling
 
-# Prepare recipe
+# Step 1: Define model specification
+my_model_spec <- logistic_reg() \%>\%
+  set_mode("classification") \%>\%
+  set_engine("glm")
+
+# Step 2: Create recipe
 my_recipe <- h3sdm_recipe(combined_data)
 
-# Create workflow
+# Step 3: Combine into workflow
 sdm_wf <- h3sdm_workflow(model_spec = my_model_spec, sdm_recipe = my_recipe)
 }
 

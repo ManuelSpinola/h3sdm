@@ -2,7 +2,7 @@
 % Please edit documentation in R/h3sdm_explain.R
 \name{h3sdm_explain}
 \alias{h3sdm_explain}
-\title{DALEX Explainer for h3sdm Workflows}
+\title{Create a DALEX explainer for h3sdm workflows}
 \usage{
 h3sdm_explain(model, data, response = "presence", label = "h3sdm workflow")
 }
@@ -10,7 +10,7 @@ h3sdm_explain(model, data, response = "presence", label = "h3sdm workflow")
 \item{model}{A fitted workflow returned by \code{h3sdm_fit_model()}.}
 
 \item{data}{A \code{data.frame} or \code{sf} object containing the original predictors
-and response variable. If an \code{sf} object, the geometry is dropped automatically.}
+and response variable. If an \code{sf} object, geometry is dropped automatically.}
 
 \item{response}{Character string specifying the name of the response column.
 Must be a binary factor or numeric vector (0/1). Defaults to \code{"presence"}.}
@@ -24,17 +24,11 @@ used with \code{feature_importance()}, \code{model_performance()}, \code{predict
 and other DALEX functions.
 }
 \description{
-Combines species presence/absence data with predictor variables
-and generates a DALEX explainer suitable for model diagnostics.
-}
-\details{
-Create a DALEX explainer for h3sdm workflows
-
-This function creates a DALEX explainer for a species distribution model
-fitted with \code{h3sdm_fit_model()}. It prepares the response and predictor
-variables, ensuring that all columns used during model training (including
-\code{h3_address} and coordinates) are included. The explainer can then be used
-for feature importance, model residuals, and other DALEX diagnostics.
+Creates a DALEX explainer for a species distribution model fitted
+with \code{h3sdm_fit_model()}. Prepares response and predictor variables,
+ensuring that all columns used during model training (including \code{h3_address}
+and coordinates) are included. The explainer can be used for feature
+importance, model residuals, and other DALEX diagnostics.
 }
 \examples{
 \donttest{
@@ -42,21 +36,17 @@ library(h3sdm)
 library(DALEX)
 library(parsnip)
 
-# Dataset de ejemplo con factor
 dat <- data.frame(
   x1 = rnorm(20),
   x2 = rnorm(20),
   presence = factor(sample(0:1, 20, replace = TRUE))
 )
 
-# Modelo simple
-f <- list(
-  final_model = logistic_reg() |>
-    fit(presence ~ x1 + x2, data = dat)
-)
+model <- logistic_reg() |>
+  fit(presence ~ x1 + x2, data = dat)
 
-# Explainer
-expl <- h3sdm_explain(f$final_model, data = dat, response = "presence")
-feature_importance(expl)
+explainer <- h3sdm_explain(model, data = dat, response = "presence")
+feature_importance(explainer)
 }
+
 }

@@ -2,25 +2,27 @@
 % Please edit documentation in R/h3sdm_data.R
 \name{h3sdm_data}
 \alias{h3sdm_data}
-\title{Combina datos para modelos de distribución de especies (SDM) basados en H3}
+\title{Combine species and environmental data for SDMs using H3 grids}
 \usage{
 h3sdm_data(pa_sf, predictors_sf)
 }
 \arguments{
-\item{pa_sf}{An sf object from the h3sdm_pa function containing species presence-absence data.}
+\item{pa_sf}{An \code{sf} object from \code{h3sdm_pa()} containing species presence–absence data.}
 
-\item{predictors_sf}{An sf object from the h3sdm_pred function with environmental predictors.}
+\item{predictors_sf}{An \code{sf} object from \code{h3sdm_predictors()} containing environmental predictors.}
 }
 \value{
-An sf object containing species, environmental, and spatial data.
+An \code{sf} object containing species presence–absence, environmental predictor variables,
+and centroid coordinates for each hexagon cell.
 }
 \description{
-Combines species presence-absence data with environmental predictors.
-It also calculates the centroid coordinates (x and y) for each hexagon.
+Combines species presence–absence data with environmental predictors.
+It also calculates centroid coordinates (x and y) for each hexagon grid cell.
 }
 \examples{
-# Assuming you have a species dataset (my_species_pa) and a predictor dataset (my_predictors)
-# my_species_pa <- h3sdm_pa(...)
-# my_predictors <- h3sdm_predictors(...)
-# combined_data <- h3sdm_data(my_species_pa, my_predictors)
+\dontrun{
+my_species_pa <- h3sdm_pa("Panthera onca", res = 6)
+my_predictors <- h3sdm_predictors(my_species_pa)
+combined_data <- h3sdm_data(my_species_pa, my_predictors)
+}
 }

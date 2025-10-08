@@ -1,22 +1,67 @@
 #' @name h3sdm_fit_model
 #' @title Fit a single H3SDM species distribution model
 #' @description
-#' Trains a single tidymodels workflow using a spatial split, computes performance metrics
-#' for each fold, and fits the final model to the full dataset. Optionally computes
-#' post-hoc metrics like TSS and the Boyce index.
+#' Fits a single species distribution model (SDM) workflow using spatial cross-validation.
+#' Computes performance metrics for each fold and fits the final model to the entire dataset.
+#' Optionally calculates post-hoc metrics such as True Skill Statistic (TSS) and Boyce index.
 #'
 #' @param sdm_workflow A `workflow` object from `h3sdm_workflow()` or manually created.
-#' @param data_split A resampling object (e.g., from `vfold_cv()` or `h3sdm_spatial_cv()`) for cross-validation.
-#' @param presence_data Optional `sf` or tibble with presence locations to compute Boyce index.
-#' @param truth_col Character. Name of the column containing the true presence/absence values (default `"presence"`).
-#' @param pred_col Character. Name of the column containing predicted probabilities (default `".pred_1"`).
+#' @param data_split A resampling object (e.g., from `vfold_cv()` or `h3sdm_spatial_cv()`) used for cross-validation.
+#' @param presence_data Optional `sf` or tibble object containing presence locations to compute Boyce index.
+#' @param truth_col Character string specifying the name of the column containing the true presence/absence values. Defaults to `"presence"`.
+#' @param pred_col Character string specifying the name of the column containing predicted probabilities. Defaults to `".pred_1"`.
 #'
-#' @return A list with:
+#' @return A list containing:
 #' \describe{
-#'   \item{cv_model}{Results of cross-validation (`tune_results`).}
-#'   \item{final_model}{Fitted workflow on full data.}
-#'   \item{metrics}{Tibble with performance metrics including ROC AUC, accuracy, sensitivity,
+#'   \item{cv_model}{Cross-validation results (`tune_results`).}
+#'   \item{final_model}{Fitted workflow on the full dataset.}
+#'   \item{metrics}{A tibble of performance metrics including ROC AUC, accuracy, sensitivity,
 #'                 specificity, F1-score, Kappa, TSS, and Boyce index.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' library(h3sdm)
+#' library(tidymodels)
+#' library(sf)
+#'
+#' # Simular datos espaciales
+#' coords <- cbind(
+#'   x = runif(20, -100, 100),
+#'   y = runif(20, -100, 100)
+#' )
+#' dat_sf <- st_as_sf(
+#'   data.frame(
+#'     x1 = rnorm(20),
+#'     x2 = rnorm(20),
+#'     presence = factor(sample(0:1, 20, replace = TRUE))
+#'   ),
+#'   coords = c("x", "y"),
+#'   crs = 4326
+#' )
+#'
+#' # Crear receta
+#' rec <- recipe(presence ~ x1 + x2, data = dat_sf)
+#'
+#' # Modelo simple
+#' mod_spec <- logistic_reg() %>%
+#'   set_engine("glm") %>%
+#'   set_mode("classification")
+#'
+#' # Crear workflow
+#' my_workflow <- workflow() %>%
+#'   add_model(mod_spec) %>%
+#'   add_recipe(rec)
+#'
+#' # Resampling espacial
+#' my_cv <- vfold_cv(dat_sf, v = 3)
+#'
+#' # Ajustar modelo
+#' fitted <- h3sdm_fit_model(
+#'   sdm_workflow  = my_workflow,
+#'   data_split    = my_cv,
+#'   presence_data = dat_sf
+#' )
 #' }
 #'
 #' @importFrom tune fit_resamples control_resamples
@@ -26,14 +71,6 @@
 #' @importFrom purrr imap map2_dfr
 #' @importFrom dplyr mutate
 #' @importFrom tibble tibble
-#' @examples
-#' \dontrun{
-#' fitted <- h3sdm_fit_model(
-#'   sdm_workflow  = my_workflow,
-#'   data_split    = my_cv,
-#'   presence_data = my_presence_sf
-#' )
-#' }
 #'
 #' @export
 

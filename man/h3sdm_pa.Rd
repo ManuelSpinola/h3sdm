@@ -40,11 +40,15 @@ h3sdm_pa(
 }
 \description{
 Generates presence-absence points for a species over a specified AOI using H3 hexagons.
-Retrieves occurrence records, aggregates them by hexagon, and samples pseudo-absences.
+Retrieves occurrence records from specified providers (e.g., GBIF), aggregates them
+by hexagon resolution, and samples pseudo-absence points. Useful for building
+species distribution models using hexagonal grids.
 }
 \examples{
 \dontrun{
-cr <- sf::st_read(system.file("shape/nc.shp", package="sf"))
-rec_sf <- h3sdm_pa("Lynx rufus", cr, res = 6, n_neg = 300, limit = 1000)
+# Example requires internet connection and AOI polygon
+nc <- sf::st_read(system.file("shape/nc.shp", package="sf"))
+rec_sf <- h3sdm_pa("Lynx rufus", nc, res = 6, n_neg = 300, limit = 1000)
 }
+
 }

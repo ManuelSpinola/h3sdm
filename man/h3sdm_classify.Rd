@@ -7,14 +7,44 @@
 h3sdm_classify(predictions_sf, threshold)
 }
 \arguments{
-\item{predictions_sf}{An sf object with a 'prediction' column from h3sdm_predict().}
+\item{predictions_sf}{An \code{sf} object containing a numeric column named
+\code{prediction}, typically produced by \code{\link[=h3sdm_predict]{h3sdm_predict()}}.}
 
-\item{threshold}{The optimal probability threshold (e.g., 0.45).}
+\item{threshold}{A numeric value representing the probability threshold
+(e.g., \code{0.45}) above which predictions are classified as presence (\code{1}).}
 }
 \value{
-An sf object with the same geometry as \code{predictions_sf} and a new integer column \code{predicted_presence} with values 0 (absence) or 1 (presence).
+An \code{sf} object with the same geometry and all original columns, plus a new
+integer column \code{predicted_presence} with values \code{0} (absence) or \code{1} (presence).
 }
 \description{
-Converts continuous probability predictions into binary
-presence/absence based on a specified threshold.
+Converts continuous probability predictions into binary presence/absence
+based on a specified threshold.
+}
+\details{
+This function is useful for converting continuous probability outputs into
+binary presence/absence data for mapping or model evaluation purposes.
+}
+\examples{
+\dontrun{
+library(sf)
+library(dplyr)
+
+# Crear un sf de ejemplo
+df <- data.frame(
+  id = 1:5,
+  prediction = c(0.2, 0.6, 0.45, 0.8, 0.3),
+  lon = c(-75, -74, -73, -72, -71),
+  lat = c(10, 11, 12, 13, 14)
+)
+
+df_sf <- st_as_sf(df, coords = c("lon", "lat"), crs = 4326)
+
+# Clasificar usando un umbral
+classified_sf <- h3sdm_classify(df_sf, threshold = 0.5)
+
+# Revisar resultados
+print(classified_sf)
+}
+
 }

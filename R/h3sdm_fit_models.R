@@ -21,7 +21,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Define workflows for different models
+#' # Example requires prepared recipes and resampling objects
 #' mod_log <- logistic_reg() %>%
 #'   set_engine("glm") %>%
 #'   set_mode("classification")
@@ -46,6 +46,7 @@
 #' @importFrom purrr imap map2_dfr
 #' @importFrom dplyr mutate
 #' @importFrom tibble tibble
+#'
 #' @export
 
 h3sdm_fit_models <- function(workflows, data_split, presence_data = NULL, truth_col = "presence", pred_col = ".pred_1") {

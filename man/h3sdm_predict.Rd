@@ -18,14 +18,16 @@ the predicted probability of presence for each hexagon.
 \description{
 Uses a fitted tidymodels workflow (from \code{h3sdm_fit_model} or a standalone workflow)
 to predict species presence probabilities on a new spatial H3 grid.
-Automatically generates \code{x} and \code{y} coordinates from polygon centroids if missing.
+Automatically generates centroid coordinates (\code{x} and \code{y}) if missing.
+The \code{new_data} must contain the same predictor variables as used in model training.
 }
 \examples{
 \dontrun{
-# Assuming 'fitted_model' is the result of h3sdm_fit_model()
-# and 'grid_sf' is an sf object with predictor variables
-predictions_sf <- h3sdm_predict(fit_object = fitted_model,
-                                new_data   = grid_sf)
+# Predict presence probabilities on a new hex grid
+predictions_sf <- h3sdm_predict(
+  fit_object = fitted_model,
+  new_data   = grid_sf
+)
 }
 
 }

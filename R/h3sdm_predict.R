@@ -3,7 +3,8 @@
 #' @description
 #' Uses a fitted tidymodels workflow (from `h3sdm_fit_model` or a standalone workflow)
 #' to predict species presence probabilities on a new spatial H3 grid.
-#' Automatically generates `x` and `y` coordinates from polygon centroids if missing.
+#' Automatically generates centroid coordinates (`x` and `y`) if missing.
+#' The `new_data` must contain the same predictor variables as used in model training.
 #'
 #' @param fit_object A fitted `tidymodels` workflow or the output list from `h3sdm_fit_model`.
 #' @param new_data An `sf` object containing the spatial grid and the same predictor variables used for model training.
@@ -13,10 +14,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Assuming 'fitted_model' is the result of h3sdm_fit_model()
-#' # and 'grid_sf' is an sf object with predictor variables
-#' predictions_sf <- h3sdm_predict(fit_object = fitted_model,
-#'                                 new_data   = grid_sf)
+#' # Predict presence probabilities on a new hex grid
+#' predictions_sf <- h3sdm_predict(
+#'   fit_object = fitted_model,
+#'   new_data   = grid_sf
+#' )
 #' }
 #'
 #' @importFrom sf st_drop_geometry st_centroid st_coordinates

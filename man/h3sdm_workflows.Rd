@@ -8,30 +8,46 @@ h3sdm_workflows(model_specs, sdm_recipe)
 }
 \arguments{
 \item{model_specs}{A named list of \code{tidymodels} model specifications
-(e.g., \code{logistic_reg()}, \code{rand_forest()}, \code{boost_tree()}).}
+(e.g., \code{logistic_reg()}, \code{rand_forest()}, \code{boost_tree()}), where each element
+specifies a different modeling approach to be included in the workflow set.}
 
-\item{sdm_recipe}{A \code{tidymodels} recipe object, typically created with \code{h3sdm_recipe()}.}
+\item{sdm_recipe}{A \code{tidymodels} recipe object, typically created with \code{h3sdm_recipe()},
+which prepares and preprocesses the data for modeling.}
 }
 \value{
 A named list of \code{workflow} objects, one per model specification.
 }
 \description{
-Takes a named list of \code{tidymodels} model specifications and a prepared recipe,
-returning a list of workflows ready for fitting or cross-validation. Useful for
-comparing multiple models for species distribution modeling with H3 hexagonal grids.
+Creates a list of tidymodels workflows from multiple model specifications and a prepared recipe.
+This is useful for comparing different modeling approaches in species distribution modeling
+using H3 hexagonal grids. The returned workflows can be used for model fitting and resampling.
+}
+\details{
+This function automates the creation of workflows for multiple model specifications.
+Each workflow combines the same preprocessing steps (recipe) with a different
+modeling method. This facilitates systematic comparison of models and is
+especially useful in ensemble and stacking approaches.
 }
 \examples{
 \dontrun{
-# Create model specifications
-mod_log <- logistic_reg() \%>\% set_mode("classification") \%>\% set_engine("glm")
-mod_rf  <- rand_forest()   \%>\% set_mode("classification") \%>\% set_engine("ranger")
+library(parsnip)
 
+# Define model specifications
+mod_log <- logistic_reg() \%>\%
+  set_mode("classification") \%>\%
+  set_engine("glm")
+
+mod_rf <- rand_forest() \%>\%
+  set_mode("classification") \%>\%
+  set_engine("ranger")
+
+# Named list of models
 model_list <- list(logistic = mod_log, rf = mod_rf)
 
 # Prepare recipe
 my_recipe <- h3sdm_recipe(combined_data)
 
-# Create multiple workflows
+# Create workflows
 workflows <- h3sdm_workflows(model_specs = model_list, sdm_recipe = my_recipe)
 }
 
