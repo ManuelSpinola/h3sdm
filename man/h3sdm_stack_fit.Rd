@@ -2,30 +2,31 @@
 % Please edit documentation in R/h3sdm_stack_fit.R
 \name{h3sdm_stack_fit}
 \alias{h3sdm_stack_fit}
-\title{Crea y ajusta completamente un ensemble de modelos (Stack).}
+\title{Creates and fully fits an ensemble model (Stack).}
 \usage{
 h3sdm_stack_fit(..., non_negative = TRUE, metric = NULL)
 }
 \arguments{
-\item{...}{Objetos de lista que son el resultado de \code{h3sdm_fit_model()}.
-Cada objeto debe contener el elemento \code{cv_model} (resultado de fit_resamples).}
+\item{...}{List objects that are the result of \code{h3sdm_fit_model()}.
+Each object must contain the \code{cv_model} element (result of fit_resamples).}
 
-\item{non_negative}{Lógico. Si es \code{TRUE} (por defecto), fuerza a que los
-pesos de los modelos candidatos sean no negativos.}
+\item{non_negative}{Logical. If \code{TRUE} (default), forces the candidate
+model weights to be non-negative.}
 
-\item{metric}{La métrica utilizada para optimizar la combinación de pesos.}
+\item{metric}{The metric used to optimize the combination of weights.}
 }
 \value{
-Un objeto \code{model_stack} completamente ajustado (\code{fitted}).
-Está listo para hacer predicciones directamente con \code{predict()}.
+A list containing two elements: \code{blended_model} (the stack after blending)
+and \code{final_model} (a fully \code{fitted} \code{model_stack} object).
+The \code{final_model} is ready for direct prediction with \code{predict()}.
 }
 \description{
-Esta función combina el proceso de crear la pila de modelos, optimizar los
-pesos (\code{blend_predictions}), y ajustar los modelos base al conjunto de
-entrenamiento completo (\code{fit_members()}) en un solo paso.
+This function combines the process of creating the model stack, optimizing the
+weights (\code{blend_predictions}), and fitting the base models to the complete
+training set (\code{fit_members()}) into a single step.
 
-\strong{Advertencia:} No sigue el flujo canónico de tidymodels, pero es conveniente.
-Requiere que los resultados de ajuste se generaran con \code{h3sdm_fit_model(..., for_stacking = TRUE)}.
+\strong{Warning:} It does not follow the canonical tidymodels flow but is convenient.
+It requires that the fitting results were generated using \code{h3sdm_fit_model(..., for_stacking = TRUE)}.
 }
 \seealso{
 Other h3sdm_tools: 

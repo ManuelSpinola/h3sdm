@@ -1,4 +1,5 @@
 #' @name h3sdm_fit_models
+#'
 #' @title Fit and evaluate multiple H3SDM species distribution models
 #' @description
 #' Fits one or more species distribution models using tidymodels workflows and

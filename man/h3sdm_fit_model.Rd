@@ -2,7 +2,7 @@
 % Please edit documentation in R/h3sdm_fit_model.R
 \name{h3sdm_fit_model}
 \alias{h3sdm_fit_model}
-\title{Ajusta un workflow SDM a los datos usando resampling y prepara para stacking.}
+\title{Fits an SDM workflow to data using resampling and prepares it for stacking.}
 \usage{
 h3sdm_fit_model(
   workflow,
@@ -15,30 +15,32 @@ h3sdm_fit_model(
 )
 }
 \arguments{
-\item{workflow}{Un objeto 'workflow' de tidymodels (ej., el GAM o Random Forest).}
+\item{workflow}{A 'workflow' object from tidymodels (e.g., GAM or Random Forest).}
 
-\item{data_split}{Un objeto 'rsplit' o 'rset' (ej. resultado de vfold_cv o spatial_block_cv).}
+\item{data_split}{An 'rsplit' or 'rset' object (e.g., result of vfold_cv or spatial_block_cv).}
 
-\item{presence_data}{(Opcional) Datos originales de presencia (usados para métricas extendidas).}
+\item{presence_data}{(Optional) Original presence data (used for extended metrics).}
 
-\item{truth_col}{Columna de la variable respuesta (por defecto, "presence").}
+\item{truth_col}{Column name of the response variable (defaults to "presence").}
 
-\item{pred_col}{Columna de predicción de la clase de interés (por defecto, ".pred_1").}
+\item{pred_col}{Column name for the prediction of the class of interest (defaults to ".pred_1").}
 
-\item{for_stacking}{Lógico. Si es \code{TRUE}, usa \code{control_stack_resamples()}
-para guardar toda la información del workflow necesaria para el paquete 'stacks'.
-Si es \code{FALSE}, usa el control estándar con \code{save_pred = TRUE}.}
+\item{for_stacking}{Logical. If \code{TRUE}, uses \code{control_stack_resamples()}
+to save all workflow information required for the 'stacks' package.
+If \code{FALSE}, uses the standard control with \code{save_pred = TRUE}.}
+
+\item{...}{Arguments passed on to other functions (e.g., to \code{tune::fit_resamples} if needed).}
 }
 \value{
-Una lista con tres elementos:
+A list with three elements:
 \itemize{
-\item \code{cv_model}: El resultado de \code{fit_resamples()}.
-\item \code{final_model}: El modelo ajustado a todo el conjunto de entrenamiento (primer split).
-\item \code{metrics}: Métricas de evaluación extendidas (si \code{presence_data} es provisto).
+\item \code{cv_model}: The result of \code{fit_resamples()}.
+\item \code{final_model}: The model fitted to the entire training set (first split).
+\item \code{metrics}: Extended evaluation metrics (if \code{presence_data} is provided).
 }
 }
 \description{
-Ajusta un workflow de Modelos de Distribución de Especies (SDM) a los datos de
-resampling (cross-validation). Esta función es el paso principal de entrenamiento
-y opcionalmente configura los resultados para ser usados con el paquete 'stacks'.
+Fits a Species Distribution Model (SDM) workflow to resampling data (cross-validation).
+This function is the main training step and optionally configures the results
+to be used with the 'stacks' package.
 }

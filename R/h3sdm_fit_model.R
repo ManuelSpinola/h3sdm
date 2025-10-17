@@ -1,24 +1,27 @@
-#' @title Ajusta un workflow SDM a los datos usando resampling y prepara para stacking.
+#' @name h3sdm_fit_model
+#'
+#' @title Fits an SDM workflow to data using resampling and prepares it for stacking.
 #'
 #' @description
-#' Ajusta un workflow de Modelos de Distribución de Especies (SDM) a los datos de
-#' resampling (cross-validation). Esta función es el paso principal de entrenamiento
-#' y opcionalmente configura los resultados para ser usados con el paquete 'stacks'.
+#' Fits a Species Distribution Model (SDM) workflow to resampling data (cross-validation).
+#' This function is the main training step and optionally configures the results
+#' to be used with the 'stacks' package.
 #'
-#' @param workflow Un objeto 'workflow' de tidymodels (ej., el GAM o Random Forest).
-#' @param data_split Un objeto 'rsplit' o 'rset' (ej. resultado de vfold_cv o spatial_block_cv).
-#' @param presence_data (Opcional) Datos originales de presencia (usados para métricas extendidas).
-#' @param truth_col Columna de la variable respuesta (por defecto, "presence").
-#' @param pred_col Columna de predicción de la clase de interés (por defecto, ".pred_1").
-#' @param for_stacking Lógico. Si es \code{TRUE}, usa \code{control_stack_resamples()}
-#'   para guardar toda la información del workflow necesaria para el paquete 'stacks'.
-#'   Si es \code{FALSE}, usa el control estándar con \code{save_pred = TRUE}.
+#' @param workflow A 'workflow' object from tidymodels (e.g., GAM or Random Forest).
+#' @param data_split An 'rsplit' or 'rset' object (e.g., result of vfold_cv or spatial_block_cv).
+#' @param presence_data (Optional) Original presence data (used for extended metrics).
+#' @param truth_col Column name of the response variable (defaults to "presence").
+#' @param pred_col Column name for the prediction of the class of interest (defaults to ".pred_1").
+#' @param for_stacking Logical. If \code{TRUE}, uses \code{control_stack_resamples()}
+#'   to save all workflow information required for the 'stacks' package.
+#'   If \code{FALSE}, uses the standard control with \code{save_pred = TRUE}.
+#' @param ... Arguments passed on to other functions (e.g., to \code{tune::fit_resamples} if needed).
 #'
-#' @return Una lista con tres elementos:
+#' @return A list with three elements:
 #' \itemize{
-#'   \item \code{cv_model}: El resultado de \code{fit_resamples()}.
-#'   \item \code{final_model}: El modelo ajustado a todo el conjunto de entrenamiento (primer split).
-#'   \item \code{metrics}: Métricas de evaluación extendidas (si \code{presence_data} es provisto).
+#'   \item \code{cv_model}: The result of \code{fit_resamples()}.
+#'   \item \code{final_model}: The model fitted to the entire training set (first split).
+#'   \item \code{metrics}: Extended evaluation metrics (if \code{presence_data} is provided).
 #' }
 #' @export
 #'
@@ -28,20 +31,19 @@
 #' @importFrom workflows fit
 #' @importFrom rsample analysis
 #' @importFrom sf st_drop_geometry
-
-
+#'
 h3sdm_fit_model <- function(workflow, data_split, presence_data = NULL,
                             truth_col = "presence", pred_col = ".pred_1",
                             for_stacking = FALSE, ...) {
 
   sdm_metrics <- yardstick::metric_set(roc_auc, accuracy, sens, spec, f_meas, kap)
 
-  # 1. Configuración de control dinámica
+  # 1. Dynamic control configuration
   if (for_stacking) {
-    # Control requerido por el paquete stacks
+    # Control required by the stacks package
     resamples_control <- stacks::control_stack_resamples()
   } else {
-    # Control estándar: Guarda predicciones para evaluación
+    # Standard control: Saves predictions for evaluation
     resamples_control <- tune::control_resamples(save_pred = TRUE)
   }
 
@@ -53,28 +55,28 @@ h3sdm_fit_model <- function(workflow, data_split, presence_data = NULL,
     control   = resamples_control
   )
 
-  # 3. Retorno para STACKING
+  # 3. Return for STACKING
   if (for_stacking) {
-    # Devuelve el objeto cv_model PURO (¡solución para stacks!)
+    # Returns the PURE cv_model object (solution for stacks!)
     return(cv_model)
   }
 
-  # --- Flujo Normal (NO Stacking): Retorno de Lista Completa ---
+  # --- Normal Flow (NO Stacking): Full List Return ---
 
-  # Inicialización (FIX: evita el error 'object final_metrics not found')
+  # Initialization (FIX: avoids 'object final_metrics not found' error)
   final_metrics <- NULL
 
-  # 4. Ajuste del modelo final
+  # 4. Final model fitting
   final_model <- workflows::fit(workflow, data = rsample::analysis(data_split$splits[[1]]))
 
-  # 5. Cálculo de Métricas Finales
+  # 5. Final Metrics Calculation
   if (!is.null(presence_data)) {
-    # Asegura que la data no tenga geometría para el cálculo
+    # Ensures data has no geometry for calculation
     if (inherits(presence_data, "sf")) {
       presence_data <- sf::st_drop_geometry(presence_data)
     }
 
-    # Asume que h3sdm_eval_metrics está definida y usa cv_model
+    # Assumes h3sdm_eval_metrics is defined and uses cv_model
     final_metrics <- h3sdm_eval_metrics(
       fitted_model  = cv_model,
       presence_data = presence_data,
@@ -83,7 +85,7 @@ h3sdm_fit_model <- function(workflow, data_split, presence_data = NULL,
     )
   }
 
-  # 6. Retornar la lista completa (para análisis/inspección)
+  # 6. Return the complete list (for analysis/inspection)
   return(list(
     cv_model    = cv_model,
     final_model = final_model,

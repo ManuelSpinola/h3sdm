@@ -6,10 +6,10 @@
 #' using H3 hexagonal grids. The returned workflows can be used for model fitting and resampling.
 #'
 #' @param model_specs A named list of `tidymodels` model specifications
-#'   (e.g., `logistic_reg()`, `rand_forest()`, `boost_tree()`), where each element
-#'   specifies a different modeling approach to be included in the workflow set.
+#' (e.g., `logistic_reg()`, `rand_forest()`, `boost_tree()`), where each element
+#' specifies a different modeling approach to be included in the workflow set.
 #' @param recipe A `tidymodels` recipe object, typically created with `h3sdm_recipe()`,
-#'   which prepares and preprocesses the data for modeling.
+#' which prepares and preprocesses the data for modeling.
 #'
 #' @details
 #' This function automates the creation of workflows for multiple model specifications.
@@ -28,8 +28,8 @@
 #' @importFrom workflows workflow add_model add_recipe
 #'
 #' @export
-# Los argumentos deben ser consistentes con la documentación: model_specs
-h3sdm_workflows <- function(model_specs, recipe = NULL) {
+
+h3sdm_workflows <- function(model_specs, recipe) {
 
   # 1. Corrección de la validación: Usar 'model_specs'
   if (!is.list(model_specs)) stop("model_specs debe ser una lista de especificaciones de modelos parsnip")
