@@ -7,7 +7,7 @@
 #'
 #' @param model_spec A `tidymodels` model specification (e.g., `logistic_reg()`, `rand_forest()`, or `boost_tree()`),
 #'   describing the model type and engine to use for fitting.
-#' @param sdm_recipe A `tidymodels` recipe object, typically created with `h3sdm_recipe()`,
+#' @param recipe A `tidymodels` recipe object, typically created with `h3sdm_recipe()`,
 #'   which preprocesses the data and defines predictor/response roles.
 #'
 #' @details
@@ -39,7 +39,7 @@
 #'
 #' @export
 
-h3sdm_workflow <- function(model_spec, sdm_recipe) {
+h3sdm_workflow <- function(model_spec, recipe) {
   if (!inherits(model_spec, "model_spec")) stop("model_spec debe ser un objeto <model_spec>")
   wf <- workflows::workflow() %>%
     workflows::add_model(model_spec) %>%

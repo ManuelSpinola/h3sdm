@@ -5,7 +5,7 @@
 #' This is useful for comparing different modeling approaches in species distribution modeling
 #' using H3 hexagonal grids. The returned workflows can be used for model fitting and resampling.
 #'
-#' @param models A named list of `tidymodels` model specifications
+#' @param model_spec A named list of `tidymodels` model specifications
 #'   (e.g., `logistic_reg()`, `rand_forest()`, `boost_tree()`), where each element
 #'   specifies a different modeling approach to be included in the workflow set.
 #' @param recipe A `tidymodels` recipe object, typically created with `h3sdm_recipe()`,
@@ -47,7 +47,7 @@
 #'
 #' @export
 
-h3sdm_workflows <- function(models, recipe = NULL) {
+h3sdm_workflows <- function(model_spec, recipe = NULL) {
   if (!is.list(models)) stop("models debe ser una lista de modelos parsnip")
 
   purrr::imap(models, function(mod, nm) {
