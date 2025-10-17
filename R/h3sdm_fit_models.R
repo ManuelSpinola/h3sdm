@@ -51,6 +51,11 @@
 
 h3sdm_fit_models <- function(workflows, data_split, presence_data = NULL, truth_col = "presence", pred_col = ".pred_1") {
 
+  # Convertir sf a data.frame si es necesario
+  if (!is.null(presence_data) && inherits(presence_data, "sf")) {
+    presence_data <- sf::st_drop_geometry(presence_data)
+  }
+
   results <- purrr::imap(workflows, function(wf, name) {
     fit_res <- h3sdm_fit_model(wf, data_split, presence_data, truth_col, pred_col)
     fit_res$model_name <- name

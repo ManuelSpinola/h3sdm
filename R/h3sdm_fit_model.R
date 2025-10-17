@@ -89,6 +89,11 @@ h3sdm_fit_model <- function(sdm_workflow, data_split, presence_data = NULL, trut
   # Modelo final sobre todos los datos
   final_model <- workflows::fit(sdm_workflow, data = rsample::analysis(data_split$splits[[1]]))
 
+  # Convertir sf a data.frame si es necesario
+  if (!is.null(presence_data) && inherits(presence_data, "sf")) {
+    presence_data <- sf::st_drop_geometry(presence_data)
+  }
+
   # Métricas extendidas
   final_metrics <- NULL
   if (!is.null(presence_data)) {

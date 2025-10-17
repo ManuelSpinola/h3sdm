@@ -4,14 +4,14 @@
 \alias{h3sdm_workflows}
 \title{Create multiple tidymodels workflows for H3-based SDMs}
 \usage{
-h3sdm_workflows(model_specs, sdm_recipe)
+h3sdm_workflows(models, recipe = NULL)
 }
 \arguments{
-\item{model_specs}{A named list of \code{tidymodels} model specifications
+\item{models}{A named list of \code{tidymodels} model specifications
 (e.g., \code{logistic_reg()}, \code{rand_forest()}, \code{boost_tree()}), where each element
 specifies a different modeling approach to be included in the workflow set.}
 
-\item{sdm_recipe}{A \code{tidymodels} recipe object, typically created with \code{h3sdm_recipe()},
+\item{recipe}{A \code{tidymodels} recipe object, typically created with \code{h3sdm_recipe()},
 which prepares and preprocesses the data for modeling.}
 }
 \value{

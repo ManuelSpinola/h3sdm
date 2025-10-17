@@ -5,10 +5,10 @@
 #' This is useful for comparing different modeling approaches in species distribution modeling
 #' using H3 hexagonal grids. The returned workflows can be used for model fitting and resampling.
 #'
-#' @param model_specs A named list of `tidymodels` model specifications
+#' @param models A named list of `tidymodels` model specifications
 #'   (e.g., `logistic_reg()`, `rand_forest()`, `boost_tree()`), where each element
 #'   specifies a different modeling approach to be included in the workflow set.
-#' @param sdm_recipe A `tidymodels` recipe object, typically created with `h3sdm_recipe()`,
+#' @param recipe A `tidymodels` recipe object, typically created with `h3sdm_recipe()`,
 #'   which prepares and preprocesses the data for modeling.
 #'
 #' @details
@@ -47,11 +47,17 @@
 #'
 #' @export
 
-h3sdm_workflows <- function(model_specs, sdm_recipe) {
-  if (!is.list(model_specs)) stop("model_specs debe ser una lista de <model_spec>")
-  purrr::imap(model_specs, function(mod, nm) {
-    workflows::workflow() %>%
-      workflows::add_model(mod) %>%
-      workflows::add_recipe(sdm_recipe)
+h3sdm_workflows <- function(models, recipe = NULL) {
+  if (!is.list(models)) stop("models debe ser una lista de modelos parsnip")
+
+  purrr::imap(models, function(mod, nm) {
+    wf <- workflows::workflow() %>% workflows::add_model(mod)
+
+    # Agregar la receta a todos los modelos si se proporciona
+    if (!is.null(recipe)) {
+      wf <- wf %>% workflows::add_recipe(recipe)
+    }
+
+    wf
   })
 }
