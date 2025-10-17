@@ -50,7 +50,7 @@ using H3 hexagonal grids. The returned workflows can be used for model fitting a
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">h3sdm_workflows</span><span class="op">(</span><span class="va">model_specs</span>, recipe <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">h3sdm_workflows</span><span class="op">(</span><span class="va">model_specs</span>, <span class="va">recipe</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -59,13 +59,13 @@ using H3 hexagonal grids. The returned workflows can be used for model fitting a
 
 <dl><dt id="arg-model-specs">model_specs<a class="anchor" aria-label="anchor" href="#arg-model-specs"></a></dt>
 <dd><p>A named list of <code>tidymodels</code> model specifications
-  (e.g., <code><a href="https://parsnip.tidymodels.org/reference/logistic_reg.html" class="external-link">logistic_reg()</a></code>, <code><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest()</a></code>, <code><a href="https://parsnip.tidymodels.org/reference/boost_tree.html" class="external-link">boost_tree()</a></code>), where each element
-  specifies a different modeling approach to be included in the workflow set.</p></dd>
+(e.g., <code><a href="https://parsnip.tidymodels.org/reference/logistic_reg.html" class="external-link">logistic_reg()</a></code>, <code><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest()</a></code>, <code><a href="https://parsnip.tidymodels.org/reference/boost_tree.html" class="external-link">boost_tree()</a></code>), where each element
+specifies a different modeling approach to be included in the workflow set.</p></dd>
 
 
 <dt id="arg-recipe">recipe<a class="anchor" aria-label="anchor" href="#arg-recipe"></a></dt>
 <dd><p>A <code>tidymodels</code> recipe object, typically created with <code><a href="h3sdm_recipe.html">h3sdm_recipe()</a></code>,
-  which prepares and preprocesses the data for modeling.</p></dd>
+which prepares and preprocesses the data for modeling.</p></dd>
 
 </dl></div>
     <div class="section level2">
