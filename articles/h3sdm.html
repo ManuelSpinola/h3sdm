@@ -144,20 +144,20 @@ and the characteristics of the species being modeled.</p>
 <span><span class="co">#&gt; Simple feature collection with 6 features and 2 fields</span></span>
 <span><span class="co">#&gt; Geometry type: MULTIPOLYGON</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
-<span><span class="co">#&gt; Bounding box:  xmin: -84.06344 ymin: 8.486587 xmax: -82.69362 ymax: 9.639285</span></span>
+<span><span class="co">#&gt; Bounding box:  xmin: -84.06344 ymin: 8.486587 xmax: -82.77295 ymax: 9.643344</span></span>
 <span><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
 <span><span class="co">#&gt;        h3_address presence                       geometry</span></span>
 <span><span class="co">#&gt; 1 8766b4415ffffff        1 MULTIPOLYGON (((-84.05549 9...</span></span>
-<span><span class="co">#&gt; 2 8766b54d3ffffff        1 MULTIPOLYGON (((-83.18895 8...</span></span>
-<span><span class="co">#&gt; 3 87679b78effffff        1 MULTIPOLYGON (((-82.85228 9...</span></span>
-<span><span class="co">#&gt; 4 8766b0135ffffff        1 MULTIPOLYGON (((-83.71366 8...</span></span>
-<span><span class="co">#&gt; 5 8766b014cffffff        1 MULTIPOLYGON (((-83.53362 8...</span></span>
-<span><span class="co">#&gt; 6 87679b620ffffff        1 MULTIPOLYGON (((-82.71216 9...</span></span></code></pre></div>
+<span><span class="co">#&gt; 2 87679b636ffffff        1 MULTIPOLYGON (((-82.79149 9...</span></span>
+<span><span class="co">#&gt; 3 8766b54d3ffffff        1 MULTIPOLYGON (((-83.18895 8...</span></span>
+<span><span class="co">#&gt; 4 87679b78effffff        1 MULTIPOLYGON (((-82.85228 9...</span></span>
+<span><span class="co">#&gt; 5 8766b0135ffffff        1 MULTIPOLYGON (((-83.71366 8...</span></span>
+<span><span class="co">#&gt; 6 8766b014cffffff        1 MULTIPOLYGON (((-83.53362 8...</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">records</span><span class="op">$</span><span class="va">presence</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   0   1 </span></span>
-<span><span class="co">#&gt; 300 111</span></span></code></pre></div>
+<span><span class="co">#&gt; 300 113</span></span></code></pre></div>
 <p><img src="h3sdm_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -288,14 +288,14 @@ folds.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 6</span></span></span>
 <span><span class="co">#&gt;   .metric  .estimator  mean std_err conf_low conf_high</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> accuracy binary     0.652  0.063<span style="text-decoration: underline;">9</span>    0.527     0.777</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> f_meas   binary     0.699  0.070<span style="text-decoration: underline;">9</span>    0.561     0.838</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> kap      binary     0.300  0.085<span style="text-decoration: underline;">5</span>    0.133     0.468</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> roc_auc  binary     0.672  0.049<span style="text-decoration: underline;">1</span>    0.576     0.768</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> sens     binary     0.595  0.087<span style="text-decoration: underline;">3</span>    0.424     0.766</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> spec     binary     0.770  0.086<span style="text-decoration: underline;">6</span>    0.600     0.939</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> tss      binary     0.434 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> boyce    binary     0.687 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> accuracy binary     0.611  0.027<span style="text-decoration: underline;">1</span>    0.558     0.664</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> f_meas   binary     0.684  0.044<span style="text-decoration: underline;">8</span>    0.596     0.771</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> kap      binary     0.217  0.043<span style="text-decoration: underline;">1</span>    0.132     0.301</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> roc_auc  binary     0.687  0.037<span style="text-decoration: underline;">0</span>    0.614     0.759</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> sens     binary     0.608  0.073<span style="text-decoration: underline;">2</span>    0.464     0.751</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> spec     binary     0.759  0.151     0.463     1.06 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> tss      binary     0.345 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> boyce    binary     0.458 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span></span></span></code></pre></div>
 <p>Key points:</p>
 <ul>
 <li><p>Metrics are computed using spatial cross-validation, so results
@@ -350,14 +350,14 @@ most influential and how they affect predictions.</p>
 <code class="sourceCode R"><span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/h3sdm_explain.html">h3sdm_explain</a></span><span class="op">(</span><span class="va">f</span><span class="op">$</span><span class="va">final_model</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Preparation of a new explainer is initiated</span></span>
 <span><span class="co">#&gt;   -&gt; model label       :  h3sdm workflow </span></span>
-<span><span class="co">#&gt;   -&gt; data              :  411  rows  6  cols </span></span>
-<span><span class="co">#&gt;   -&gt; target variable   :  411  values </span></span>
+<span><span class="co">#&gt;   -&gt; data              :  413  rows  6  cols </span></span>
+<span><span class="co">#&gt;   -&gt; target variable   :  413  values </span></span>
 <span><span class="co">#&gt;   -&gt; predict function  :  custom_predict </span></span>
 <span><span class="co">#&gt;   -&gt; predicted values  :  No value for predict function target column. (  default  )</span></span>
 <span><span class="co">#&gt;   -&gt; model_info        :  package tidymodels , ver. 1.4.1 , task classification (  default  ) </span></span>
-<span><span class="co">#&gt;   -&gt; predicted values  :  numerical, min =  0.001203664 , mean =  0.4468654 , max =  0.8345315  </span></span>
+<span><span class="co">#&gt;   -&gt; predicted values  :  numerical, min =  1.737835e-05 , mean =  0.4266961 , max =  0.9903545  </span></span>
 <span><span class="co">#&gt;   -&gt; residual function :  difference between y and yhat (  default  )</span></span>
-<span><span class="co">#&gt;   -&gt; residuals         :  numerical, min =  -0.8345315 , mean =  -0.1767924 , max =  0.885965  </span></span>
+<span><span class="co">#&gt;   -&gt; residuals         :  numerical, min =  -0.9903545 , mean =  -0.1530883 , max =  0.9705663  </span></span>
 <span><span class="co">#&gt;   A new explainer has been created!</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="feature-importance">Feature Importance<a class="anchor" aria-label="anchor" href="#feature-importance"></a>
@@ -437,11 +437,11 @@ category.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>scenario <span class="op">=</span> <span class="st">"Present"</span><span class="op">)</span></span>
 <span><span class="va">counts_current</span></span>
 <span><span class="co">#&gt;   habitat_cat    n scenario</span></span>
-<span><span class="co">#&gt; 1    Very low 2767  Present</span></span>
-<span><span class="co">#&gt; 2         Low 2978  Present</span></span>
-<span><span class="co">#&gt; 3      Medium 1881  Present</span></span>
-<span><span class="co">#&gt; 4        High 2241  Present</span></span>
-<span><span class="co">#&gt; 5   Very high  549  Present</span></span></code></pre></div>
+<span><span class="co">#&gt; 1    Very low 5026  Present</span></span>
+<span><span class="co">#&gt; 2         Low 1058  Present</span></span>
+<span><span class="co">#&gt; 3      Medium 1239  Present</span></span>
+<span><span class="co">#&gt; 4        High 1570  Present</span></span>
+<span><span class="co">#&gt; 5   Very high 1523  Present</span></span></code></pre></div>
 <p>Now we can create a waffle plot to visualize the distribution of
 habitat suitability categories.</p>
 <p><img src="h3sdm_files/figure-html/unnamed-chunk-37-1.png" width="700"></p>
@@ -503,11 +503,11 @@ category.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>scenario <span class="op">=</span> <span class="st">"Future"</span><span class="op">)</span></span>
 <span><span class="va">counts_future</span></span>
 <span><span class="co">#&gt;   habitat_cat    n scenario</span></span>
-<span><span class="co">#&gt; 1    Very low 2894   Future</span></span>
-<span><span class="co">#&gt; 2         Low 2918   Future</span></span>
-<span><span class="co">#&gt; 3      Medium 1906   Future</span></span>
-<span><span class="co">#&gt; 4        High 2258   Future</span></span>
-<span><span class="co">#&gt; 5   Very high  405   Future</span></span></code></pre></div>
+<span><span class="co">#&gt; 1    Very low 4969   Future</span></span>
+<span><span class="co">#&gt; 2         Low 1130   Future</span></span>
+<span><span class="co">#&gt; 3      Medium 1197   Future</span></span>
+<span><span class="co">#&gt; 4        High 1567   Future</span></span>
+<span><span class="co">#&gt; 5   Very high 1518   Future</span></span></code></pre></div>
 <p>Now we can create a waffle plot to visualize the distribution of
 habitat suitability categories for the future scenario.</p>
 <p><img src="h3sdm_files/figure-html/unnamed-chunk-47-1.png" width="700"></p>
