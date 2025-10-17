@@ -30,7 +30,6 @@ Requiere que los resultados de ajuste se generaran con \code{h3sdm_fit_model(...
 \seealso{
 Other h3sdm_tools: 
 \code{\link{h3sdm_recipe_gam}()},
-\code{\link{h3sdm_stack_blend}()},
 \code{\link{h3sdm_workflow_gam}()}
 }
 \concept{h3sdm_tools}

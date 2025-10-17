@@ -45,6 +45,7 @@
 #' }
 #'
 #' @export
+
 h3sdm_recipe_gam <- function(data) {
   if (!inherits(data, "sf")) stop("data must be an sf object.")
 

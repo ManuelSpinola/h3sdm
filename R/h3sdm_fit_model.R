@@ -5,7 +5,7 @@
 #' resampling (cross-validation). Esta función es el paso principal de entrenamiento
 #' y opcionalmente configura los resultados para ser usados con el paquete 'stacks'.
 #'
-#' @param sdm_workflow Un objeto 'workflow' de tidymodels (ej., el GAM o Random Forest).
+#' @param workflow Un objeto 'workflow' de tidymodels (ej., el GAM o Random Forest).
 #' @param data_split Un objeto 'rsplit' o 'rset' (ej. resultado de vfold_cv o spatial_block_cv).
 #' @param presence_data (Opcional) Datos originales de presencia (usados para métricas extendidas).
 #' @param truth_col Columna de la variable respuesta (por defecto, "presence").
@@ -30,42 +30,51 @@
 #' @importFrom sf st_drop_geometry
 
 
-h3sdm_fit_model <- function(sdm_workflow, data_split, presence_data = NULL,
+h3sdm_fit_model <- function(workflow, data_split, presence_data = NULL,
                             truth_col = "presence", pred_col = ".pred_1",
-                            for_stacking = FALSE) {
+                            for_stacking = FALSE, ...) {
 
   sdm_metrics <- yardstick::metric_set(roc_auc, accuracy, sens, spec, f_meas, kap)
 
-  # Configuración de control dinámica para Stacking
+  # 1. Configuración de control dinámica
   if (for_stacking) {
-    # Control especial requerido por el paquete stacks
+    # Control requerido por el paquete stacks
     resamples_control <- stacks::control_stack_resamples()
   } else {
-    # Control estándar, solo guarda las predicciones
+    # Control estándar: Guarda predicciones para evaluación
     resamples_control <- tune::control_resamples(save_pred = TRUE)
   }
 
-  # Cross-validation
+  # 2. Cross-validation
   cv_model <- tune::fit_resamples(
-    object    = sdm_workflow,
+    object    = workflow,
     resamples = data_split,
     metrics   = sdm_metrics,
-    control   = resamples_control # Usando el control ajustado
+    control   = resamples_control
   )
 
-  # Modelo final sobre los datos de entrenamiento del primer split
-  # Nota: Usar el primer split como sustituto de los 'datos de entrenamiento completos'
-  final_model <- workflows::fit(sdm_workflow, data = rsample::analysis(data_split$splits[[1]]))
-
-  # Convertir sf a data.frame si es necesario para el cálculo de métricas
-  if (!is.null(presence_data) && inherits(presence_data, "sf")) {
-    presence_data <- sf::st_drop_geometry(presence_data)
+  # 3. Retorno para STACKING
+  if (for_stacking) {
+    # Devuelve el objeto cv_model PURO (¡solución para stacks!)
+    return(cv_model)
   }
 
-  # Métricas extendidas
+  # --- Flujo Normal (NO Stacking): Retorno de Lista Completa ---
+
+  # Inicialización (FIX: evita el error 'object final_metrics not found')
   final_metrics <- NULL
+
+  # 4. Ajuste del modelo final
+  final_model <- workflows::fit(workflow, data = rsample::analysis(data_split$splits[[1]]))
+
+  # 5. Cálculo de Métricas Finales
   if (!is.null(presence_data)) {
-    # Asume que h3sdm_eval_metrics está definida en tu paquete
+    # Asegura que la data no tenga geometría para el cálculo
+    if (inherits(presence_data, "sf")) {
+      presence_data <- sf::st_drop_geometry(presence_data)
+    }
+
+    # Asume que h3sdm_eval_metrics está definida y usa cv_model
     final_metrics <- h3sdm_eval_metrics(
       fitted_model  = cv_model,
       presence_data = presence_data,
@@ -74,6 +83,7 @@ h3sdm_fit_model <- function(sdm_workflow, data_split, presence_data = NULL,
     )
   }
 
+  # 6. Retornar la lista completa (para análisis/inspección)
   return(list(
     cv_model    = cv_model,
     final_model = final_model,

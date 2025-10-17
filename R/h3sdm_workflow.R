@@ -43,7 +43,7 @@ h3sdm_workflow <- function(model_spec, recipe) {
   if (!inherits(model_spec, "model_spec")) stop("model_spec debe ser un objeto <model_spec>")
   wf <- workflows::workflow() %>%
     workflows::add_model(model_spec) %>%
-    workflows::add_recipe(sdm_recipe)
+    workflows::add_recipe(recipe)
   return(wf)
 }
 

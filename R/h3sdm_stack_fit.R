@@ -24,45 +24,52 @@
 
 h3sdm_stack_fit <- function(..., non_negative = TRUE, metric = NULL) {
 
-  # 1. Preparación y Validación
+  # 1. Obtener los candidatos (se esperan objetos tune_results puros)
   candidate_list <- list(...)
 
   if (length(candidate_list) < 2) {
-    stop("Se requieren al menos dos resultados de h3sdm_fit_model para crear un stack.")
+    stop("Se requieren al menos dos modelos para crear un stack.")
   }
 
-  model_stack <- stacks::stacks()
+  # 2. Asignar NOMBRES a los argumentos (CRUCIAL para add_candidates)
+  nombres <- names(candidate_list)
+  if (is.null(nombres) || any(nombres == "")) {
+    nombres_originales <- as.character(substitute(list(...)))[-1]
+    names(candidate_list) <- nombres_originales
+  }
 
-  # 2. Añadir los Candidatos (Mismo proceso que antes)
-  for (name in names(candidate_list)) {
-    fit_result <- candidate_list[[name]]
+  # 3. Inicializar el stack y añadir candidatos (Lógica que SÍ FUNCIONA)
+  primer_nombre <- names(candidate_list)[1]
+  primer_candidato <- candidate_list[[1]]
 
-    if (!inherits(fit_result, "list") || is.null(fit_result$cv_model)) {
-      warning(paste("El argumento", name, "no es un resultado válido de h3sdm_fit_model. Omitiendo."))
-      next
+  model_stack <- stacks::stacks() %>%
+    stacks::add_candidates(primer_candidato, name = primer_nombre)
+
+  # 4. Añadir el resto de candidatos uno por uno
+  if (length(candidate_list) > 1) {
+    for (i in 2:length(candidate_list)) {
+      nombre_actual <- names(candidate_list)[i]
+      candidato_actual <- candidate_list[[i]]
+
+      model_stack <- model_stack %>%
+        stacks::add_candidates(candidato_actual, name = nombre_actual)
     }
-
-    cv_model_res <- fit_result$cv_model
-
-    model_stack <- model_stack %>%
-      stacks::add_candidates(cv_model_res, name = name)
   }
 
-  if (is.null(model_stack$candidate)) {
-    stop("No se encontraron candidatos válidos (cv_model) para el stacking.")
-  }
-
-  # 3. Entrenar los Pesos (Blending)
+  # 5. Entrenar los pesos (Blending)
   ensemble_model_blended <- model_stack %>%
     stacks::blend_predictions(
       non_negative = non_negative,
       metric = metric
     )
 
-  # 4. PASO EXTRA: Ajustar los Miembros (Fit Members)
-  # Este es el paso que diferencia esta función de h3sdm_models_stack
+  # 6. Ajustar los Miembros (Fit Members)
   final_ensemble_model <- ensemble_model_blended %>%
-    stacks::fit_members() # Ajuste final de los modelos base a los datos completos
+    stacks::fit_members()
 
-  return(final_ensemble_model)
+  # 7. DEVOLVER AMBOS MODELOS EN UNA LISTA
+  return(list(
+    blended_model = ensemble_model_blended,
+    final_model = final_ensemble_model
+  ))
 }

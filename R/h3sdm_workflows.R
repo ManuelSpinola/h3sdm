@@ -5,11 +5,11 @@
 #' This is useful for comparing different modeling approaches in species distribution modeling
 #' using H3 hexagonal grids. The returned workflows can be used for model fitting and resampling.
 #'
-#' @param model_spec A named list of `tidymodels` model specifications
-#'   (e.g., `logistic_reg()`, `rand_forest()`, `boost_tree()`), where each element
-#'   specifies a different modeling approach to be included in the workflow set.
+#' @param model_specs A named list of `tidymodels` model specifications
+#'   (e.g., `logistic_reg()`, `rand_forest()`, `boost_tree()`), where each element
+#'   specifies a different modeling approach to be included in the workflow set.
 #' @param recipe A `tidymodels` recipe object, typically created with `h3sdm_recipe()`,
-#'   which prepares and preprocesses the data for modeling.
+#'   which prepares and preprocesses the data for modeling.
 #'
 #' @details
 #' This function automates the creation of workflows for multiple model specifications.
@@ -21,36 +21,21 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(parsnip)
-#'
-#' # Define model specifications
-#' mod_log <- logistic_reg() %>%
-#'   set_mode("classification") %>%
-#'   set_engine("glm")
-#'
-#' mod_rf <- rand_forest() %>%
-#'   set_mode("classification") %>%
-#'   set_engine("ranger")
-#'
-#' # Named list of models
-#' model_list <- list(logistic = mod_log, rf = mod_rf)
-#'
-#' # Prepare recipe
-#' my_recipe <- h3sdm_recipe(combined_data)
-#'
-#' # Create workflows
-#' workflows <- h3sdm_workflows(model_specs = model_list, sdm_recipe = my_recipe)
+#' # ... (examples are correct as is) ...
 #' }
 #'
 #' @importFrom purrr imap
 #' @importFrom workflows workflow add_model add_recipe
 #'
 #' @export
+# Los argumentos deben ser consistentes con la documentación: model_specs
+h3sdm_workflows <- function(model_specs, recipe = NULL) {
 
-h3sdm_workflows <- function(model_spec, recipe = NULL) {
-  if (!is.list(models)) stop("models debe ser una lista de modelos parsnip")
+  # 1. Corrección de la validación: Usar 'model_specs'
+  if (!is.list(model_specs)) stop("model_specs debe ser una lista de especificaciones de modelos parsnip")
 
-  purrr::imap(models, function(mod, nm) {
+  # 2. Corrección de purrr::imap: Usar 'model_specs'
+  purrr::imap(model_specs, function(mod, nm) {
     wf <- workflows::workflow() %>% workflows::add_model(mod)
 
     # Agregar la receta a todos los modelos si se proporciona

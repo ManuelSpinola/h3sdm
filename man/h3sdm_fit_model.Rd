@@ -5,16 +5,17 @@
 \title{Ajusta un workflow SDM a los datos usando resampling y prepara para stacking.}
 \usage{
 h3sdm_fit_model(
-  sdm_workflow,
+  workflow,
   data_split,
   presence_data = NULL,
   truth_col = "presence",
   pred_col = ".pred_1",
-  for_stacking = FALSE
+  for_stacking = FALSE,
+  ...
 )
 }
 \arguments{
-\item{sdm_workflow}{Un objeto 'workflow' de tidymodels (ej., el GAM o Random Forest).}
+\item{workflow}{Un objeto 'workflow' de tidymodels (ej., el GAM o Random Forest).}
 
 \item{data_split}{Un objeto 'rsplit' o 'rset' (ej. resultado de vfold_cv o spatial_block_cv).}
 
