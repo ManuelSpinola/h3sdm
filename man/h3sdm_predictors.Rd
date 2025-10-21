@@ -2,55 +2,59 @@
 % Please edit documentation in R/h3sdm_predictors.R
 \name{h3sdm_predictors}
 \alias{h3sdm_predictors}
-\title{Extract Predictors for Hexagonal Grids}
+\title{Merge numeric, categorical, and landscape metric sf into one}
 \usage{
-h3sdm_predictors(
-  aoi_sf,
-  res = 6,
-  num_rasters = NULL,
-  cat_rasters = NULL,
-  landscape_raster = NULL,
-  expand_factor = 0.1
-)
+h3sdm_predictors(num_sf, cat_sf, it_sf)
 }
 \arguments{
-\item{aoi_sf}{An \code{sf} object (POLYGON or MULTIPOLYGON) defining the area of interest.}
+\item{num_sf}{An \code{sf} object with numeric raster values.
+Typically the output of \code{h3sdm_extract_num()}.}
 
-\item{res}{Integer. H3 resolution (default = 6).}
+\item{cat_sf}{An \code{sf} object with categorical raster proportions.
+Typically the output of \code{h3sdm_extract_cat()}.}
 
-\item{num_rasters}{A \code{SpatRaster} or list of \code{SpatRaster}s with numeric variables to extract (optional).}
-
-\item{cat_rasters}{A named list of \code{SpatRaster}s with categorical variables to extract (optional).}
-
-\item{landscape_raster}{A \code{SpatRaster} for calculating landscape metrics (optional).}
-
-\item{expand_factor}{Numeric. Factor to expand the AOI when creating the H3 grid (default = 0.1).}
+\item{it_sf}{An \code{sf} object with landscape metrics.
+Typically the output of \code{h3sdm_calculate_it_metrics()}.}
 }
 \value{
-An \code{sf} object (MULTIPOLYGON) representing the H3 grid, with predictor columns added.
+An \code{sf} object of class MULTIPOLYGON with all variables from the
+three input sf objects combined as columns.
 }
 \description{
-Generates an H3 hexagonal grid over a specified area of interest (AOI) and extracts
-numeric, categorical, and landscape predictors for each hexagon. Uses functions
-from the 'paisaje' package to calculate landscape metrics when \code{landscape_raster} is provided.
-If \code{landscape_raster} is not supplied, only numeric and categorical predictors will be extracted.
+This function allows the combination of numeric raster extractions
+(from \code{h3sdm_extract_num}), categorical raster proportions
+(from \code{h3sdm_extract_cat}), and landscape metrics
+(from \code{h3sdm_calculate_it_metrics}) into a single \code{sf} object.
+It ensures that the geometry remains a \code{MULTIPOLYGON} and performs
+joins by the \code{h3_address} or \code{ID} column.
+}
+\details{
+Combine extracted numeric, categorical, and landscape metrics into a single sf
+
+This function merges three pre-computed sf objects—numeric raster values,
+categorical raster proportions, and landscape metrics—into a single sf object.
+The resulting sf has all variables as columns and geometry as MULTIPOLYGON.
+
+The function performs a left join of the categorical and numeric sf objects
+and then joins the landscape metrics. The geometry column is preserved
+and cast to \code{MULTIPOLYGON} to ensure compatibility with mapping and spatial analyses.
 }
 \examples{
 \dontrun{
-# Example: Extract numeric and categorical predictors for a study area
-library(terra)
-library(sf)
+# Suppose you already have a hex grid:
+hex_grid_sf <- h3sdm_get_grid(aoi_sf, res = 7)
 
-bio <- rast("cr_bio/bio.tif")           # numeric raster
-lc  <- rast("landcover.tif")            # categorical raster
-cr  <- cr_outline_c                      # area of interest (sf POLYGON/MULTIPOLYGON)
+# Extract numeric raster values
+num_sf <- h3sdm_extract_num(bio, hex_grid_sf)
 
-pred_sf <- h3sdm_predictors(
-  aoi_sf = cr,
-  res = 6,
-  num_rasters = bio,
-  cat_rasters = list(landcover = lc)
-)
+# Extract categorical raster proportions
+cat_sf <- h3sdm_extract_cat(lulc, hex_grid_sf)
+
+# Calculate landscape metrics
+it_sf <- h3sdm_calculate_it_metrics(lulc, hex_grid_sf)
+
+# Combine everything
+predictors_sf <- h3sdm_predictors(num_sf, cat_sf, it_sf)
 }
 
 }

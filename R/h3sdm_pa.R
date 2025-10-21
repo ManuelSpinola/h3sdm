@@ -1,32 +1,26 @@
 #' @name h3sdm_pa
-#' @title Sample Presence-Absence Data for a Species in Hexagonal Grid
+#' @title Generate presence-absence dataset on H3 hexagonal grid
+#'
 #' @description
-#' Generates presence-absence points for a species over a specified AOI using H3 hexagons.
-#' Retrieves occurrence records from specified providers (e.g., GBIF), aggregates them
-#' by hexagon resolution, and samples pseudo-absence points. Useful for building
-#' species distribution models using hexagonal grids.
+#' Downloads species records within an AOI, assigns them to an H3 hexagonal grid,
+#' and generates a presence-absence dataset with optional pseudo-absences.
 #'
-#' @param species Character. Species name.
-#' @param aoi_sf `sf` polygon of the area of interest (AOI).
-#' @param res Integer. H3 resolution (1–16). Default 6.
-#' @param n_neg Integer. Number of pseudo-absence hexagons to sample. Default 500.
-#' @param providers Character vector of data sources (e.g., "gbif").
-#' @param remove_duplicates Logical. Remove duplicate geometries. Default FALSE.
-#' @param date Character vector c("start","end") to filter by date.
-#' @param limit Integer. Maximum number of occurrence records to download. Default 500.
-#' @param expand_factor Numeric. Expand AOI bbox for full hex coverage. Default 0.1.
-#' @return `sf` object with columns `h3_address`, `presence` (factor 0/1), and `geometry`.
-#' @importFrom paisaje get_records_by_hexagon
+#' @param species Character string with the species name.
+#' @param aoi_sf `sf` object defining the area of interest.
+#' @param res H3 resolution (integer, default 6).
+#' @param n_neg Number of pseudo-absence hexagons to sample (default 500).
+#' @param providers Optional vector of data providers (GBIF, iNaturalist, etc.).
+#' @param remove_duplicates Logical, whether to remove duplicate records (default FALSE).
+#' @param date Optional date filter for records.
+#' @param limit Maximum number of records to download (default 500).
+#' @param expand_factor Fraction to expand AOI when generating grid (default 0.1).
 #'
-#' @examples
-#' \dontrun{
-#' # Example requires internet connection and AOI polygon
-#' nc <- sf::st_read(system.file("shape/nc.shp", package="sf"))
-#' rec_sf <- h3sdm_pa("Lynx rufus", nc, res = 6, n_neg = 300, limit = 1000)
-#' }
+#' @return `sf` object with columns:
+#'   - `h3_address`: H3 hexagon identifier
+#'   - `presence`: factor (0 = absence / pseudo-absence, 1 = presence)
+#'   - `geometry`: MULTIPOLYGON of the hexagon
 #'
 #' @export
-
 h3sdm_pa <- function(species,
                      aoi_sf,
                      res = 6,
@@ -37,36 +31,45 @@ h3sdm_pa <- function(species,
                      limit = 500,
                      expand_factor = 0.1) {
 
-  # hex grid + records
-  rec <- get_records_by_hexagon(
+  if (!inherits(aoi_sf, "sf")) stop("aoi_sf must be an sf object")
+  if (!is.character(species)) stop("species must be a character vector")
+
+  # 1️⃣ Generate hexagonal grid
+  hex_grid <- h3sdm_get_grid(aoi_sf, res = res, expand_factor = expand_factor)
+  hex_grid <- hex_grid[, c("h3_address", "geometry")]
+  hex_grid <- sf::st_cast(hex_grid, "MULTIPOLYGON")
+
+  # 2️⃣ Download species records
+  sp_sf <- get_records(
     species = species,
     aoi_sf = aoi_sf,
-    res = res,
     providers = providers,
     remove_duplicates = remove_duplicates,
     date = date,
-    limit = limit,
-    expand_factor = expand_factor
+    limit = limit
   )
 
-  # presence variable
-  col_name <- gsub(" ", "_", species)
-  rec <- rec %>%
-    dplyr::mutate(presence = ifelse(.data[[col_name]] > 0, 1, 0)) %>%
-    dplyr::select(h3_address, presence, geometry)
+  # If no records found, return all absences
+  if (nrow(sp_sf) == 0) {
+    hex_grid$presence <- factor(0, levels = c("0", "1"))
+    return(hex_grid)
+  }
 
-  # Pseudo-absences
-  n_total_neg <- nrow(dplyr::filter(rec, presence == 0))
-  neg_hex <- rec %>%
-    dplyr::filter(presence == 0) %>%
-    dplyr::slice_sample(n = min(n_neg, n_total_neg)) %>%
-    dplyr::mutate(presence = 0)
+  # 3️⃣ Assign species to hexagons using st_intersects
+  hits <- sf::st_intersects(hex_grid, sp_sf)
+  hex_grid$presence <- as.integer(lengths(hits) > 0)
 
-  pos_hex <- rec %>% dplyr::filter(presence == 1)
+  # 4️⃣ Sample pseudo-absences
+  pos_hex <- hex_grid[hex_grid$presence == 1, ]
+  neg_hex <- hex_grid[hex_grid$presence == 0, ]
+  if (nrow(neg_hex) > 0) {
+    n_sample <- min(n_neg, nrow(neg_hex))
+    neg_hex <- neg_hex[sample(seq_len(nrow(neg_hex)), n_sample), ]
+    neg_hex$presence <- 0
+  }
 
-  dataset_sf <- dplyr::bind_rows(pos_hex, neg_hex)
-
-  # Convert presence to factor
+  # Combine presence + pseudo-absence
+  dataset_sf <- rbind(pos_hex, neg_hex)
   dataset_sf$presence <- factor(dataset_sf$presence, levels = c("0", "1"))
 
   return(dataset_sf)

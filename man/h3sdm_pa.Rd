@@ -2,7 +2,7 @@
 % Please edit documentation in R/h3sdm_pa.R
 \name{h3sdm_pa}
 \alias{h3sdm_pa}
-\title{Sample Presence-Absence Data for a Species in Hexagonal Grid}
+\title{Generate presence-absence dataset on H3 hexagonal grid}
 \usage{
 h3sdm_pa(
   species,
@@ -17,38 +17,33 @@ h3sdm_pa(
 )
 }
 \arguments{
-\item{species}{Character. Species name.}
+\item{species}{Character string with the species name.}
 
-\item{aoi_sf}{\code{sf} polygon of the area of interest (AOI).}
+\item{aoi_sf}{\code{sf} object defining the area of interest.}
 
-\item{res}{Integer. H3 resolution (1–16). Default 6.}
+\item{res}{H3 resolution (integer, default 6).}
 
-\item{n_neg}{Integer. Number of pseudo-absence hexagons to sample. Default 500.}
+\item{n_neg}{Number of pseudo-absence hexagons to sample (default 500).}
 
-\item{providers}{Character vector of data sources (e.g., "gbif").}
+\item{providers}{Optional vector of data providers (GBIF, iNaturalist, etc.).}
 
-\item{remove_duplicates}{Logical. Remove duplicate geometries. Default FALSE.}
+\item{remove_duplicates}{Logical, whether to remove duplicate records (default FALSE).}
 
-\item{date}{Character vector c("start","end") to filter by date.}
+\item{date}{Optional date filter for records.}
 
-\item{limit}{Integer. Maximum number of occurrence records to download. Default 500.}
+\item{limit}{Maximum number of records to download (default 500).}
 
-\item{expand_factor}{Numeric. Expand AOI bbox for full hex coverage. Default 0.1.}
+\item{expand_factor}{Fraction to expand AOI when generating grid (default 0.1).}
 }
 \value{
-\code{sf} object with columns \code{h3_address}, \code{presence} (factor 0/1), and \code{geometry}.
+\code{sf} object with columns:
+\itemize{
+\item \code{h3_address}: H3 hexagon identifier
+\item \code{presence}: factor (0 = absence / pseudo-absence, 1 = presence)
+\item \code{geometry}: MULTIPOLYGON of the hexagon
+}
 }
 \description{
-Generates presence-absence points for a species over a specified AOI using H3 hexagons.
-Retrieves occurrence records from specified providers (e.g., GBIF), aggregates them
-by hexagon resolution, and samples pseudo-absence points. Useful for building
-species distribution models using hexagonal grids.
-}
-\examples{
-\dontrun{
-# Example requires internet connection and AOI polygon
-nc <- sf::st_read(system.file("shape/nc.shp", package="sf"))
-rec_sf <- h3sdm_pa("Lynx rufus", nc, res = 6, n_neg = 300, limit = 1000)
-}
-
+Downloads species records within an AOI, assigns them to an H3 hexagonal grid,
+and generates a presence-absence dataset with optional pseudo-absences.
 }
