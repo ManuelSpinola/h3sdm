@@ -9,3 +9,6 @@
 inst/doc
 /doc/
 /Meta/
+_site/
+docs/
+*.html

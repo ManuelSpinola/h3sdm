@@ -82,7 +82,7 @@ There are different methods for generating pseudo-absences; here, we rely on ran
 
 
 ```{r}
-records <- h3sdm_pa("Silverstoneia flotator", cr, res = 7, limit = 10000, n_neg = 300)
+records <- h3sdm_pa("Silverstoneia flotator", cr, res = 7, limit = 10000, n_pseudoabs = 300)
 ```
 
 ```{r}
