@@ -2,36 +2,51 @@
 % Please edit documentation in R/h3sdm_extract_cat.R
 \name{h3sdm_extract_cat}
 \alias{h3sdm_extract_cat}
-\title{Extract categorical raster values for a hexagonal grid}
+\title{Calculate Area Proportions for Categorical Raster Classes}
 \usage{
-h3sdm_extract_cat(
-  spat_raster_cat,
-  aoi_sf,
-  res = 7,
-  expand_factor = 0.1,
-  clip_to_aoi = FALSE
-)
+h3sdm_extract_cat(spat_raster_cat, sf_hex_grid, proportion = TRUE)
 }
 \arguments{
-\item{spat_raster_cat}{A \code{SpatRaster} object containing categorical layers.}
+\item{spat_raster_cat}{A single-layer \code{SpatRaster} object containing categorical
+values (e.g., LULC classes).}
 
-\item{aoi_sf}{An \code{sf} object defining the area of interest.}
+\item{sf_hex_grid}{An \code{sf} object containing polygonal geometries (e.g., H3
+hexagons). Must contain a column named \code{h3_address} for joining and grouping.}
 
-\item{res}{H3 resolution (integer) for the hexagonal grid.}
-
-\item{expand_factor}{Numeric factor to expand the AOI bbox before generating the grid (default 0.1).}
-
-\item{clip_to_aoi}{Logical, if TRUE hexagons are clipped to the AOI (default FALSE).}
+\item{proportion}{Logical. If \code{TRUE} (default), the output values are the
+proportion of the polygon area covered by each category (summing to 1 for covered area).
+If \code{FALSE}, the output is the raw sum of the coverage fraction (area).}
 }
 \value{
-An \code{sf} object (\code{MULTIPOLYGON}) with categorical raster values added as columns.
+An \code{sf} object identical to \code{sf_hex_grid}, but with new columns
+appended for each categorical value found in the raster. Column names follow the
+pattern \code{<layer_name>_prop_<category_value>}. Columns are \strong{numerically ordered}
+by the category value.
 }
 \description{
-Extracts the majority (mode) values of categorical raster layers
-for each polygon in a hexagonal grid.
+Extracts and calculates the \strong{area proportion} of each land-use/land-cover (LULC)
+category found within each input polygon of the \code{sf_hex_grid}. This function
+is tailored for categorical rasters and ensures accurate, sub-pixel weighted statistics.
+}
+\details{
+The function uses a custom function with \code{exactextractr::exact_extract} to
+perform three critical steps:
+\enumerate{
+\item \strong{Filtering NA/NaN:} Raster cells with missing values (\code{NA}) are explicitly
+excluded from the calculation, preventing the creation of a \code{_prop_NaN} column.
+\item \strong{Area Consolidation:} It sums the coverage fractions for all fragments belonging
+to the same category within the same hexagon, which is essential when polygons
+have been clipped or fragmented.
+\item \strong{Numerical Ordering:} The final columns are explicitly sorted based on the
+numerical value of the category (e.g., \code{_prop_70} appears before \code{_prop_80})
+to correct the default alphanumeric sorting behavior of \code{tidyr::pivot_wider}.
+}
 }
 \examples{
-\donttest{
-hex_grid <- h3sdm_extract_cat(landcover_raster, aoi_sf, res = 7)
+\dontrun{
+# Assuming 'lulc' is a categorical SpatRaster and 'h7' is an sf hexagon grid
+# lulc_p <- h3sdm_extract_cat(lulc, h7, proportion = TRUE)
+# head(lulc_p)
 }
+
 }

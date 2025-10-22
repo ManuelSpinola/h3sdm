@@ -53,24 +53,45 @@
 #' predictors_sf <- h3sdm_predictors(num_sf, cat_sf, it_sf)
 #' }
 #'
+
 h3sdm_predictors <- function(num_sf, cat_sf, it_sf) {
 
-  # Validate inputs
-  if (!all(c("sf", "sfc") %in% class(num_sf))) stop("num_sf must be an sf object")
-  if (!all(c("sf", "sfc") %in% class(cat_sf))) stop("cat_sf must be an sf object")
-  if (!all(c("sf", "sfc") %in% class(it_sf))) stop("it_sf must be an sf object")
+  # --- 1️⃣ Robust Input Validation ---
+  # Check if the objects INHERIT the 'sf' class. This is the standard, reliable way.
+  if (!inherits(num_sf, "sf")) stop("num_sf must be an sf object (inherits 'sf').")
+  if (!inherits(cat_sf, "sf")) stop("cat_sf must be an sf object (inherits 'sf').")
+  if (!inherits(it_sf, "sf")) stop("it_sf must be an sf object (inherits 'sf').")
 
-  # Determine join key
+  # --- 2️⃣ Determine Join Key ---
+  # Use 'h3_address' if it exists, otherwise fall back to 'ID'.
   join_key <- if ("h3_address" %in% names(num_sf)) "h3_address" else "ID"
 
+  # Ensure the join key is present in ALL data frames before proceeding
+  required_keys <- c(join_key)
+  if (!all(required_keys %in% names(num_sf)) ||
+      !all(required_keys %in% names(cat_sf)) ||
+      !all(required_keys %in% names(it_sf))) {
+    stop(paste("The chosen join key ('", join_key, "') is not present in all input data frames.", sep=""))
+  }
+
+  # --- 3️⃣ Join Data ---
+
   # Join categorical and numeric
-  combined_sf <- dplyr::left_join(num_sf, cat_sf %>% dplyr::select(-geometry), by = join_key)
+  # We select all columns *except* geometry from the right-hand side (cat_sf) to avoid conflicts.
+  combined_sf <- dplyr::left_join(num_sf,
+                                  cat_sf %>% sf::st_drop_geometry(),
+                                  by = join_key)
 
   # Join landscape metrics
-  combined_sf <- dplyr::left_join(combined_sf, it_sf %>% dplyr::select(-geometry), by = join_key)
+  # Drop geometry from it_sf again, ensuring we keep num_sf's geometry column
+  combined_sf <- dplyr::left_join(combined_sf,
+                                  it_sf %>% sf::st_drop_geometry(),
+                                  by = join_key)
 
-  # Ensure geometry is MULTIPOLYGON
-  combined_sf$geometry <- sf::st_cast(combined_sf$geometry, "MULTIPOLYGON")
+  # --- 4️⃣ Final Cleanup ---
+
+  # Ensure geometry is MULTIPOLYGON (safer for downstream processes)
+  combined_sf <- sf::st_cast(combined_sf, "MULTIPOLYGON")
 
   return(combined_sf)
 }

@@ -2,28 +2,54 @@
 % Please edit documentation in R/h3sdm_get_grid.R
 \name{h3sdm_get_grid}
 \alias{h3sdm_get_grid}
-\title{Generate H3 hexagonal grid over an AOI}
+\title{Generar cuadrícula H3 para un área de interés}
 \usage{
-h3sdm_get_grid(aoi_sf, res = 7, expand_factor = 0.1, clip_to_aoi = FALSE)
+h3sdm_get_grid(
+  sf_object,
+  resolution = 6,
+  expand_factor = 0.1,
+  clip_to_aoi = TRUE
+)
 }
 \arguments{
-\item{aoi_sf}{An \code{sf} object defining the AOI.}
+\item{sf_object}{Objeto \code{sf} que define el área de interés (AOI).}
 
-\item{res}{H3 resolution (integer, 1–16).}
+\item{resolution}{Entero entre 1 y 16. Define la resolución del índice H3.
+Valores mayores producen hexágonos más pequeños.}
 
-\item{expand_factor}{Factor to expand the AOI bbox before generating the grid (default 0.1).}
+\item{expand_factor}{Valor numérico que amplía ligeramente el bounding box
+del AOI antes de generar los hexágonos. Por defecto \code{0.1}.}
 
-\item{clip_to_aoi}{Logical; if TRUE, hexagons are clipped to the AOI (slower, precise for landscape metrics). Default FALSE.}
+\item{clip_to_aoi}{Lógico (\code{TRUE} o \code{FALSE}), indica si los hexágonos deben
+recortarse exactamente al contorno del AOI. Por defecto \code{TRUE}.}
 }
 \value{
-An \code{sf} object with MULTIPOLYGON geometries representing the hexagonal grid.
+Un objeto \code{sf} con los hexágonos H3 correspondientes al área de interés,
+con geometrías válidas (\code{MULTIPOLYGON}).
 }
 \description{
-Generates an H3 hexagonal grid as an sf object over a given area of interest (AOI).
-Optionally clips the hexagons to the AOI for precise landscape metrics.
+Crea una cuadrícula de hexágonos H3 que cubre un área de interés (\code{sf_object}),
+asegurando que las celdas se ajusten a la extensión del área y se recorten
+opcionalmente al contorno del AOI.
+
+Esta función es equivalente a la usada en los módulos de paisaje de \code{h3sdm},
+pero con el nombre estandarizado para mantener consistencia en el paquete.
 }
 \examples{
-\donttest{
-hex_grid_sf <- h3sdm_get_grid(aoi_sf, res = 7, clip_to_aoi = TRUE)
+\dontrun{
+library(sf)
+
+# Crear un polígono de ejemplo
+cr <- st_as_sf(data.frame(
+  lon = c(-85, -85, -83, -83, -85),
+  lat = c(9, 11, 11, 9, 9)
+), coords = c("lon", "lat"), crs = 4326) |>
+  summarise(geometry = st_combine(geometry)) |>
+  st_cast("POLYGON")
+
+# Generar cuadrícula H3
+h5 <- h3sdm_get_grid(cr, resolution = 5)
+plot(st_geometry(h5))
 }
+
 }

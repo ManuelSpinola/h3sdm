@@ -2,13 +2,13 @@
 % Please edit documentation in R/h3sdm_pa.R
 \name{h3sdm_pa}
 \alias{h3sdm_pa}
-\title{Generate presence-absence dataset on H3 hexagonal grid}
+\title{Generate presence/pseudo-absence dataset for a species}
 \usage{
 h3sdm_pa(
   species,
   aoi_sf,
   res = 6,
-  n_neg = 500,
+  n_pseudoabs = 500,
   providers = NULL,
   remove_duplicates = FALSE,
   date = NULL,
@@ -17,33 +17,40 @@ h3sdm_pa(
 )
 }
 \arguments{
-\item{species}{Character string with the species name.}
+\item{species}{\code{character} Species name (single string) for which records are requested.}
 
-\item{aoi_sf}{\code{sf} object defining the area of interest.}
+\item{aoi_sf}{\code{sf} AOI (area of interest) polygon.}
 
-\item{res}{H3 resolution (integer, default 6).}
+\item{res}{\code{integer} H3 resolution for the hexagonal grid.}
 
-\item{n_neg}{Number of pseudo-absence hexagons to sample (default 500).}
+\item{n_pseudoabs}{\code{integer} Number of pseudo-absence hexagons to sample.}
 
-\item{providers}{Optional vector of data providers (GBIF, iNaturalist, etc.).}
+\item{providers}{\code{character} Optional vector of data providers (e.g., "gbif", "inat").}
 
-\item{remove_duplicates}{Logical, whether to remove duplicate records (default FALSE).}
+\item{remove_duplicates}{\code{logical} Remove duplicate records at the same coordinates.}
 
-\item{date}{Optional date filter for records.}
+\item{date}{\code{character} Optional date filter for records.}
 
-\item{limit}{Maximum number of records to download (default 500).}
+\item{limit}{\code{integer} Maximum number of records to download.}
 
-\item{expand_factor}{Fraction to expand AOI when generating grid (default 0.1).}
+\item{expand_factor}{\code{numeric} Factor to expand AOI before creating hex grid.}
 }
 \value{
 \code{sf} object with columns:
 \itemize{
-\item \code{h3_address}: H3 hexagon identifier
-\item \code{presence}: factor (0 = absence / pseudo-absence, 1 = presence)
-\item \code{geometry}: MULTIPOLYGON of the hexagon
+\item \code{h3_address}: H3 index of the hexagon.
+\item \code{presence}: factor with levels "0" (pseudo-absence) and "1" (presence).
+\item \code{geometry}: MULTIPOLYGON of each hexagon.
 }
 }
 \description{
-Downloads species records within an AOI, assigns them to an H3 hexagonal grid,
-and generates a presence-absence dataset with optional pseudo-absences.
+Generates a hexagonal grid over the AOI, assigns species presence records to hexagons,
+and samples pseudo-absences from hexagons with no records.
+}
+\examples{
+\donttest{
+cr_outline <- st_read(system.file("shape/nc.shp", package="sf"))
+dataset <- h3sdm_pa("Agalychnis callidryas", cr_outline, res = 7, n_pseudoabs = 100)
+}
+
 }

@@ -1,38 +1,137 @@
 #' @name h3sdm_extract_cat
-#' @title Extract categorical raster values for a hexagonal grid
-#' @description Extracts the majority (mode) values of categorical raster layers
-#'   for each polygon in a hexagonal grid.
-#' @param spat_raster_cat A `SpatRaster` object containing categorical layers.
-#' @param aoi_sf An `sf` object defining the area of interest.
-#' @param res H3 resolution (integer) for the hexagonal grid.
-#' @param expand_factor Numeric factor to expand the AOI bbox before generating the grid (default 0.1).
-#' @param clip_to_aoi Logical, if TRUE hexagons are clipped to the AOI (default FALSE).
-#' @return An `sf` object (`MULTIPOLYGON`) with categorical raster values added as columns.
+#'
+#' @title Calculate Area Proportions for Categorical Raster Classes
+#'
+#' @description
+#' Extracts and calculates the **area proportion** of each land-use/land-cover (LULC)
+#' category found within each input polygon of the \code{sf_hex_grid}. This function
+#' is tailored for categorical rasters and ensures accurate, sub-pixel weighted statistics.
+#'
+#' @param spat_raster_cat A single-layer \code{SpatRaster} object containing categorical
+#'   values (e.g., LULC classes).
+#' @param sf_hex_grid An \code{sf} object containing polygonal geometries (e.g., H3
+#'   hexagons). Must contain a column named \code{h3_address} for joining and grouping.
+#' @param proportion Logical. If \code{TRUE} (default), the output values are the
+#'   proportion of the polygon area covered by each category (summing to 1 for covered area).
+#'   If \code{FALSE}, the output is the raw sum of the coverage fraction (area).
+#'
+#' @return An \code{sf} object identical to \code{sf_hex_grid}, but with new columns
+#'   appended for each categorical value found in the raster. Column names follow the
+#'   pattern \code{<layer_name>_prop_<category_value>}. Columns are **numerically ordered**
+#'   by the category value.
+#'
+#' @details
+#' The function uses a custom function with \code{exactextractr::exact_extract} to
+#' perform three critical steps:
+#' 1. **Filtering NA/NaN:** Raster cells with missing values (\code{NA}) are explicitly
+#'    excluded from the calculation, preventing the creation of a \code{_prop_NaN} column.
+#' 2. **Area Consolidation:** It sums the coverage fractions for all fragments belonging
+#'    to the same category within the same hexagon, which is essential when polygons
+#'    have been clipped or fragmented.
+#' 3. **Numerical Ordering:** The final columns are explicitly sorted based on the
+#'    numerical value of the category (e.g., \code{_prop_70} appears before \code{_prop_80})
+#'    to correct the default alphanumeric sorting behavior of \code{tidyr::pivot_wider}.
+#'
 #' @examples
-#' \donttest{
-#' hex_grid <- h3sdm_extract_cat(landcover_raster, aoi_sf, res = 7)
+#' \dontrun{
+#' # Assuming 'lulc' is a categorical SpatRaster and 'h7' is an sf hexagon grid
+#' # lulc_p <- h3sdm_extract_cat(lulc, h7, proportion = TRUE)
+#' # head(lulc_p)
 #' }
+#'
 #' @export
 
-h3sdm_extract_cat <- function(spat_raster_cat, aoi_sf, res = 7,
-                              expand_factor = 0.1, clip_to_aoi = FALSE) {
+h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE) {
 
-  hex_grid <- h3sdm_get_grid(aoi_sf, res = res,
-                             expand_factor = expand_factor,
-                             clip_to_aoi = clip_to_aoi)
+  # 1️⃣ Validation and Setup
+  if (!inherits(spat_raster_cat, "SpatRaster")) stop("spat_raster_cat must be a SpatRaster")
+  if (!inherits(sf_hex_grid, "sf")) stop("sf_hex_grid must be an sf object")
 
-  extracted_df <- exactextractr::exact_extract(
+  sf_hex_grid <- sf::st_make_valid(sf_hex_grid)
+  layer_name <- names(spat_raster_cat)[1]
+
+  if (!"h3_address" %in% names(sf_hex_grid)) {
+    stop("Input sf_hex_grid must contain a column named 'h3_address'.")
+  }
+
+  # 2️⃣ Extracción y Consolidación (Custom Function)
+  extracted <- exactextractr::exact_extract(
     x = spat_raster_cat,
-    y = hex_grid,
-    fun = "mode",
-    force_df = TRUE
+    y = sf_hex_grid,
+    summarize_df = TRUE,
+    include_cols = "h3_address",
+
+    fun = function(df) {
+      if (nrow(df) == 0) return(NULL)
+
+      # FILTRO CLAVE: Excluir los píxeles con valor NA (para evitar la columna prop_NaN)
+      df <- df %>%
+        dplyr::filter(!is.na(.data$value))
+
+      if (nrow(df) == 0) return(NULL)
+
+      # Calcular la suma de cobertura para cada categoría
+      df_summary <- df %>%
+        dplyr::group_by(h3_address, value) %>%
+        dplyr::summarize(
+          sum_coverage = sum(.data$coverage_fraction, na.rm = TRUE),
+          .groups = "drop_last"
+        )
+
+      # Calcular la proporción
+      df_summary <- df_summary %>%
+        dplyr::mutate(
+          total_area_cell = sum(.data$sum_coverage),
+          freq = if (proportion) .data$sum_coverage / .data$total_area_cell else .data$sum_coverage
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(h3_address, value, freq)
+
+      return(df_summary)
+    },
+    progress = TRUE
   )
 
-  colnames(extracted_df) <- names(spat_raster_cat)[seq_len(ncol(extracted_df))]
+  # 3️⃣ Pivotar a formato Wide
+  if (is.null(extracted) || nrow(extracted) == 0) {
+    warning("No raster data extracted or all extractions were empty.")
+    return(sf_hex_grid)
+  }
 
-  result_sf <- dplyr::bind_cols(hex_grid, extracted_df)
-  result_sf <- sf::st_make_valid(result_sf)
-  result_sf <- sf::st_cast(result_sf, "MULTIPOLYGON")
+  extracted_wide <- extracted %>%
+    tidyr::pivot_wider(
+      id_cols = "h3_address",
+      names_from = .data$value,
+      values_from = .data$freq,
+      names_prefix = paste0(layer_name, "_prop_"),
+      values_fill = 0
+    )
 
-  return(result_sf)
+  # 4️⃣ Unir a la geometría y Ordenar Columnas
+  result_sf <- sf_hex_grid %>%
+    dplyr::left_join(extracted_wide, by = "h3_address")
+
+  # Rellenar NAs (hexágonos que no intersectaron ninguna categoría definida) con 0
+  prop_cols <- names(result_sf)[grepl(paste0(layer_name, "_prop_"), names(result_sf))]
+  result_sf <- result_sf %>%
+    dplyr::mutate(dplyr::across(dplyr::all_of(prop_cols), ~tidyr::replace_na(.x, 0)))
+
+  # ❗ PASO EXTRA DE ORDENAMIENTO NUMÉRICO ❗
+  if (length(prop_cols) > 0) {
+    # 1. Extraer solo la parte numérica (ej: "10" de "lulc_prop_10")
+    prop_numbers <- gsub(paste0(layer_name, "_prop_"), "", prop_cols)
+
+    # 2. Ordenar los nombres de columna basándose en el valor NUMÉRICO
+    ordered_indices <- order(as.numeric(prop_numbers))
+    ordered_prop_cols <- prop_cols[ordered_indices]
+
+    # 3. Reordenar el dataframe: ID, Columnas Ordenadas, Geometría, Otras Columnas
+    cols_to_select <- c("h3_address", ordered_prop_cols, "geometry",
+                        setdiff(names(result_sf), c("h3_address", ordered_prop_cols, "geometry")))
+
+    result_sf <- result_sf %>%
+      dplyr::select(dplyr::all_of(cols_to_select))
+  }
+
+  return(sf::st_cast(result_sf, "MULTIPOLYGON"))
 }

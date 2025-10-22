@@ -1,46 +1,74 @@
+#' @title Generar cuadrícula H3 para un área de interés
 #' @name h3sdm_get_grid
-#' @title Generate H3 hexagonal grid over an AOI
-#' @description Generates an H3 hexagonal grid as an sf object over a given area of interest (AOI).
-#' Optionally clips the hexagons to the AOI for precise landscape metrics.
-#' @param aoi_sf An `sf` object defining the AOI.
-#' @param res H3 resolution (integer, 1–16).
-#' @param expand_factor Factor to expand the AOI bbox before generating the grid (default 0.1).
-#' @param clip_to_aoi Logical; if TRUE, hexagons are clipped to the AOI (slower, precise for landscape metrics). Default FALSE.
-#' @return An `sf` object with MULTIPOLYGON geometries representing the hexagonal grid.
+#'
+#' @description
+#' Crea una cuadrícula de hexágonos H3 que cubre un área de interés (`sf_object`),
+#' asegurando que las celdas se ajusten a la extensión del área y se recorten
+#' opcionalmente al contorno del AOI.
+#'
+#' Esta función es equivalente a la usada en los módulos de paisaje de `h3sdm`,
+#' pero con el nombre estandarizado para mantener consistencia en el paquete.
+#'
+#' @param sf_object Objeto `sf` que define el área de interés (AOI).
+#' @param resolution Entero entre 1 y 16. Define la resolución del índice H3.
+#' Valores mayores producen hexágonos más pequeños.
+#' @param expand_factor Valor numérico que amplía ligeramente el bounding box
+#' del AOI antes de generar los hexágonos. Por defecto `0.1`.
+#' @param clip_to_aoi Lógico (`TRUE` o `FALSE`), indica si los hexágonos deben
+#' recortarse exactamente al contorno del AOI. Por defecto `TRUE`.
+#'
+#' @return
+#' Un objeto `sf` con los hexágonos H3 correspondientes al área de interés,
+#' con geometrías válidas (`MULTIPOLYGON`).
+#'
 #' @examples
-#' \donttest{
-#' hex_grid_sf <- h3sdm_get_grid(aoi_sf, res = 7, clip_to_aoi = TRUE)
+#' \dontrun{
+#' library(sf)
+#'
+#' # Crear un polígono de ejemplo
+#' cr <- st_as_sf(data.frame(
+#'   lon = c(-85, -85, -83, -83, -85),
+#'   lat = c(9, 11, 11, 9, 9)
+#' ), coords = c("lon", "lat"), crs = 4326) |>
+#'   summarise(geometry = st_combine(geometry)) |>
+#'   st_cast("POLYGON")
+#'
+#' # Generar cuadrícula H3
+#' h5 <- h3sdm_get_grid(cr, resolution = 5)
+#' plot(st_geometry(h5))
 #' }
+#'
 #' @export
 
-h3sdm_get_grid <- function(aoi_sf, res = 7, expand_factor = 0.1, clip_to_aoi = FALSE) {
+h3sdm_get_grid <- function(sf_object, resolution = 6, expand_factor = 0.1, clip_to_aoi = TRUE) {
+  # Validaciones iniciales
+  if (!inherits(sf_object, "sf")) stop("Input must be an sf object")
+  if (resolution < 1 || resolution > 16) stop("Resolution must be between 1 and 16")
 
-  if (!inherits(aoi_sf, "sf")) stop("aoi_sf must be an sf object.")
+  # Transformar a WGS84 y asegurar geometrías válidas
+  sf_object <- sf::st_transform(sf_object, 4326)
+  sf_object <- sf::st_make_valid(sf_object)
 
-  # Expand bounding box
-  bbox <- sf::st_bbox(aoi_sf)
-  x_range <- bbox["xmax"] - bbox["xmin"]
-  y_range <- bbox["ymax"] - bbox["ymin"]
-  bbox_exp <- bbox + c(-expand_factor * x_range, -expand_factor * y_range,
-                       expand_factor * x_range, expand_factor * y_range)
-  aoi_exp <- sf::st_as_sfc(bbox_exp) |> sf::st_as_sf()
+  # Expandir bbox ligeramente
+  bbox <- sf::st_bbox(sf_object)
+  bbox_expanded <- bbox + c(-expand_factor, -expand_factor, expand_factor, expand_factor)
+  bbox_poly <- sf::st_as_sfc(bbox_expanded)
 
-  # Generate H3 addresses
-  h3_addresses <- h3jsr::polygon_to_cells(aoi_exp, res = res)
+  # Crear hexágonos H3 sobre el bbox expandido
+  h3_cells <- h3jsr::polygon_to_cells(bbox_poly, res = resolution)
+  hexagons <- h3jsr::cell_to_polygon(h3_cells, simple = FALSE)
 
+  # Recortar hexágonos al AOI (solo si clip_to_aoi = TRUE)
   if (clip_to_aoi) {
-    # Convert to polygons and clip to AOI
-    hex_sf <- h3jsr::cell_to_polygon(h3_addresses, simple = FALSE)
-    hex_sf <- sf::st_intersection(hex_sf, aoi_sf)
-    # Union fragments per hex to ensure MULTIPOLYGON
-    hex_sf <- sf::st_union(hex_sf, by_feature = TRUE)
-    hex_sf <- sf::st_make_valid(hex_sf)
-  } else {
-    hex_sf <- h3jsr::cell_to_polygon(h3_addresses, simple = FALSE)
+    hexagons <- sf::st_intersection(hexagons, sf_object)
   }
 
-  hex_sf$h3_address <- h3_addresses
-  hex_sf <- sf::st_cast(hex_sf, "MULTIPOLYGON")
+  # Unir fragmentos por celda para que siempre sea MULTIPOLYGON
+  hexagons <- sf::st_union(hexagons, by_feature = TRUE)
 
-  return(hex_sf)
+  # Asegurar geometrías válidas
+  hexagons <- sf::st_make_valid(hexagons)
+
+  # Devolver
+  return(hexagons)
 }

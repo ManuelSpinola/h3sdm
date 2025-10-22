@@ -2,43 +2,52 @@
 % Please edit documentation in R/h3sdm_calculate_it_metrics.R
 \name{h3sdm_calculate_it_metrics}
 \alias{h3sdm_calculate_it_metrics}
-\title{Calculate 5 information theory landscape metrics for hexagonal grid}
+\title{Calculate Information Theory Landscape Metrics for Hexagonal Grid}
 \usage{
-h3sdm_calculate_it_metrics(
-  landscape_raster,
-  aoi_sf,
-  res = 7,
-  expand_factor = 0.1,
-  clip_to_aoi = FALSE
-)
+h3sdm_calculate_it_metrics(landscape_raster, sf_grid)
 }
 \arguments{
 \item{landscape_raster}{A categorical \code{SpatRaster}.}
 
-\item{aoi_sf}{An \code{sf} object defining the area of interest.}
+\item{aoi_sf}{An \code{sf} object defining the Area of Interest (AOI).}
 
-\item{res}{H3 resolution (integer) for the hexagonal grid.}
+\item{res}{H3 resolution (integer, e.g., 7 or 8). Determines the size of the hexagons.}
 
-\item{expand_factor}{Numeric factor to expand the AOI bbox before generating the grid (default 0.1).}
+\item{expand_factor}{Factor to expand the AOI bounding box before H3 grid generation.
+(Numeric, e.g., 1.1).}
 
-\item{clip_to_aoi}{Logical, if TRUE hexagons are clipped to the AOI (default FALSE).}
+\item{clip_to_aoi}{Logical. If \code{TRUE}, the generated hexagons are clipped
+to the exact boundary of the \code{aoi_sf}.}
 }
 \value{
-An \code{sf} object (\code{MULTIPOLYGON}) with IT landscape metrics as columns.
+An \code{sf} object containing the generated hexagonal grid with new columns
+appended for each calculated landscape metric, plus the \code{h3_address} column.
 }
 \description{
-Calculates the landscape metrics \code{condent}, \code{ent}, \code{joinent},
-\code{mutinf}, and \code{relmutinf} for a categorical raster over each hexagon.
+Calculates 5 Information Theory (IT)-based landscape metrics (\code{condent},
+\code{ent}, \code{joinent}, \code{mutinf}, \code{relmutinf}) by generating an H3
+hexagonal grid over a categorical raster and using \code{landscapemetrics::sample_lsm()}.
 }
-\note{
-This is a wrapper for \code{landscapemetrics::sample_lsm()}.
+\details{
+This function is a comprehensive wrapper that handles the entire workflow:
+\enumerate{
+\item Generating the H3 grid based on \code{aoi_sf} and \code{res}.
+\item Calculating the IT metrics (which are part of the "complexity metric" type in
+\code{landscapemetrics}) for each hexagon.
+\item Pivoting the results to a wide format for easy use.
+}
 }
 \examples{
 \donttest{
-it_metrics_sf <- h3sdm_calculate_it_metrics(landcover_raster, aoi_sf, res = 7)
+# Assuming 'worldcover' is a SpatRaster and 'aoi_sf' is an sf polygon
+# result_sf <- h3sdm_calculate_it_metrics(worldcover, aoi_sf, res = 7)
+# head(result_sf)
 }
 }
 \references{
-Hesselbarth et al., 2019. \emph{landscapemetrics: an open‐source R tool to calculate landscape metrics}, Ecography, 42:1648-1657.
-Nowosad & Stepinski, 2019. \emph{Information theory as a consistent framework for quantification and classification of landscape patterns}, https://doi.org/10.1007/s10980-019-00830-x
+Hesselbarth et al., 2019. landscapemetrics: an open-source R tool to calculate
+landscape metrics. Ecography 42: 1648–1657.
+
+Nowosad & Stepinski, 2019. Information theory as a consistent framework for
+landscape patterns. \url{https://doi.org/10.1007/s10980-019-00830-x}
 }

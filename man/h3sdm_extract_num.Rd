@@ -2,36 +2,42 @@
 % Please edit documentation in R/h3sdm_extract_num.R
 \name{h3sdm_extract_num}
 \alias{h3sdm_extract_num}
-\title{Extract numeric raster values for a hexagonal grid}
+\title{Extract Area-Weighted Mean from Numeric Raster Stack}
 \usage{
-h3sdm_extract_num(
-  spat_raster_multi,
-  aoi_sf,
-  res = 7,
-  expand_factor = 0.1,
-  clip_to_aoi = FALSE
-)
+h3sdm_extract_num(spat_raster_multi, sf_hex_grid)
 }
 \arguments{
-\item{spat_raster_multi}{A \code{SpatRaster} object containing one or more numeric layers.}
+\item{spat_raster_multi}{A \code{SpatRaster} object from the \code{terra} package.
+Must contain numeric layers (can be a single layer or a stack/brick).}
 
-\item{aoi_sf}{An \code{sf} object defining the area of interest.}
-
-\item{res}{H3 resolution (integer) for the hexagonal grid.}
-
-\item{expand_factor}{Numeric factor to expand the AOI bbox before generating the grid (default 0.1).}
-
-\item{clip_to_aoi}{Logical, if TRUE hexagons are clipped to the AOI (default FALSE).}
+\item{sf_hex_grid}{An \code{sf} object containing polygonal geometries (e.g., H3
+hexagons). Must be a valid set of polygons for extraction.}
 }
 \value{
-An \code{sf} object (\code{MULTIPOLYGON}) with raster values added as columns.
+An \code{sf} object identical to \code{sf_hex_grid}, but with new columns
+appended. The new column names match the original \code{SpatRaster} layer names.
+The values represent the area-weighted mean for that variable within each polygon.
 }
 \description{
-Extracts area-weighted mean values of numeric raster layers
-for each polygon in a hexagonal grid.
+Calculates the \strong{area-weighted mean} value for each layer in a numeric
+\code{SpatRaster} (or single layer) within each polygon feature of an \code{sf} object.
+This function is designed to efficiently summarize continuous environmental variables
+(such as bioclimatic data) for predefined spatial units (e.g., H3 hexagons).
+It utilizes \code{exactextractr} to ensure highly precise zonal statistics by
+accounting for sub-pixel coverage fractions.
+}
+\details{
+The function relies on \code{exactextractr::exact_extract} with \code{fun = "weighted_mean"}
+and \code{weights = "area"}. This methodology is crucial for maintaining spatial
+accuracy when polygons are irregular or small relative to the raster resolution.
+A critical check (\code{nrow} match) is performed before binding columns to ensure
+data integrity and prevent misalignment errors.
 }
 \examples{
-\donttest{
-hex_grid <- h3sdm_extract_num(bio_raster, aoi_sf, res = 7)
+\dontrun{
+# Assuming 'bio' is a SpatRaster stack and 'h7' is an sf hexagon grid
+# bio_p <- h3sdm_extract_num(bio, h7)
+# head(bio_p)
 }
+
 }
