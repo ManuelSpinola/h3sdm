@@ -10,7 +10,7 @@
 #' pero con el nombre estandarizado para mantener consistencia en el paquete.
 #'
 #' @param sf_object Objeto `sf` que define el área de interés (AOI).
-#' @param resolution Entero entre 1 y 16. Define la resolución del índice H3.
+#' @param res Entero entre 1 y 16. Define la resolución del índice H3.
 #' Valores mayores producen hexágonos más pequeños.
 #' @param expand_factor Valor numérico que amplía ligeramente el bounding box
 #' del AOI antes de generar los hexágonos. Por defecto `0.1`.
@@ -34,16 +34,16 @@
 #'   st_cast("POLYGON")
 #'
 #' # Generar cuadrícula H3
-#' h5 <- h3sdm_get_grid(cr, resolution = 5)
+#' h5 <- h3sdm_get_grid(cr, res = 5)
 #' plot(st_geometry(h5))
 #' }
 #'
 #' @export
 
-h3sdm_get_grid <- function(sf_object, resolution = 6, expand_factor = 0.1, clip_to_aoi = TRUE) {
+h3sdm_get_grid <- function(sf_object, res = 6, expand_factor = 0.1, clip_to_aoi = TRUE) {
   # Validaciones iniciales
   if (!inherits(sf_object, "sf")) stop("Input must be an sf object")
-  if (resolution < 1 || resolution > 16) stop("Resolution must be between 1 and 16")
+  if (res < 1 || res > 16) stop("Resolution must be between 1 and 16")
 
   # Transformar a WGS84 y asegurar geometrías válidas
   sf_object <- sf::st_transform(sf_object, 4326)
@@ -55,7 +55,7 @@ h3sdm_get_grid <- function(sf_object, resolution = 6, expand_factor = 0.1, clip_
   bbox_poly <- sf::st_as_sfc(bbox_expanded)
 
   # Crear hexágonos H3 sobre el bbox expandido
-  h3_cells <- h3jsr::polygon_to_cells(bbox_poly, res = resolution)
+  h3_cells <- h3jsr::polygon_to_cells(bbox_poly, res = res)
   hexagons <- h3jsr::cell_to_polygon(h3_cells, simple = FALSE)
 
   # Recortar hexágonos al AOI (solo si clip_to_aoi = TRUE)

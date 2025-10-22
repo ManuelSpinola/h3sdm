@@ -49,8 +49,7 @@ and samples pseudo-absences from hexagons with no records.
 }
 \examples{
 \donttest{
-cr_outline <- st_read(system.file("shape/nc.shp", package="sf"))
-dataset <- h3sdm_pa("Agalychnis callidryas", cr_outline, res = 7, n_pseudoabs = 100)
+data(cr_outline_c, package = "h3sdm")
+dataset <- h3sdm_pa("Agalychnis callidryas", cr_outline_c, res = 7, n_pseudoabs = 100)
 }
-
 }

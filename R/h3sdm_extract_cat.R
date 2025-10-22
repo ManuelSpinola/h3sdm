@@ -32,6 +32,7 @@
 #'    numerical value of the category (e.g., \code{_prop_70} appears before \code{_prop_80})
 #'    to correct the default alphanumeric sorting behavior of \code{tidyr::pivot_wider}.
 #'
+#'
 #' @examples
 #' \dontrun{
 #' # Assuming 'lulc' is a categorical SpatRaster and 'h7' is an sf hexagon grid
@@ -54,32 +55,26 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE) {
     stop("Input sf_hex_grid must contain a column named 'h3_address'.")
   }
 
-  # 2️⃣ Extracción y Consolidación (Custom Function)
+  # 2️⃣ Extracción y Consolidación
   extracted <- exactextractr::exact_extract(
     x = spat_raster_cat,
     y = sf_hex_grid,
     summarize_df = TRUE,
     include_cols = "h3_address",
-
     fun = function(df) {
       if (nrow(df) == 0) return(NULL)
 
-      # FILTRO CLAVE: Excluir los píxeles con valor NA (para evitar la columna prop_NaN)
       df <- df %>%
         dplyr::filter(!is.na(.data$value))
 
       if (nrow(df) == 0) return(NULL)
 
-      # Calcular la suma de cobertura para cada categoría
       df_summary <- df %>%
         dplyr::group_by(h3_address, value) %>%
-        dplyr::summarize(
+        dplyr::summarise(
           sum_coverage = sum(.data$coverage_fraction, na.rm = TRUE),
           .groups = "drop_last"
-        )
-
-      # Calcular la proporción
-      df_summary <- df_summary %>%
+        ) %>%
         dplyr::mutate(
           total_area_cell = sum(.data$sum_coverage),
           freq = if (proportion) .data$sum_coverage / .data$total_area_cell else .data$sum_coverage
@@ -98,7 +93,7 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE) {
     return(sf_hex_grid)
   }
 
-  extracted_wide <- extracted %>%
+  extracted_wide <- tibble::as_tibble(extracted) %>%
     tidyr::pivot_wider(
       id_cols = "h3_address",
       names_from = .data$value,
@@ -107,25 +102,21 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE) {
       values_fill = 0
     )
 
-  # 4️⃣ Unir a la geometría y Ordenar Columnas
+  # 4️⃣ Unir a la geometría y ordenar columnas
   result_sf <- sf_hex_grid %>%
     dplyr::left_join(extracted_wide, by = "h3_address")
 
-  # Rellenar NAs (hexágonos que no intersectaron ninguna categoría definida) con 0
+  # Rellenar NAs con 0
   prop_cols <- names(result_sf)[grepl(paste0(layer_name, "_prop_"), names(result_sf))]
   result_sf <- result_sf %>%
     dplyr::mutate(dplyr::across(dplyr::all_of(prop_cols), ~tidyr::replace_na(.x, 0)))
 
-  # ❗ PASO EXTRA DE ORDENAMIENTO NUMÉRICO ❗
+  # Reordenar columnas numéricamente
   if (length(prop_cols) > 0) {
-    # 1. Extraer solo la parte numérica (ej: "10" de "lulc_prop_10")
     prop_numbers <- gsub(paste0(layer_name, "_prop_"), "", prop_cols)
-
-    # 2. Ordenar los nombres de columna basándose en el valor NUMÉRICO
     ordered_indices <- order(as.numeric(prop_numbers))
     ordered_prop_cols <- prop_cols[ordered_indices]
 
-    # 3. Reordenar el dataframe: ID, Columnas Ordenadas, Geometría, Otras Columnas
     cols_to_select <- c("h3_address", ordered_prop_cols, "geometry",
                         setdiff(names(result_sf), c("h3_address", ordered_prop_cols, "geometry")))
 

@@ -31,7 +31,8 @@ The function relies on \code{exactextractr::exact_extract} with \code{fun = "wei
 and \code{weights = "area"}. This methodology is crucial for maintaining spatial
 accuracy when polygons are irregular or small relative to the raster resolution.
 A critical check (\code{nrow} match) is performed before binding columns to ensure
-data integrity and prevent misalignment errors.
+data integrity
+and prevent misalignment errors.
 }
 \examples{
 \dontrun{

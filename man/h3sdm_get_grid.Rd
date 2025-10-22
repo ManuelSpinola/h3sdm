@@ -4,17 +4,12 @@
 \alias{h3sdm_get_grid}
 \title{Generar cuadrícula H3 para un área de interés}
 \usage{
-h3sdm_get_grid(
-  sf_object,
-  resolution = 6,
-  expand_factor = 0.1,
-  clip_to_aoi = TRUE
-)
+h3sdm_get_grid(sf_object, res = 6, expand_factor = 0.1, clip_to_aoi = TRUE)
 }
 \arguments{
 \item{sf_object}{Objeto \code{sf} que define el área de interés (AOI).}
 
-\item{resolution}{Entero entre 1 y 16. Define la resolución del índice H3.
+\item{res}{Entero entre 1 y 16. Define la resolución del índice H3.
 Valores mayores producen hexágonos más pequeños.}
 
 \item{expand_factor}{Valor numérico que amplía ligeramente el bounding box
@@ -48,7 +43,7 @@ cr <- st_as_sf(data.frame(
   st_cast("POLYGON")
 
 # Generar cuadrícula H3
-h5 <- h3sdm_get_grid(cr, resolution = 5)
+h5 <- h3sdm_get_grid(cr, res = 5)
 plot(st_geometry(h5))
 }
 

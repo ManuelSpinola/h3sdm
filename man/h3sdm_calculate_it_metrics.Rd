@@ -7,40 +7,26 @@
 h3sdm_calculate_it_metrics(landscape_raster, sf_grid)
 }
 \arguments{
-\item{landscape_raster}{A categorical \code{SpatRaster}.}
+\item{landscape_raster}{A categorical SpatRaster containing land-cover data.}
 
-\item{aoi_sf}{An \code{sf} object defining the Area of Interest (AOI).}
-
-\item{res}{H3 resolution (integer, e.g., 7 or 8). Determines the size of the hexagons.}
-
-\item{expand_factor}{Factor to expand the AOI bounding box before H3 grid generation.
-(Numeric, e.g., 1.1).}
-
-\item{clip_to_aoi}{Logical. If \code{TRUE}, the generated hexagons are clipped
-to the exact boundary of the \code{aoi_sf}.}
+\item{sf_grid}{An \code{sf} object containing the hexagonal grid with species or land-cover data.}
 }
 \value{
-An \code{sf} object containing the generated hexagonal grid with new columns
-appended for each calculated landscape metric, plus the \code{h3_address} column.
+An \code{sf} object containing the input hex grid with new columns for each calculated metric.
 }
 \description{
 Calculates 5 Information Theory (IT)-based landscape metrics (\code{condent},
-\code{ent}, \code{joinent}, \code{mutinf}, \code{relmutinf}) by generating an H3
-hexagonal grid over a categorical raster and using \code{landscapemetrics::sample_lsm()}.
+\code{ent}, \code{joinent}, \code{mutinf}, \code{relmutinf}) for each hexagon
+in a given H3 hexagonal grid.
 }
 \details{
-This function is a comprehensive wrapper that handles the entire workflow:
-\enumerate{
-\item Generating the H3 grid based on \code{aoi_sf} and \code{res}.
-\item Calculating the IT metrics (which are part of the "complexity metric" type in
-\code{landscapemetrics}) for each hexagon.
-\item Pivoting the results to a wide format for easy use.
-}
+This function computes landscape metrics using the \code{landscapemetrics::sample_lsm()} workflow.
+The results are pivoted to a wide format for easy use.
 }
 \examples{
 \donttest{
-# Assuming 'worldcover' is a SpatRaster and 'aoi_sf' is an sf polygon
-# result_sf <- h3sdm_calculate_it_metrics(worldcover, aoi_sf, res = 7)
+# Assuming 'sf_grid' is an sf object with hexagons
+# result_sf <- h3sdm_calculate_it_metrics(sf_grid)
 # head(result_sf)
 }
 }

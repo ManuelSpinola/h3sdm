@@ -34,10 +34,7 @@ Imports:
     yardstick,
     ecospat,
     DALEX,
-    stacks,
-    paisaje
-Remotes:
-    ManuelSpinola/paisaje
+    stacks
 Suggests: 
     knitr,
     rmarkdown,

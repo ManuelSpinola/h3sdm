@@ -16,5 +16,6 @@ utils::globalVariables(c(
   ".metric", ".estimator", "accuracy", "roc_auc",
   "std_err", "conf_low", "conf_high", "f_meas",
   "kap", "sens", "spec", "prediction",
-  "presence", "h3_address", "geometry"
+  "presence", "h3_address", "geometry",
+  "value", "freq", "sum_coverage", "total_area_cell"
 ))
