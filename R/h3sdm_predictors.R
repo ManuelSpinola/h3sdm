@@ -1,96 +1,73 @@
-#' Combine extracted numeric, categorical, and landscape metrics into a single sf
-#'
-#' This function merges three pre-computed sf objects—numeric raster values,
-#' categorical raster proportions, and landscape metrics—into a single sf object.
-#' The resulting sf has all variables as columns and geometry as MULTIPOLYGON.
-#'
 #' @name h3sdm_predictors
-#'
-#' @title Merge numeric, categorical, and landscape metric sf into one
+#' @title Combine Predictor Data from Multiple sf Objects
 #'
 #' @description
-#' This function allows the combination of numeric raster extractions
-#' (from `h3sdm_extract_num`), categorical raster proportions
-#' (from `h3sdm_extract_cat`), and landscape metrics
-#' (from `h3sdm_calculate_it_metrics`) into a single `sf` object.
-#' It ensures that the geometry remains a `MULTIPOLYGON` and performs
-#' joins by the `h3_address` or `ID` column.
+#' This function merges predictor variables from multiple `sf` objects
+#' into a single `sf` object. It preserves the geometry from the first
+#' input (`num_sf`) and joins columns from the other `sf` objects
+#' using a common key (`h3_address` or `ID`).
 #'
-#' @usage h3sdm_predictors(num_sf, cat_sf, it_sf)
+#' @param num_sf An `sf` object containing numeric predictor variables.
+#' @param cat_sf An `sf` object containing categorical predictor variables.
+#' @param it_sf An `sf` object containing landscape or information theory metrics.
 #'
-#' @param num_sf An `sf` object with numeric raster values.
-#'               Typically the output of `h3sdm_extract_num()`.
-#' @param cat_sf An `sf` object with categorical raster proportions.
-#'               Typically the output of `h3sdm_extract_cat()`.
-#' @param it_sf An `sf` object with landscape metrics.
-#'              Typically the output of `h3sdm_calculate_it_metrics()`.
+#' @return An `sf` object containing the geometry of `num_sf` and all predictor
+#' columns from `num_sf`, `cat_sf`, and `it_sf`.
 #'
 #' @details
-#' The function performs a left join of the categorical and numeric sf objects
-#' and then joins the landscape metrics. The geometry column is preserved
-#' and cast to `MULTIPOLYGON` to ensure compatibility with mapping and spatial analyses.
-#'
-#' @return An `sf` object of class MULTIPOLYGON with all variables from the
-#'         three input sf objects combined as columns.
-#'
-#' @export
+#' The function uses a left join based on the `h3_address` column if present,
+#' otherwise it falls back to `ID`. Geometries from the right-hand side `sf`
+#' objects are dropped to avoid conflicts, and the final geometry is cast
+#' to `MULTIPOLYGON`.
 #'
 #' @examples
-#' \dontrun{
-#' # Suppose you already have a hex grid:
-#' hex_grid_sf <- h3sdm_get_grid(aoi_sf, res = 7)
+#' \donttest{
+#' # Assume you have 2 or more sf objects with predictor variables:
+#' # num_sf: numeric predictors
+#' # cat_sf: categorical predictors
+#' # it_sf: landscape or information metrics
 #'
-#' # Extract numeric raster values
-#' num_sf <- h3sdm_extract_num(bio, hex_grid_sf)
+#' # Combine them into a single sf object
+#' combined <- h3sdm_predictors(num_sf, cat_sf, it_sf)
 #'
-#' # Extract categorical raster proportions
-#' cat_sf <- h3sdm_extract_cat(lulc, hex_grid_sf)
-#'
-#' # Calculate landscape metrics
-#' it_sf <- h3sdm_calculate_it_metrics(lulc, hex_grid_sf)
-#'
-#' # Combine everything
-#' predictors_sf <- h3sdm_predictors(num_sf, cat_sf, it_sf)
+#' # Resulting object contains geometry from num_sf and all attribute columns
+#' head(combined)
 #' }
-#'
+#' @export
 
-h3sdm_predictors <- function(num_sf, cat_sf, it_sf) {
+h3sdm_predictors <- function(...) {
+  # Recibir todos los objetos sf como lista
+  sf_list <- list(...)
 
-  # --- 1️⃣ Robust Input Validation ---
-  # Check if the objects INHERIT the 'sf' class. This is the standard, reliable way.
-  if (!inherits(num_sf, "sf")) stop("num_sf must be an sf object (inherits 'sf').")
-  if (!inherits(cat_sf, "sf")) stop("cat_sf must be an sf object (inherits 'sf').")
-  if (!inherits(it_sf, "sf")) stop("it_sf must be an sf object (inherits 'sf').")
+  # Filtrar NULLs
+  sf_list <- sf_list[!sapply(sf_list, is.null)]
 
-  # --- 2️⃣ Determine Join Key ---
-  # Use 'h3_address' if it exists, otherwise fall back to 'ID'.
-  join_key <- if ("h3_address" %in% names(num_sf)) "h3_address" else "ID"
+  # Validar que haya al menos uno
+  if (length(sf_list) == 0) stop("At least one sf object must be provided.")
 
-  # Ensure the join key is present in ALL data frames before proceeding
-  required_keys <- c(join_key)
-  if (!all(required_keys %in% names(num_sf)) ||
-      !all(required_keys %in% names(cat_sf)) ||
-      !all(required_keys %in% names(it_sf))) {
-    stop(paste("The chosen join key ('", join_key, "') is not present in all input data frames.", sep=""))
+  # Validar que todos sean sf
+  if (!all(sapply(sf_list, inherits, "sf"))) {
+    stop("All inputs must be sf objects.")
   }
 
-  # --- 3️⃣ Join Data ---
+  # Determinar la clave de unión
+  join_key <- if ("h3_address" %in% names(sf_list[[1]])) "h3_address" else "ID"
 
-  # Join categorical and numeric
-  # We select all columns *except* geometry from the right-hand side (cat_sf) to avoid conflicts.
-  combined_sf <- dplyr::left_join(num_sf,
-                                  cat_sf %>% sf::st_drop_geometry(),
-                                  by = join_key)
+  # Empezar con el primer sf
+  combined_sf <- sf_list[[1]]
 
-  # Join landscape metrics
-  # Drop geometry from it_sf again, ensuring we keep num_sf's geometry column
-  combined_sf <- dplyr::left_join(combined_sf,
-                                  it_sf %>% sf::st_drop_geometry(),
-                                  by = join_key)
+  # Iterar sobre el resto y hacer left_join sin geometría
+  if (length(sf_list) > 1) {
+    for (i in 2:length(sf_list)) {
+      combined_sf <- dplyr::left_join(
+        combined_sf,
+        sf_list[[i]] %>% sf::st_drop_geometry(),
+        by = join_key
+      )
+    }
+  }
 
-  # --- 4️⃣ Final Cleanup ---
-
-  # Ensure geometry is MULTIPOLYGON (safer for downstream processes)
+  # Asegurar que la geometría sea MULTIPOLYGON
   combined_sf <- sf::st_cast(combined_sf, "MULTIPOLYGON")
 
   return(combined_sf)

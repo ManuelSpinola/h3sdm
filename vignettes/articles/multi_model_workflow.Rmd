@@ -57,6 +57,10 @@ We use WorldClim historic bioclimatic variables for Costa Rica as environmental 
 bio <- terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sdm"))
 ```
 
+```{r}
+names(bio) <- gsub(".*bio_", "bio", names(bio))
+```
+
 ## 3. Load Species Occurrence Data
 
 Here we obtain presence–absence data for the species of interest (Silverstoneia flotator). We use the h3sdm_pa function to generate both presence and pseudo-absence records. A limit of 10,000 records is set to ensure that all presence records are retrieved, and 300 pseudo-absences are generated.
@@ -84,29 +88,30 @@ ggplot() +
 
 ## 4. Prepare Predictors
 
-Prepare environmental predictors by extracting values for each hexagon in the study area. 
-
-```{r, message=FALSE, warning=FALSE}
-predictors <- h3sdm_predictors(cr, 
-                    res = 7, 
-                    num_rasters = bio)
-```
-
-Because the name of the bioclimatic variables are long, we rename them to a shorter format (e.g., Bio1, Bio2, ..., Bio19).
+Prepare environmental predictors by extracting values for each hexagon in the study area. In this case prepare only de bioclimatic variables. As we are working with a resolutio 7 we create a grid with the same resolution.
 
 ```{r}
-predictors <- predictors |>
-  rename_with(
-    .cols = contains("bio_"),
-    .fn = ~ paste0("Bio", str_extract(., "\\d+$"))
-  )
+h7 <- h3sdm_get_grid(cr, res = 7)
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = h7)
+```
+
+```{r}
+bio_predictors <- h3sdm_extract_num(bio, h7)
+```
+
+```{r, message=FALSE, warning=FALSE}
+predictors <- h3sdm_predictors(bio_predictors)
 ```
 
 In this case we select Bio1 (Annual Mean Temperature), Bio12 (Annual Precipitation), and Bio15 (Precipitation Seasonality).
 
 ```{r}
 predictors <- predictors |>
-  dplyr::select(h3_address, Bio1, Bio12, Bio15, geometry)
+  dplyr::select(h3_address, bio1, bio12, bio15, geometry)
 ```
 
 We can visualize one of the predictors, for example Bio1.
@@ -114,7 +119,7 @@ We can visualize one of the predictors, for example Bio1.
 ```{r}
 ggplot() +
   theme_minimal() +
-  geom_sf(data = predictors, aes(fill = Bio1)) +
+  geom_sf(data = predictors, aes(fill = bio1)) +
   scale_fill_viridis_c(option = "B")
 ```
 

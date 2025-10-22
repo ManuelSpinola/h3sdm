@@ -2,59 +2,44 @@
 % Please edit documentation in R/h3sdm_predictors.R
 \name{h3sdm_predictors}
 \alias{h3sdm_predictors}
-\title{Merge numeric, categorical, and landscape metric sf into one}
+\title{Combine Predictor Data from Multiple sf Objects}
 \usage{
-h3sdm_predictors(num_sf, cat_sf, it_sf)
+h3sdm_predictors(...)
 }
 \arguments{
-\item{num_sf}{An \code{sf} object with numeric raster values.
-Typically the output of \code{h3sdm_extract_num()}.}
+\item{num_sf}{An \code{sf} object containing numeric predictor variables.}
 
-\item{cat_sf}{An \code{sf} object with categorical raster proportions.
-Typically the output of \code{h3sdm_extract_cat()}.}
+\item{cat_sf}{An \code{sf} object containing categorical predictor variables.}
 
-\item{it_sf}{An \code{sf} object with landscape metrics.
-Typically the output of \code{h3sdm_calculate_it_metrics()}.}
+\item{it_sf}{An \code{sf} object containing landscape or information theory metrics.}
 }
 \value{
-An \code{sf} object of class MULTIPOLYGON with all variables from the
-three input sf objects combined as columns.
+An \code{sf} object containing the geometry of \code{num_sf} and all predictor
+columns from \code{num_sf}, \code{cat_sf}, and \code{it_sf}.
 }
 \description{
-This function allows the combination of numeric raster extractions
-(from \code{h3sdm_extract_num}), categorical raster proportions
-(from \code{h3sdm_extract_cat}), and landscape metrics
-(from \code{h3sdm_calculate_it_metrics}) into a single \code{sf} object.
-It ensures that the geometry remains a \code{MULTIPOLYGON} and performs
-joins by the \code{h3_address} or \code{ID} column.
+This function merges predictor variables from multiple \code{sf} objects
+into a single \code{sf} object. It preserves the geometry from the first
+input (\code{num_sf}) and joins columns from the other \code{sf} objects
+using a common key (\code{h3_address} or \code{ID}).
 }
 \details{
-Combine extracted numeric, categorical, and landscape metrics into a single sf
-
-This function merges three pre-computed sf objects—numeric raster values,
-categorical raster proportions, and landscape metrics—into a single sf object.
-The resulting sf has all variables as columns and geometry as MULTIPOLYGON.
-
-The function performs a left join of the categorical and numeric sf objects
-and then joins the landscape metrics. The geometry column is preserved
-and cast to \code{MULTIPOLYGON} to ensure compatibility with mapping and spatial analyses.
+The function uses a left join based on the \code{h3_address} column if present,
+otherwise it falls back to \code{ID}. Geometries from the right-hand side \code{sf}
+objects are dropped to avoid conflicts, and the final geometry is cast
+to \code{MULTIPOLYGON}.
 }
 \examples{
-\dontrun{
-# Suppose you already have a hex grid:
-hex_grid_sf <- h3sdm_get_grid(aoi_sf, res = 7)
+\donttest{
+# Assume you have 2 or more sf objects with predictor variables:
+# num_sf: numeric predictors
+# cat_sf: categorical predictors
+# it_sf: landscape or information metrics
 
-# Extract numeric raster values
-num_sf <- h3sdm_extract_num(bio, hex_grid_sf)
+# Combine them into a single sf object
+combined <- h3sdm_predictors(num_sf, cat_sf, it_sf)
 
-# Extract categorical raster proportions
-cat_sf <- h3sdm_extract_cat(lulc, hex_grid_sf)
-
-# Calculate landscape metrics
-it_sf <- h3sdm_calculate_it_metrics(lulc, hex_grid_sf)
-
-# Combine everything
-predictors_sf <- h3sdm_predictors(num_sf, cat_sf, it_sf)
+# Resulting object contains geometry from num_sf and all attribute columns
+head(combined)
 }
-
 }
