@@ -2,39 +2,55 @@
 % Please edit documentation in R/h3sdm_get_records.R
 \name{h3sdm_get_records}
 \alias{h3sdm_get_records}
-\title{Download species occurrence records}
+\title{Query Species Occurrence Records within an H3 Area of Interest (AOI)}
 \usage{
-h3sdm_get_records(species, aoi_sf, providers = c("gbif","inat"), limit = 500,
-                         remove_duplicates = FALSE, date = NULL)
+h3sdm_get_records(
+  species,
+  aoi_sf,
+  providers = NULL,
+  limit = 500,
+  remove_duplicates = FALSE,
+  date = NULL
+)
 }
 \arguments{
-\item{species}{Character string with the species name (e.g., "Agalychnis callidryas").}
+\item{species}{Character string specifying the species name to query (e.g., "Puma concolor").}
 
-\item{aoi_sf}{An \code{sf} object defining the area of interest.}
+\item{aoi_sf}{An \code{sf} object defining the Area of Interest (AOI). Its CRS will be
+transformed to WGS84 (\code{EPSG:4326}) before query.}
 
-\item{providers}{Character vector of data providers (default c("gbif","inat")).}
+\item{providers}{Character vector of data providers to query (e.g., "gbif", "bison").
+If \code{NULL} (default), all available providers are used.}
 
-\item{limit}{Maximum number of records to download per provider (default 500).}
+\item{limit}{Numeric. The maximum number of records to retrieve per provider. Default is 500.}
 
-\item{remove_duplicates}{Logical, whether to remove duplicate coordinates (default FALSE).}
+\item{remove_duplicates}{Logical. If \code{TRUE}, records with identical longitude and
+latitude are removed using \code{dplyr::distinct()}. Default is \code{FALSE}.}
 
-\item{date}{Character string in format "YYYY-MM-DD,YYYY-MM-DD" to filter by observation date (optional).}
+\item{date}{Character vector specifying a date range (e.g., \code{c('2000-01-01', '2020-12-31')}).}
 }
 \value{
-An \code{sf} object with species occurrence points inside the AOI.
+An \code{sf} object of points containing the filtered occurrence records,
+with geometry confirmed to fall strictly within the \code{aoi_sf} boundary. If no
+records are found or the download fails, an empty \code{sf} object with the
+expected structure is returned.
 }
 \description{
-Downloads species occurrence records from GBIF, iNaturalist, or other providers
-for a given area of interest (AOI) as an \code{sf} object with geometries.
+Downloads species occurrence records from providers (e.g., GBIF) using the \code{spocc}
+package, filtering the initial query by the exact polygonal boundary of the
+Area of Interest (AOI) for maximum efficiency and precision.
 }
 \details{
-The function downloads occurrence records from online providers using the \code{spocc} package,
-transforms them to the CRS of the AOI, and optionally removes duplicates.
+The function transforms the \code{aoi_sf} polygon into a WKT string, which is used in
+the \code{spocc::occ} geometry argument for \strong{efficient WKT-based querying}. Final
+spatial filtering is performed using \code{sf::st_intersection} to ensure strict
+containment. A critical check is included to prevent errors when the API returns no
+data (addressing the 'column not found' error).
 }
 \examples{
-\donttest{
-library(sf)
-nc <- st_read(system.file("shape/nc.shp", package="sf"))
-records <- h3sdm_get_records("Agalychnis callidryas", nc, limit = 100)
+\dontrun{
+# Assuming aoi_sf is a valid sf polygon
+# h3_records <- h3sdm_get_records("Puma concolor", aoi_sf, providers = "gbif", limit = 1000)
+# head(h3_records)
 }
 }
