@@ -16,53 +16,54 @@ h3sdm_get_records_by_hexagon(
 )
 }
 \arguments{
-\item{species}{Character vector specifying the species names to query (e.g., \code{c("Puma concolor", "Panthera onca")}).}
+\item{species}{Character vector of species names to query (e.g., \code{c("Puma concolor", "Panthera onca")}).}
 
-\item{aoi_sf}{An \code{sf} object defining the Area of Interest (AOI).}
+\item{aoi_sf}{An \code{sf} polygon defining the Area of Interest (AOI).}
 
-\item{res}{Numeric. The H3 resolution level (default is 6). Determines the size of the hexagons.}
+\item{res}{Numeric. H3 resolution level (default 6), determining hexagon size.}
 
-\item{providers}{Character vector of data providers to query (e.g., "gbif", "bison"). If \code{NULL}, all available providers are used.}
+\item{providers}{Character vector of data providers (e.g., "gbif"). If \code{NULL}, all providers are used.}
 
-\item{remove_duplicates}{Logical. If \code{TRUE}, records with identical longitude and latitude are removed before counting. Default is \code{FALSE}.}
+\item{remove_duplicates}{Logical. If \code{TRUE}, duplicate coordinates are removed before counting. Default is \code{FALSE}.}
 
-\item{date}{Character vector specifying a date range (e.g., \code{c('2000-01-01', '2020-12-31')}).}
+\item{date}{Character vector specifying a date range (e.g., \code{c('2000-01-01','2020-12-31')}).}
 
-\item{expand_factor}{Numeric. Factor to expand the AOI bounding box before H3 grid generation. Default is 0.1 (10\\% expansion).}
+\item{expand_factor}{Numeric. Factor to expand the AOI bounding box before generating the H3 grid. Default is 0.1.}
 
-\item{limit}{Numeric. The maximum number of records to retrieve per species per provider during the initial query. Default is 500.}
+\item{limit}{Numeric. Maximum number of records to retrieve per species per provider. Default is 500.}
 }
 \value{
-An \code{sf} object containing the H3 hexagonal grid (\code{MULTIPOLYGON}),
-with new integer columns appended. Each new column corresponds to a species (with
-spaces replaced by underscores in the name) and contains the count of occurrence
-records found within that hexagon. Hexagons with no records for a species will have a value of 0.
+An \code{sf} object containing the H3 hexagonal grid (\code{MULTIPOLYGON}) with
+additional integer columns for each species (spaces replaced by underscores) showing
+the count of occurrence records in each hexagon. Hexagons with no records have 0.
 }
 \description{
-This function integrates data acquisition, hexagonal gridding, and spatial joining
-to count the number of occurrence records for one or more species within each
-H3 hexagon covering the Area of Interest (AOI).
+This function downloads occurrence records for one or more species and counts
+the number of records falling inside each H3 hexagon covering the specified Area
+of Interest (AOI).
 }
 \details{
-The workflow for each species is:
-\enumerate{
-\item \strong{Grid Generation:} An H3 grid is created across the AOI using \code{h3sdm_get_grid()}.
-\item \strong{Data Download:} Occurrence records are downloaded using \code{h3sdm_get_records()} (which uses \code{spocc}).
-\item \strong{Spatial Join:} Points are joined to the hexagonal grid using \code{sf::st_join}.
-\item \strong{Counting:} The number of points is counted per hexagon (\code{h3_address}).
-\item \strong{Aggregation:} Counts are merged back into the main grid.
-}
+Download Species Records and Count Occurrences per H3 Hexagon
 
-This function handles API failures using \code{tryCatch} and ensures the column names
-derived from species names are safe for use in R by replacing spaces with underscores.
+For each species:
+\enumerate{
+\item An H3 grid is generated across the AOI using \code{h3sdm_get_grid()}.
+\item Occurrence records are downloaded using \code{h3sdm_get_records()}.
+\item Points are joined to the hexagonal grid with \code{sf::st_join()}.
+\item Counts of points per hexagon are calculated.
+\item Counts are merged into the main hex grid.
+}
+The function ensures column names derived from species names are safe in R
+by replacing spaces with underscores and handles API failures gracefully.
 }
 \examples{
 \dontrun{
 # Assuming aoi_sf is a valid sf polygon
 # species_list <- c("Agalychnis callidryas", "Smilisca baudinii")
-# count_sf <- h3sdm_get_records_by_hexagon(species_list, aoi_sf, res = 7, limit = 1000)
-# head(count_sf)
+# hex_counts <- h3sdm_get_records_by_hexagon(species_list, aoi_sf, res = 7, limit = 1000)
+# head(hex_counts)
 }
+
 }
 \seealso{
 \code{\link[h3sdm]{h3sdm_get_grid}}, \code{\link[h3sdm]{h3sdm_get_records}}

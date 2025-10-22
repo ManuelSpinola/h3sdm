@@ -72,7 +72,7 @@ h3sdm_get_records <- function(species,
   # Handle no records
   if (is.null(records) || nrow(records) == 0 ||
       !all(c("longitude", "latitude") %in% names(records))) {
-    message("⚠️ No records found for ", species, ". Returning empty sf object.")
+    message("WARNING: No records found for ", species, ". Returning empty sf object.")
     return(sf::st_sf(
       name = character(0),
       geometry = sf::st_sfc(crs = 4326)
