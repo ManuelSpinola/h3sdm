@@ -12,3 +12,6 @@ inst/doc
 _site/
 docs/
 *.html
+
+# Local Netlify folder
+.netlify

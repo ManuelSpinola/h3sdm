@@ -319,7 +319,7 @@ plot(var_imp)
 We create partial dependence plots (PDPs) to visualize the relationship between key predictors and the predicted habitat suitability. PDPs show how the predicted outcome changes as a single predictor varies, while averaging out the effects of other predictors.
 
 ```{r}
-pdp_glm <- partial_dependence(e, variables = c("Bio12", "Bio1", "Bio15"))
+pdp_glm <- partial_dependence(e, variables = c("bio12", "bio1", "bio15"))
 ```
 
 Now we can plot the PDPs.

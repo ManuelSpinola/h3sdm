@@ -333,7 +333,7 @@ plot(var_imp)
 We create partial dependence plots (PDPs) to visualize the relationship between key predictors and the predicted habitat suitability. PDPs show how the predicted outcome changes as a single predictor varies, while averaging out the effects of other predictors.
 
 ```{r}
-pdp_glm <- partial_dependence(e, variables = c("Bio12", "Bio1", "Bio15"))
+pdp_glm <- partial_dependence(e, variables = c("bio12", "bio1", "bio15"))
 ```
 
 Now we can plot the PDPs.
@@ -437,16 +437,19 @@ bio_future <- terra::rast(system.file("extdata", "bioclim_future.tif", package =
 Rename the layers of the raster to match the names used in the model.
 
 ```{r}
-names(bio_future) <- c("Bio1", "Bio12", "Bio15") 
+names(bio_future) <- c("bio1", "bio12", "bio15") 
 ```
 
 
 We prepare the future predictors by extracting values for each hexagon in the study area.
 
 ```{r}
-predictors_future <- h3sdm_predictors(cr, 
-                    res = 7, 
-                    num_rasters = bio_future)
+bio_future_predictors <- h3sdm_extract_num(bio_future, h7)
+```
+
+
+```{r}
+predictors_future <- h3sdm_predictors(bio_future_predictors)
 ```
 
 
