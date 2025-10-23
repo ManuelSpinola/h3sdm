@@ -10,8 +10,6 @@ inst/doc
 /doc/
 /Meta/
 _site/
-docs/
-*.html
 
 # Local Netlify folder
 .netlify
