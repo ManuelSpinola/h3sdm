@@ -42,41 +42,33 @@
 #'
 #' @export
 
-h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, nodata_value = -9999) {
+h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, na_placeholder = 254) {
 
   if (!inherits(spat_raster_cat, "SpatRaster"))
     stop("spat_raster_cat must be a SpatRaster")
   if (!inherits(sf_hex_grid, "sf"))
     stop("sf_hex_grid must be an sf object")
 
-  # Hacer válidas las geometrías
   sf_hex_grid <- sf::st_make_valid(sf_hex_grid)
-
   layer_name <- names(spat_raster_cat)[1]
 
   if (!"h3_address" %in% names(sf_hex_grid)) {
     stop("Input sf_hex_grid must contain a column named 'h3_address'.")
   }
 
-  # Reemplazar NA en el raster por nodata_value
-  spat_raster_cat[is.na(spat_raster_cat)] <- nodata_value
-
-  # Asegurarse de que el nivel exista
-  if (!nodata_value %in% levels(spat_raster_cat)[[1]]$value) {
-    levels(spat_raster_cat)[[1]] <- rbind(
-      levels(spat_raster_cat)[[1]],
-      data.frame(value = nodata_value, class = "NoData")
-    )
-  }
+  # Crear copia temporal donde reemplazamos NA por un valor dentro del rango
+  temp_raster <- spat_raster_cat
+  temp_raster[is.na(temp_raster)] <- na_placeholder
 
   # Extraer con exactextractr
   extracted <- exactextractr::exact_extract(
-    x = spat_raster_cat,
+    x = temp_raster,
     y = sf_hex_grid,
     summarize_df = TRUE,
     include_cols = "h3_address",
     fun = function(df) {
-      df <- df %>% dplyr::filter(!is.na(.data$value))
+      # Ignorar celdas temporales NA
+      df <- df[df$value != na_placeholder, ]
       if (nrow(df) == 0) return(NULL)
 
       df_summary <- df %>%
@@ -99,7 +91,7 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
     return(sf_hex_grid)
   }
 
-  # Pivotear y unir al sf
+  # Pivotear y unir
   extracted_wide <- tibble::as_tibble(extracted) %>%
     tidyr::pivot_wider(
       id_cols = "h3_address",
@@ -111,7 +103,6 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
 
   result_sf <- sf_hex_grid %>% dplyr::left_join(extracted_wide, by = "h3_address")
 
-  # Reordenar columnas de proporciones
   prop_cols <- names(result_sf)[grepl(paste0(layer_name, "_prop_"), names(result_sf))]
   result_sf <- result_sf %>% dplyr::mutate(dplyr::across(dplyr::all_of(prop_cols), ~tidyr::replace_na(.x, 0)))
 
@@ -120,10 +111,10 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
     ordered_indices <- order(as.numeric(prop_numbers))
     ordered_prop_cols <- prop_cols[ordered_indices]
 
-    cols_to_select <- c("h3_address", ordered_prop_cols, "geometry", setdiff(names(result_sf), c("h3_address", ordered_prop_cols, "geometry")))
+    cols_to_select <- c("h3_address", ordered_prop_cols, "geometry",
+                        setdiff(names(result_sf), c("h3_address", ordered_prop_cols, "geometry")))
     result_sf <- result_sf %>% dplyr::select(dplyr::all_of(cols_to_select))
   }
 
-  # Convertir a MULTIPOLYGON si no lo es
   return(sf::st_cast(result_sf, "MULTIPOLYGON"))
 }
