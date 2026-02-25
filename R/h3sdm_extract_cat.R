@@ -44,9 +44,11 @@
 
 h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE) {
 
-  # 1️⃣ Validation and Setup
-  if (!inherits(spat_raster_cat, "SpatRaster")) stop("spat_raster_cat must be a SpatRaster")
-  if (!inherits(sf_hex_grid, "sf")) stop("sf_hex_grid must be an sf object")
+  if (!inherits(spat_raster_cat, "SpatRaster"))
+    stop("spat_raster_cat must be a SpatRaster")
+
+  if (!inherits(sf_hex_grid, "sf"))
+    stop("sf_hex_grid must be an sf object")
 
   sf_hex_grid <- sf::st_make_valid(sf_hex_grid)
   layer_name <- names(spat_raster_cat)[1]
@@ -55,74 +57,69 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE) {
     stop("Input sf_hex_grid must contain a column named 'h3_address'.")
   }
 
-  # 2️⃣ Extracción y Consolidación
   extracted <- exactextractr::exact_extract(
     x = spat_raster_cat,
     y = sf_hex_grid,
     summarize_df = TRUE,
     include_cols = "h3_address",
+    progress = TRUE,
     fun = function(df) {
-      if (nrow(df) == 0) return(NULL)
 
-      df <- df %>%
-        dplyr::filter(!is.na(.data$value))
+      df <- df[!is.na(df$value), ]
 
-      if (nrow(df) == 0) return(NULL)
+      # 🔥 CLAVE: nunca devolver NULL
+      if (nrow(df) == 0) {
+        return(data.frame(
+          h3_address = character(0),
+          value = numeric(0),
+          freq = numeric(0)
+        ))
+      }
 
-      df_summary <- df %>%
-        dplyr::group_by(h3_address, value) %>%
+      df_summary <- df |>
+        dplyr::group_by(h3_address, value) |>
         dplyr::summarise(
-          sum_coverage = sum(.data$coverage_fraction, na.rm = TRUE),
+          sum_coverage = sum(coverage_fraction, na.rm = TRUE),
           .groups = "drop_last"
-        ) %>%
+        ) |>
         dplyr::mutate(
-          total_area_cell = sum(.data$sum_coverage),
-          freq = if (proportion) .data$sum_coverage / .data$total_area_cell else .data$sum_coverage
-        ) %>%
-        dplyr::ungroup() %>%
+          total_area_cell = sum(sum_coverage),
+          freq = if (proportion)
+            sum_coverage / total_area_cell
+          else
+            sum_coverage
+        ) |>
+        dplyr::ungroup() |>
         dplyr::select(h3_address, value, freq)
 
       return(df_summary)
-    },
-    progress = TRUE
+    }
   )
 
-  # 3️⃣ Pivotar a formato Wide
-  if (is.null(extracted) || nrow(extracted) == 0) {
+  # 🔥 Protección adicional
+  if (is.null(extracted) || length(extracted) == 0) {
     warning("No raster data extracted or all extractions were empty.")
     return(sf_hex_grid)
   }
 
-  extracted_wide <- tibble::as_tibble(extracted) %>%
+  extracted_wide <- tibble::as_tibble(extracted) |>
     tidyr::pivot_wider(
       id_cols = "h3_address",
-      names_from = .data$value,
-      values_from = .data$freq,
+      names_from = value,
+      values_from = freq,
       names_prefix = paste0(layer_name, "_prop_"),
       values_fill = 0
     )
 
-  # 4️⃣ Unir a la geometría y ordenar columnas
-  result_sf <- sf_hex_grid %>%
+  result_sf <- sf_hex_grid |>
     dplyr::left_join(extracted_wide, by = "h3_address")
 
-  # Rellenar NAs con 0
   prop_cols <- names(result_sf)[grepl(paste0(layer_name, "_prop_"), names(result_sf))]
-  result_sf <- result_sf %>%
-    dplyr::mutate(dplyr::across(dplyr::all_of(prop_cols), ~tidyr::replace_na(.x, 0)))
 
-  # Reordenar columnas numéricamente
-  if (length(prop_cols) > 0) {
-    prop_numbers <- gsub(paste0(layer_name, "_prop_"), "", prop_cols)
-    ordered_indices <- order(as.numeric(prop_numbers))
-    ordered_prop_cols <- prop_cols[ordered_indices]
-
-    cols_to_select <- c("h3_address", ordered_prop_cols, "geometry",
-                        setdiff(names(result_sf), c("h3_address", ordered_prop_cols, "geometry")))
-
-    result_sf <- result_sf %>%
-      dplyr::select(dplyr::all_of(cols_to_select))
-  }
+  result_sf <- result_sf |>
+    dplyr::mutate(
+      dplyr::across(dplyr::all_of(prop_cols), ~tidyr::replace_na(.x, 0))
+    )
 
   return(sf::st_cast(result_sf, "MULTIPOLYGON"))
 }
