@@ -42,7 +42,7 @@
 #'
 #' @export
 
-h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, na_placeholder = 254) {
+h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, nodata_value = 255) {
 
   if (!inherits(spat_raster_cat, "SpatRaster"))
     stop("spat_raster_cat must be a SpatRaster")
@@ -56,19 +56,25 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
     stop("Input sf_hex_grid must contain a column named 'h3_address'.")
   }
 
-  # Crear copia temporal donde reemplazamos NA por un valor dentro del rango
-  temp_raster <- spat_raster_cat
-  temp_raster[is.na(temp_raster)] <- na_placeholder
+  # Reemplazar NA por un valor dentro del rango del raster
+  spat_raster_cat[is.na(spat_raster_cat)] <- nodata_value
 
-  # Extraer con exactextractr
+  # Asegurarse de que el nivel exista
+  if (!nodata_value %in% levels(spat_raster_cat)[[1]]$value) {
+    levels(spat_raster_cat)[[1]] <- rbind(
+      levels(spat_raster_cat)[[1]],
+      data.frame(value = nodata_value, class = "NoData")
+    )
+  }
+
+  # Exact extract
   extracted <- exactextractr::exact_extract(
-    x = temp_raster,
+    x = spat_raster_cat,
     y = sf_hex_grid,
     summarize_df = TRUE,
     include_cols = "h3_address",
     fun = function(df) {
-      # Ignorar celdas temporales NA
-      df <- df[df$value != na_placeholder, ]
+      df <- df %>% dplyr::filter(!is.na(.data$value))
       if (nrow(df) == 0) return(NULL)
 
       df_summary <- df %>%
@@ -91,7 +97,7 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
     return(sf_hex_grid)
   }
 
-  # Pivotear y unir
+  # Pivotear y unir al sf
   extracted_wide <- tibble::as_tibble(extracted) %>%
     tidyr::pivot_wider(
       id_cols = "h3_address",
@@ -111,8 +117,7 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
     ordered_indices <- order(as.numeric(prop_numbers))
     ordered_prop_cols <- prop_cols[ordered_indices]
 
-    cols_to_select <- c("h3_address", ordered_prop_cols, "geometry",
-                        setdiff(names(result_sf), c("h3_address", ordered_prop_cols, "geometry")))
+    cols_to_select <- c("h3_address", ordered_prop_cols, "geometry", setdiff(names(result_sf), c("h3_address", ordered_prop_cols, "geometry")))
     result_sf <- result_sf %>% dplyr::select(dplyr::all_of(cols_to_select))
   }
 
