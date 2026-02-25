@@ -42,7 +42,7 @@
 #'
 #' @export
 
-h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, nodata_value = 255) {
+h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE) {
 
   if (!inherits(spat_raster_cat, "SpatRaster"))
     stop("spat_raster_cat must be a SpatRaster")
@@ -51,15 +51,24 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
 
   sf_hex_grid <- sf::st_make_valid(sf_hex_grid)
   layer_name <- names(spat_raster_cat)[1]
-
-  if (!"h3_address" %in% names(sf_hex_grid)) {
+  if (!"h3_address" %in% names(sf_hex_grid))
     stop("Input sf_hex_grid must contain a column named 'h3_address'.")
-  }
 
-  # Reemplazar NA por un valor dentro del rango del raster
+  # --- 1. Detectar datatype ---
+  dt <- terra::datatype(spat_raster_cat)
+  nodata_value <- switch(dt,
+                         "INT1U" = 255,
+                         "INT2U" = 65535,
+                         "INT4U" = 4294967295,
+                         "INT1S" = -128,
+                         "INT2S" = -32767,
+                         "INT4S" = -2147483647,
+                         9999)  # fallback si no coincide
+
+  # --- 2. Reemplazar NA por valor válido ---
   spat_raster_cat[is.na(spat_raster_cat)] <- nodata_value
 
-  # Asegurarse de que el nivel exista
+  # --- 3. Asegurarse de que el nivel exista ---
   if (!nodata_value %in% levels(spat_raster_cat)[[1]]$value) {
     levels(spat_raster_cat)[[1]] <- rbind(
       levels(spat_raster_cat)[[1]],
@@ -67,7 +76,7 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
     )
   }
 
-  # Exact extract
+  # --- resto de la función como antes ---
   extracted <- exactextractr::exact_extract(
     x = spat_raster_cat,
     y = sf_hex_grid,
@@ -80,10 +89,8 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
       df_summary <- df %>%
         dplyr::group_by(h3_address, value) %>%
         dplyr::summarise(sum_coverage = sum(.data$coverage_fraction, na.rm = TRUE), .groups = "drop_last") %>%
-        dplyr::mutate(
-          total_area_cell = sum(.data$sum_coverage),
-          freq = if (proportion) .data$sum_coverage/.data$total_area_cell else .data$sum_coverage
-        ) %>%
+        dplyr::mutate(total_area_cell = sum(.data$sum_coverage),
+                      freq = if (proportion) .data$sum_coverage/.data$total_area_cell else .data$sum_coverage) %>%
         dplyr::ungroup() %>%
         dplyr::select(h3_address, value, freq)
 
@@ -97,7 +104,6 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
     return(sf_hex_grid)
   }
 
-  # Pivotear y unir al sf
   extracted_wide <- tibble::as_tibble(extracted) %>%
     tidyr::pivot_wider(
       id_cols = "h3_address",
@@ -108,7 +114,6 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
     )
 
   result_sf <- sf_hex_grid %>% dplyr::left_join(extracted_wide, by = "h3_address")
-
   prop_cols <- names(result_sf)[grepl(paste0(layer_name, "_prop_"), names(result_sf))]
   result_sf <- result_sf %>% dplyr::mutate(dplyr::across(dplyr::all_of(prop_cols), ~tidyr::replace_na(.x, 0)))
 
@@ -116,8 +121,8 @@ h3sdm_extract_cat <- function(spat_raster_cat, sf_hex_grid, proportion = TRUE, n
     prop_numbers <- gsub(paste0(layer_name, "_prop_"), "", prop_cols)
     ordered_indices <- order(as.numeric(prop_numbers))
     ordered_prop_cols <- prop_cols[ordered_indices]
-
-    cols_to_select <- c("h3_address", ordered_prop_cols, "geometry", setdiff(names(result_sf), c("h3_address", ordered_prop_cols, "geometry")))
+    cols_to_select <- c("h3_address", ordered_prop_cols, "geometry",
+                        setdiff(names(result_sf), c("h3_address", ordered_prop_cols, "geometry")))
     result_sf <- result_sf %>% dplyr::select(dplyr::all_of(cols_to_select))
   }
 
