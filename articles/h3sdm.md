@@ -1,0 +1,496 @@
+# h3sdm workflow for a single model
+
+## Introduction
+
+This tutorial demonstrates a complete workflow for species distribution
+modeling (SDM) for a single species using h3sdm and related packages. We
+cover data preparation, model fitting, spatial cross-validation,
+prediction, and feature importance analysis.
+
+**Note:** The h3sdm package depends on the **paisaje** package for data
+access and processing functions. paisaje is not available on CRAN, so it
+must be installed from GitHub using:
+
+``` r
+install.packages("remotes")
+remotes::install_github("ManuelSpinola/paisaje")
+```
+
+``` r
+# Load the required packages
+library(h3sdm)
+library(paisaje)
+library(tidyverse)
+library(here)
+library(tidymodels)
+library(spatialsample)
+library(sf)
+library(terra)
+library(tidyterra)
+library(DALEX)
+library(DALEXtra)
+library(ingredients)
+library(exactextractr)
+library(workflowsets)
+library(themis)
+library(ggbrick)
+
+# Optional packages for advanced modeling or visualization:
+if (requireNamespace("ranger", quietly = TRUE)) library(ranger)
+if (requireNamespace("xgboost", quietly = TRUE)) library(xgboost)
+```
+
+## 1. Define the Area of Interest
+
+We start by defining the geographical area for modeling. Here we use
+Costa Rica as an example. The file is includesd in the ‘h3sdm’ package.
+
+``` r
+cr <- cr_outline_c
+```
+
+## 2. Load Environmental Predictors
+
+We use WorldClim historic bioclimatic variables for Costa Rica as
+environmental predictors. The data is included in the ‘h3sdm’ package.
+
+``` r
+bio <- terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sdm"))
+```
+
+``` r
+names(bio) <- gsub(".*bio_", "bio", names(bio))
+```
+
+## 3. Load Species Occurrence Data
+
+Here we obtain presence–absence data for the species of interest
+(Silverstoneia flotator). We use the h3sdm_pa function to generate both
+presence and pseudo-absence records. A limit of 10,000 records is set to
+ensure that all presence records are retrieved, and 300 pseudo-absences
+are generated.
+
+There are different methods for generating pseudo-absences; here, we
+rely on random sampling. Since there are approximately 100 positive
+hexagons at resolution 7, we request three times that number (i.e., 300)
+of pseudo-absences. At this resolution, H3 hexagons are about 5.16 ha in
+size. These parameters can be adjusted depending on your specific needs
+and the characteristics of the species being modeled.
+
+``` r
+records <- h3sdm_pa("Silverstoneia flotator", cr, res = 7, limit = 10000, n_pseudoabs = 300)
+```
+
+``` r
+head(records)
+```
+
+``` r
+table(records$presence)
+```
+
+## 4. Prepare Predictors
+
+Prepare environmental predictors by extracting values for each hexagon
+in the study area.
+
+``` r
+h7 <- h3sdm_get_grid(cr, res = 7)
+```
+
+``` r
+ggplot() +
+  geom_sf(data = h7)
+```
+
+``` r
+bio_predictors <- h3sdm_extract_num(bio, h7)
+```
+
+``` r
+predictors <- h3sdm_predictors(bio_predictors)
+```
+
+In this case we select bio1 (Annual Mean Temperature), bio12 (Annual
+Precipitation), and bio15 (Precipitation Seasonality).
+
+``` r
+predictors <- predictors |>
+  dplyr::select(h3_address, bio1, bio12, bio15, geometry)
+```
+
+We can visualize one of the predictors, for example Bio1.
+
+## 5. Combine Records and Predictors
+
+Merge species occurrence records with environmental predictors.
+
+``` r
+dat <- h3sdm_data(records, predictors)
+```
+
+## 6. Spatial Cross-Validation
+
+Define spatial blocks for cross-validation to account for spatial
+autocorrelation.
+
+``` r
+scv <- h3sdm_spatial_cv(dat, v = 5, repeats = 1)
+```
+
+Plot the spatial blocks.
+
+## 7. Define Recipe and Model
+
+Create a modeling recipe and specify the classification model. We start
+with presence–absence data aggregated in hexagonal cells. From the
+initial data, we obtained roughly 100 hexagons with presence (presence =
+1). For pseudo-absences, we sampled about three times more absence
+hexagons (presence = 0) to ensure sufficient coverage.
+
+This results in an imbalanced dataset, which can bias the model toward
+predicting absences. To correct for this, we use
+step_downsample(presence) from the themis package.
+
+``` r
+receta <- h3sdm_recipe(dat) |>
+  themis::step_downsample(presence)
+```
+
+Key points:
+
+- Only the majority class (pseudo-absence hexagons) is reduced.
+
+- The minority class (presence hexagons) remains unchanged.
+
+- After down-sampling, the dataset is balanced, improving model training
+  and evaluation.
+
+In our case, down-sampling ensures that the 100 presence hexagons and a
+comparable number of pseudo-absence hexagons are used for modeling,
+preventing bias toward absences while retaining the full presence
+information.
+
+Now we define a logistic regression model using the `parsnip` package,
+from the tidymodels framework.
+
+``` r
+modelo <- parsnip::logistic_reg() %>%
+  parsnip::set_engine("glm") %>%
+  parsnip::set_mode("classification")
+```
+
+## 8. Create Workflow
+
+Create a workflow combining the recipe and model.
+
+``` r
+wf <- h3sdm_workflow(modelo, receta)
+```
+
+## 9. Fit the Model
+
+Before fitting the model, we need to extract the presence data from the
+dataset. This ensures that metrics, cross-validation, and evaluation
+focus correctly on the locations where the species is actually present.
+
+``` r
+presence_data <- dat %>%
+  dplyr::filter(presence == 1)
+```
+
+Next, we fit the model using the spatial cross-validation scheme.
+Spatial CV accounts for spatial autocorrelation by partitioning the data
+into spatially distinct folds, providing a more realistic assessment of
+model performance compared to random CV.
+
+``` r
+f <- h3sdm_fit_model(wf, scv, presence_data)
+```
+
+Key points:
+
+- presence_data contains all hexagons with presence = 1.
+
+- The cross-validation folds are spatially blocked to reduce leakage
+  between training and test data.
+
+- The model is trained and validated using these folds, ensuring robust
+  performance evaluation.
+
+## 10. Evaluate Model Performance
+
+After fitting the model, assess its performance using cross-validated
+metrics such as **ROC-AUC**, **accuracy**, **TSS**, and the **Boyce
+index**. The h3sdm_eval_metrics() function computes these metrics based
+on the fitted model and the presence data, providing a quantitative
+measure of how well the model distinguishes presence from absence across
+spatial folds.
+
+``` r
+evaluation_metrics <- h3sdm_eval_metrics(
+  fitted_model  = f$cv_model,
+  presence_data = presence_data
+)
+evaluation_metrics
+```
+
+Key points:
+
+- Metrics are computed using spatial cross-validation, so results
+  reflect realistic predictive performance.
+
+- ROC-AUC evaluates discrimination ability; TSS balances sensitivity and
+  specificity.
+
+- The Boyce index evaluates how well predicted suitability matches
+  observed presences, which is particularly useful for presence-only or
+  pseudo-absence data.
+
+- These metrics help identify whether the model reliably predicts
+  species occurrence.
+
+We can visualize the metrics.
+
+``` r
+ggplot(evaluation_metrics, aes(.metric, mean)) +
+  theme_minimal() +
+  geom_col(width = 0.03, color = "dodgerblue3", fill = "dodgerblue3") +
+  geom_point(size = 3, color = "orange") +
+  ylim(0,1)
+```
+
+## 11. Make Predictions
+
+Generate spatial predictions for the species distribution across the
+study area.
+
+``` r
+p <- h3sdm_predict(f, predictors)
+```
+
+## 12. Map
+
+Now we can visualize the predictions in a map.
+
+The map represents habitat suitability for the species across the
+hexagons. The values (usually between 0 and 1 for a logistic model)
+indicate the habitat suitability of each hexagon for the species.
+
+Interpretation of the prediction values:
+
+- Higher values → more suitable habitat
+- Lower values → less suitable habitat
+
+## 13. Model Interpretation: Feature Importance & Partial Dependence
+
+Finallly, we interpret the model to understand which predictors are most
+influential and how they affect predictions.
+
+First we create an explainer object using the DALEX package.
+
+``` r
+e <- h3sdm_explain(f$final_model, data = dat)
+```
+
+### Feature Importance
+
+We evaluate the importance of each predictor variable using permutation
+importance. This method assesses how much the model’s performance
+decreases when the values of a predictor are randomly shuffled,
+indicating its contribution to the model.
+
+We need to specify the predictor variables to evaluate, excluding
+non-predictor columns.
+
+``` r
+predictors_to_evaluate <- setdiff(names(e$data), c("h3_address", "x", "y", "presence"))
+```
+
+Now we compute variable importance.
+
+``` r
+var_imp <- model_parts(
+  explainer = e,
+  variables = predictors_to_evaluate
+)
+```
+
+We can visualize the variable importance.
+
+``` r
+plot(var_imp)
+```
+
+### Partial Dependence Plots
+
+We create partial dependence plots (PDPs) to visualize the relationship
+between key predictors and the predicted habitat suitability. PDPs show
+how the predicted outcome changes as a single predictor varies, while
+averaging out the effects of other predictors.
+
+``` r
+pdp_glm <- partial_dependence(e, variables = c("bio12", "bio1", "bio15"))
+```
+
+Now we can plot the PDPs.
+
+``` r
+plot(pdp_glm)
+```
+
+All predictors show a positive relationship with habitat suitability,
+but Bio12 (annual precipitation) and Bio1 (mean annual temperature)
+stand out with higher importance and stronger positive effects. In
+contrast, Bio15 (precipitation seasonality) has a weaker positive
+effect, suggesting that while areas with variable rainfall are somewhat
+suitable, they are less influential than Bio12 or Bio1.
+
+## 14. Categorize Habitat Suitability
+
+We can categorize the continuous habitat suitability predictions into
+discrete classes for easier interpretation. Here we define five
+categories: “Very low”, “Low”, “Medium”, “High”, and “Very high”.
+
+``` r
+p <- p %>%
+  mutate(
+    habitat_cat = cut(
+      prediction,
+      breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1),
+      labels = c("Very low", "Low", "Medium", "High", "Very high"),
+      include.lowest = TRUE
+    )
+  )
+```
+
+Now we can visualize the categorized habitat suitability in a map.
+
+``` r
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = p, aes(fill = habitat_cat)) +
+  scale_fill_viridis_d(name = "Habitat \ncategory", option = "B", direction = -1, na.translate = FALSE)
+```
+
+We can also count the number of hexagons in each habitat suitability
+category.
+
+``` r
+counts_current <- p |>
+  st_drop_geometry() |>
+  count(habitat_cat) |>
+  drop_na() |>
+  mutate(scenario = "Present")
+counts_current
+```
+
+Now we can create a waffle plot to visualize the distribution of habitat
+suitability categories.
+
+## 15. Make predictios for a future scenario
+
+We can also make predictions for future climate scenarios. Here we use
+WorldClim future bioclimatic variables for Costa Rica as environmental
+predictors. The data is included in the ‘h3sdm’ package. Only three
+variables are included: Bio1 (Annual Mean Temperature), Bio12 (Annual
+Precipitation), and Bio15 (Precipitation Seasonality).
+
+``` r
+bio_future <- terra::rast(system.file("extdata", "bioclim_future.tif", package = "h3sdm"))
+```
+
+Rename the layers of the raster to match the names used in the model.
+
+``` r
+names(bio_future) <- c("bio1", "bio12", "bio15") 
+```
+
+We prepare the future predictors by extracting values for each hexagon
+in the study area.
+
+``` r
+bio_future_predictors <- h3sdm_extract_num(bio_future, h7)
+```
+
+``` r
+predictors_future <- h3sdm_predictors(bio_future_predictors)
+```
+
+Now we can make predictions for the future scenario.
+
+``` r
+p_future <- h3sdm_predict(f, predictors_future)
+```
+
+We can visualize the future predictions in a map.
+
+We can categorize the continuous habitat suitability predictions into
+discrete classes for easier interpretation. Here we define five
+categories: “Very low”, “Low”, “Medium”, “High”, and “Very high”.
+
+``` r
+p_future <- p_future %>%
+  mutate(
+    habitat_cat = cut(
+      prediction,
+      breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1),
+      labels = c("Very low", "Low", "Medium", "High", "Very high"),
+      include.lowest = TRUE
+    )
+  )
+```
+
+Now we can visualize the categorized habitat suitability in a map.
+
+``` r
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = p_future, aes(fill = habitat_cat)) +
+  scale_fill_viridis_d(name = "Habitat \ncategory", option = "B", direction = -1, na.translate = FALSE)
+```
+
+We can also count the number of hexagons in each habitat suitability
+category.
+
+``` r
+counts_future <- p_future |>
+  st_drop_geometry() |>
+  count(habitat_cat) |>
+  drop_na() |>
+  mutate(scenario = "Future")
+counts_future
+```
+
+Now we can create a waffle plot to visualize the distribution of habitat
+suitability categories for the future scenario.
+
+Now we can create a waffle plot to visualize the distribution of habitat
+suitability categories for both present and future scenarios.
+
+## 16. Conclusions
+
+This tutorial demonstrated a complete SDM workflow for a single model
+using the `h3sdm` package. The key steps included:
+
+- Defining the study area
+
+- Loading and preparing environmental predictors
+
+- Fetching species occurrence data
+
+- Building a predictive model with spatial cross-validation
+
+- Evaluating performance and making predictions
+
+- Assessing variable importance
+
+- Categorizing habitat suitability
+
+- Making predictions for future climate scenarios
+
+- Comparing habitat suitability between present and future scenarios
+
+This workflow demonstrates modeling for a single species using one
+model. It can be easily adapted to handle multiple species or more
+complex modeling scenarios, as illustrated in the Articles section.
