@@ -37,6 +37,7 @@ Imports:
     DALEX,
     stacks
 Suggests:
+    ggplot2,
     paisaje,
     knitr,
     rmarkdown,
