@@ -12,6 +12,25 @@
 #' plot(cr_outline_c)
 "cr_outline_c"
 
+#' Presence/pseudo-absence records for Silverstoneia flotator
+#'
+#' A dataset containing presence and pseudo-absence records for the species
+#' \emph{Silverstoneia flotator} in Costa Rica, generated using H3 hexagonal
+#' grids at resolution 7.
+#'
+#' @format An \code{sf} object with columns:
+#' \describe{
+#'   \item{h3_address}{H3 index of the hexagon}
+#'   \item{presence}{factor with levels "0" (pseudo-absence) and "1" (presence)}
+#'   \item{geometry}{MULTIPOLYGON of each hexagon}
+#' }
+#' @source Generated using \code{h3sdm_pa()} with occurrence data from GBIF
+#' (\url{https://www.gbif.org}).
+#' @examples
+#' data(records)
+#' head(records)
+#' table(records$presence)
+"records"
 
 #' Current bioclimatic raster
 #'
