@@ -56,3 +56,5 @@
   : Creates a tidymodels workflow for Generalized Additive Models (GAM).
 - [`h3sdm_workflows()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_workflows.md)
   : Create multiple tidymodels workflows for H3-based SDMs
+- [`records`](https://manuelspinola.github.io/h3sdm/reference/records.md)
+  : Presence/pseudo-absence records for Silverstoneia flotator
