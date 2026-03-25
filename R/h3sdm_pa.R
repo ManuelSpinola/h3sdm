@@ -20,7 +20,7 @@
 #'   - `geometry`: MULTIPOLYGON of each hexagon.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(cr_outline_c, package = "h3sdm")
 #' dataset <- h3sdm_pa("Agalychnis callidryas", cr_outline_c, res = 7, n_pseudoabs = 100)
 #' }
@@ -36,72 +36,62 @@ h3sdm_pa <- function(species,
                      limit = 500,
                      expand_factor = 0.1) {
 
-  # Validar inputs (Estos siempre van primero y fuera del silenciamiento)
+  # Validar inputs
   if (!inherits(aoi_sf, "sf")) stop("aoi_sf must be an sf object")
   if (!is.character(species)) stop("species must be a character vector")
 
-  # ❗ FIX: ENVOLVER TODO EL PROCESAMIENTO EN UN SOLO SUPPRESSWARNINGS
-  # Esto asegura que todas las advertencias técnicas de sf, dplyr, h3jsr, etc., se silencien.
-  results <- suppressWarnings({
+  # 1. Generar hexagonal grid
+  hex_grid <- suppressWarnings(
+    h3sdm_get_grid(aoi_sf, res = res, expand_factor = expand_factor)
+  )
+  hex_grid <- hex_grid[, c("h3_address", "geometry")]
+  hex_grid <- sf::st_cast(hex_grid, "MULTIPOLYGON")
 
-    # 1️⃣ Generar hexagonal grid
-    hex_grid <- h3sdm_get_grid(aoi_sf, res = res, expand_factor = expand_factor)
-    hex_grid <- hex_grid[, c("h3_address", "geometry")]
-    hex_grid <- sf::st_cast(hex_grid, "MULTIPOLYGON")
+  # 2. Obtener registros
+  sp_sf <- suppressWarnings(
+    h3sdm_get_records(species, aoi_sf,
+                      providers = providers,
+                      remove_duplicates = remove_duplicates,
+                      date = date,
+                      limit = limit)
+  )
 
-    # 2️⃣ Obtener registros de especie (Asumimos que esta es silenciosa para cero registros)
-    sp_sf <- h3sdm_get_records(species, aoi_sf,
-                               providers = providers,
-                               remove_duplicates = remove_duplicates,
-                               date = date,
-                               limit = limit)
-
-    # Si hay cero registros, devolvemos un objeto especial con hex_grid y el indicador
-    if (nrow(sp_sf) == 0) {
-      hex_grid$presence <- factor(0, levels = c("0", "1"))
-      # Usamos 'attr' para pasar el estado del warning fuera del bloque
-      attr(hex_grid, "no_records") <- TRUE
-      return(hex_grid)
-    }
-
-    # 3️⃣ Limpieza de atributos
-    sp_sf_clean <- sp_sf %>%
-      dplyr::select(geometry)
-
-    # 4️⃣ Asignar registros a hexágonos
-    joined <- sf::st_join(sp_sf_clean, hex_grid, left = FALSE)
-
-    rec_count <- joined %>%
-      sf::st_drop_geometry() %>%
-      dplyr::group_by(hex_id = h3_address) %>%
-      dplyr::summarise(n = dplyr::n(), .groups = "drop")
-
-    # 5️⃣ Crear columna presence
-    hex_grid$presence <- 0
-    hex_grid$presence[hex_grid$h3_address %in% rec_count$hex_id] <- 1
-
-    # 6️⃣ Sample pseudo-absences
-    pos_hex <- hex_grid[hex_grid$presence == 1, ]
-    neg_hex <- hex_grid[hex_grid$presence == 0, ]
-    n_sample <- min(n_pseudoabs, nrow(neg_hex))
-    if (n_sample > 0) {
-      neg_hex <- neg_hex[sample(seq_len(nrow(neg_hex)), n_sample), ]
-      neg_hex$presence <- 0
-    }
-
-    # 7️⃣ Combinar presencia y pseudo-ausencia
-    dataset_sf <- rbind(pos_hex, neg_hex)
-    dataset_sf$presence <- factor(dataset_sf$presence, levels = c("0", "1"))
-
-    # Asegurarse de que el atributo de warning esté limpio
-    attr(dataset_sf, "no_records") <- FALSE
-    return(dataset_sf)
-  })
-
-  # ❗ GENERAR EL WARNING FUNCIONAL FUERA DEL BLOQUE SILENCIADO
-  if (isTRUE(attr(results, "no_records"))) {
+  # 3. Si no hay registros, retornar temprano
+  if (nrow(sp_sf) == 0) {
     warning("No records found for species: ", species)
+    hex_grid$presence <- factor(0, levels = c("0", "1"))
+    return(hex_grid)
   }
 
-  return(results)
+  # 4. Asignar registros a hexágonos
+  sp_sf_clean <- sp_sf %>% dplyr::select(geometry)
+
+  joined <- suppressWarnings(
+    sf::st_join(sp_sf_clean, hex_grid, left = FALSE)
+  )
+
+  rec_count <- joined %>%
+    sf::st_drop_geometry() %>%
+    dplyr::group_by(hex_id = h3_address) %>%
+    dplyr::summarise(n = dplyr::n(), .groups = "drop")
+
+  # 5. Crear columna presence
+  hex_grid$presence <- 0
+  hex_grid$presence[hex_grid$h3_address %in% rec_count$hex_id] <- 1
+
+  # 6. Sample pseudo-absences
+  pos_hex <- hex_grid[hex_grid$presence == 1, ]
+  neg_hex <- hex_grid[hex_grid$presence == 0, ]
+  n_sample <- min(n_pseudoabs, nrow(neg_hex))
+
+  if (n_sample > 0) {
+    neg_hex <- neg_hex[sample(seq_len(nrow(neg_hex)), n_sample), ]
+    neg_hex$presence <- 0
+  }
+
+  # 7. Combinar y retornar
+  dataset_sf <- rbind(pos_hex, neg_hex)
+  dataset_sf$presence <- factor(dataset_sf$presence, levels = c("0", "1"))
+
+  return(dataset_sf)
 }

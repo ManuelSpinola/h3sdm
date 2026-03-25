@@ -35,5 +35,5 @@ Hesselbarth et al., 2019. landscapemetrics: an open-source R tool to calculate
 landscape metrics. Ecography 42: 1648–1657.
 
 Nowosad & Stepinski, 2019. Information theory as a consistent framework for
-landscape patterns. \url{https://doi.org/10.1007/s10980-019-00830-x}
+landscape patterns. \doi{10.1007/s10980-019-00830-x}
 }

@@ -16,3 +16,5 @@
 ^data-raw$
 ^inst/doc$
 ^vignettes/
+^CRAN-SUBMISSION$
+^cran-comments\.md$

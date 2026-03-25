@@ -4,15 +4,15 @@
 #' @description
 #' This function merges predictor variables from multiple `sf` objects
 #' into a single `sf` object. It preserves the geometry from the first
-#' input (`num_sf`) and joins columns from the other `sf` objects
-#' using a common key (`h3_address` or `ID`).
+#' input and joins columns from the other `sf` objects using a common
+#' key (`h3_address` or `ID`).
 #'
-#' @param num_sf An `sf` object containing numeric predictor variables.
-#' @param cat_sf An `sf` object containing categorical predictor variables.
-#' @param it_sf An `sf` object containing landscape or information theory metrics.
+#' @param ... Two or more \code{sf} objects containing predictor variables.
+#'   The first object must contain the geometry to preserve. All objects
+#'   must share a common key column (\code{h3_address} or \code{ID}).
 #'
-#' @return An `sf` object containing the geometry of `num_sf` and all predictor
-#' columns from `num_sf`, `cat_sf`, and `it_sf`.
+#' @return An `sf` object containing the geometry of the first input and
+#' all predictor columns from all provided `sf` objects.
 #'
 #' @details
 #' The function uses a left join based on the `h3_address` column if present,
@@ -21,18 +21,12 @@
 #' to `MULTIPOLYGON`.
 #'
 #' @examples
-#' \donttest{
-#' # Assume you have 2 or more sf objects with predictor variables:
-#' # num_sf: numeric predictors
-#' # cat_sf: categorical predictors
-#' # it_sf: landscape or information metrics
-#'
-#' # Combine them into a single sf object
+#' \dontrun{
+#' # Combine sf objects with different predictor types into one
 #' combined <- h3sdm_predictors(num_sf, cat_sf, it_sf)
-#'
-#' # Resulting object contains geometry from num_sf and all attribute columns
 #' head(combined)
 #' }
+#'
 #' @export
 
 h3sdm_predictors <- function(...) {

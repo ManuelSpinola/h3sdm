@@ -48,7 +48,7 @@ Generates a hexagonal grid over the AOI, assigns species presence records to hex
 and samples pseudo-absences from hexagons with no records.
 }
 \examples{
-\donttest{
+\dontrun{
 data(cr_outline_c, package = "h3sdm")
 dataset <- h3sdm_pa("Agalychnis callidryas", cr_outline_c, res = 7, n_pseudoabs = 100)
 }

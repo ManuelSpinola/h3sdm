@@ -7,21 +7,19 @@
 h3sdm_predictors(...)
 }
 \arguments{
-\item{num_sf}{An \code{sf} object containing numeric predictor variables.}
-
-\item{cat_sf}{An \code{sf} object containing categorical predictor variables.}
-
-\item{it_sf}{An \code{sf} object containing landscape or information theory metrics.}
+\item{...}{Two or more \code{sf} objects containing predictor variables.
+The first object must contain the geometry to preserve. All objects
+must share a common key column (\code{h3_address} or \code{ID}).}
 }
 \value{
-An \code{sf} object containing the geometry of \code{num_sf} and all predictor
-columns from \code{num_sf}, \code{cat_sf}, and \code{it_sf}.
+An \code{sf} object containing the geometry of the first input and
+all predictor columns from all provided \code{sf} objects.
 }
 \description{
 This function merges predictor variables from multiple \code{sf} objects
 into a single \code{sf} object. It preserves the geometry from the first
-input (\code{num_sf}) and joins columns from the other \code{sf} objects
-using a common key (\code{h3_address} or \code{ID}).
+input and joins columns from the other \code{sf} objects using a common
+key (\code{h3_address} or \code{ID}).
 }
 \details{
 The function uses a left join based on the \code{h3_address} column if present,
@@ -30,16 +28,10 @@ objects are dropped to avoid conflicts, and the final geometry is cast
 to \code{MULTIPOLYGON}.
 }
 \examples{
-\donttest{
-# Assume you have 2 or more sf objects with predictor variables:
-# num_sf: numeric predictors
-# cat_sf: categorical predictors
-# it_sf: landscape or information metrics
-
-# Combine them into a single sf object
+\dontrun{
+# Combine sf objects with different predictor types into one
 combined <- h3sdm_predictors(num_sf, cat_sf, it_sf)
-
-# Resulting object contains geometry from num_sf and all attribute columns
 head(combined)
 }
+
 }
