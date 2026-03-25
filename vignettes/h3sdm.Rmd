@@ -6,7 +6,6 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -18,8 +17,9 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-This vignette demonstrates a basic workflow for species distribution modeling 
-using the `h3sdm` package.
+This vignette demonstrates a complete workflow for species distribution 
+modeling (SDM) for a single species using `h3sdm`. We cover data preparation, 
+model fitting, spatial cross-validation, prediction, and feature importance.
 
 ## Load packages
 ```{r}
@@ -28,15 +28,24 @@ library(sf)
 library(terra)
 library(dplyr)
 library(ggplot2)
+library(tidymodels)
+library(spatialsample)
+library(DALEX)
+library(themis)
 ```
 
-## 1. Area of interest
+## 1. Define the Area of Interest
 ```{r}
 cr <- cr_outline_c
-plot(st_geometry(cr))
 ```
 
-## 2. Species occurrence data
+## 2. Load Environmental Predictors
+```{r}
+bio <- terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sdm"))
+names(bio) <- gsub(".*bio_", "bio", names(bio))
+```
+
+## 3. Species Occurrence Data
 
 The package includes a precomputed presence/pseudo-absence dataset for 
 *Silverstoneia flotator* at H3 resolution 7.
@@ -45,6 +54,8 @@ data(records)
 head(records)
 table(records$presence)
 ```
+
+
 ```{r}
 ggplot() +
   theme_minimal() +
@@ -56,17 +67,126 @@ ggplot() +
   )
 ```
 
-## 3. Environmental predictors
+## 4. Prepare Predictors
 ```{r}
-bio <- terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sdm"))
 h7 <- h3sdm_get_grid(cr, res = 7)
 bio_predictors <- h3sdm_extract_num(bio, h7)
 predictors <- h3sdm_predictors(bio_predictors) |>
   dplyr::select(h3_address, bio1, bio12, bio15, geometry)
 ```
 
-## 4. Further information
 
-For a complete workflow including model fitting, spatial cross-validation, 
-predictions, and feature importance, see the 
-[full tutorial](https://manuelspinola.github.io/h3sdm/articles/h3sdm_single_model.html).
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = predictors, aes(fill = bio1)) +
+  scale_fill_viridis_c(option = "B")
+```
+
+## 5. Combine Records and Predictors
+```{r}
+dat <- h3sdm_data(records, predictors)
+```
+
+## 6. Spatial Cross-Validation
+```{r}
+scv <- h3sdm_spatial_cv(dat, v = 5, repeats = 1)
+autoplot(scv) + theme_minimal()
+```
+
+## 7. Define Recipe and Model
+```{r}
+receta <- h3sdm_recipe(dat) |>
+  themis::step_downsample(presence)
+
+modelo <- parsnip::logistic_reg() |>
+  parsnip::set_engine("glm") |>
+  parsnip::set_mode("classification")
+```
+
+## 8. Create Workflow
+```{r}
+wf <- h3sdm_workflow(modelo, receta)
+```
+
+## 9. Fit the Model
+```{r}
+presence_data <- dat |>
+  dplyr::filter(presence == 1)
+
+f <- h3sdm_fit_model(wf, scv, presence_data)
+```
+
+## 10. Evaluate Model Performance
+```{r}
+evaluation_metrics <- h3sdm_eval_metrics(
+  fitted_model  = f$cv_model,
+  presence_data = presence_data
+)
+evaluation_metrics
+```
+
+
+```{r}
+ggplot(evaluation_metrics, aes(.metric, mean)) +
+  theme_minimal() +
+  geom_col(width = 0.03, color = "dodgerblue3", fill = "dodgerblue3") +
+  geom_point(size = 3, color = "orange") +
+  ylim(0, 1)
+```
+
+## 11. Make Predictions
+```{r}
+p <- h3sdm_predict(f, predictors)
+```
+
+
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = p, aes(fill = prediction)) +
+  scale_fill_viridis_c(name = "Habitat\nsuitability", option = "B", direction = -1)
+```
+
+## 12. Model Interpretation
+```{r}
+e <- h3sdm_explain(f$final_model, data = dat)
+
+predictors_to_evaluate <- setdiff(names(e$data), c("h3_address", "x", "y", "presence"))
+
+var_imp <- DALEX::model_parts(
+  explainer = e,
+  variables = predictors_to_evaluate
+)
+plot(var_imp)
+```
+
+
+```{r}
+pdp_glm <- ingredients::partial_dependence(e, variables = c("bio12", "bio1", "bio15"))
+plot(pdp_glm)
+```
+
+## 13. Future Scenario Predictions
+```{r}
+bio_future <- terra::rast(system.file("extdata", "bioclim_future.tif", package = "h3sdm"))
+names(bio_future) <- c("bio1", "bio12", "bio15")
+
+bio_future_predictors <- h3sdm_extract_num(bio_future, h7)
+predictors_future <- h3sdm_predictors(bio_future_predictors)
+
+p_future <- h3sdm_predict(f, predictors_future)
+```
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = p_future, aes(fill = prediction)) +
+  scale_fill_viridis_c(name = "Habitat\nsuitability", option = "B", direction = -1)
+```
+
+## Conclusions
+
+This vignette demonstrated a complete SDM workflow using `h3sdm`, including
+data preparation, model fitting with spatial cross-validation, performance
+evaluation, predictions, and variable importance analysis for both current
+and future climate scenarios.

@@ -43,7 +43,6 @@ Suggests:
     here,
     tidyr,
     themis,
-    parsnip,
     DALEXtra,
     ingredients,
     exactextractr,
@@ -56,6 +55,7 @@ Suggests:
     ranger,
     xgboost,
     ggbrick,
+    parsnip,
     tidyverse
 VignetteBuilder: 
     knitr
