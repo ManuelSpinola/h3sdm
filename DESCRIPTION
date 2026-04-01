@@ -7,7 +7,7 @@ Authors@R:
            family = "Spínola",
            role = c("aut", "cre"),
            email = "mspinola10@gmail.com")
-Description: Provides tools for species distribution modeling (SDM) using H3
+Description: Provides tools for species distribution modeling using H3
   hexagonal grids (Uber Technologies Inc., 2022, <https://h3geo.org>).
   Facilitates retrieval of species occurrence records, generation of H3 grids,
   computation of landscape metrics, and preparation of spatial data for modern

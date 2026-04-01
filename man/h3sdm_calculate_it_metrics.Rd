@@ -25,10 +25,37 @@ The results are pivoted to a wide format for easy use.
 }
 \examples{
 \donttest{
-# Assuming 'sf_grid' is an sf object with hexagons
-# result_sf <- h3sdm_calculate_it_metrics(sf_grid)
-# head(result_sf)
+  library(sf)
+  library(terra)
+
+  # Create a categorical SpatRaster (land-cover map)
+  landscape_raster <- terra::rast(
+    nrows = 30, ncols = 30,
+    xmin = -85.0, xmax = -83.0,
+    ymin = 9.0,  ymax = 11.0,
+    crs = "EPSG:4326"
+  )
+  terra::values(landscape_raster) <- sample(1:4, terra::ncell(landscape_raster),
+                                            replace = TRUE)
+  names(landscape_raster) <- "landcover"
+
+  # Create a simple hexagon grid as sf polygons
+  hex_grid <- sf::st_make_grid(
+    sf::st_as_sfc(sf::st_bbox(c(
+      xmin = -84.5, xmax = -83.5,
+      ymin = 9.5,  ymax = 10.5
+    ), crs = sf::st_crs(4326))),
+    n = c(3, 3),
+    square = FALSE
+  )
+  sf_grid <- sf::st_sf(h3_address = paste0("hex_", seq_along(hex_grid)),
+                       geometry = hex_grid)
+
+  # Calculate Information Theory (IT) landscape metrics per hexagon
+  result_sf <- h3sdm_calculate_it_metrics(landscape_raster, sf_grid)
+  head(result_sf)
 }
+
 }
 \references{
 Hesselbarth et al., 2019. landscapemetrics: an open-source R tool to calculate

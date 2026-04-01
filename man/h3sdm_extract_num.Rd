@@ -35,10 +35,37 @@ data integrity
 and prevent misalignment errors.
 }
 \examples{
-\dontrun{
-# Assuming 'bio' is a SpatRaster stack and 'h7' is an sf hexagon grid
-# bio_p <- h3sdm_extract_num(bio, h7)
-# head(bio_p)
-}
+  library(sf)
+  library(terra)
+
+  # Create a SpatRaster stack with two numeric layers (e.g., bioclimatic variables)
+  bio1 <- terra::rast(
+    nrows = 10, ncols = 10,
+    xmin = -84.5, xmax = -83.5,
+    ymin = 9.5,  ymax = 10.5,
+    crs = "EPSG:4326"
+  )
+  bio2 <- bio1
+  terra::values(bio1) <- runif(terra::ncell(bio1), 15, 30)
+  terra::values(bio2) <- runif(terra::ncell(bio2), 500, 3000)
+  names(bio1) <- "bio1_temp"
+  names(bio2) <- "bio12_precip"
+  bio <- c(bio1, bio2)
+
+  # Create a simple hexagon grid as sf polygons
+  hex_grid <- sf::st_make_grid(
+    sf::st_as_sfc(sf::st_bbox(c(
+      xmin = -84.5, xmax = -83.5,
+      ymin = 9.5,  ymax = 10.5
+    ), crs = sf::st_crs(4326))),
+    n = c(3, 3),
+    square = FALSE
+  )
+  h7 <- sf::st_sf(h3_address = paste0("hex_", seq_along(hex_grid)),
+                  geometry = hex_grid)
+
+  # Extract numeric raster values by hexagon (mean per cell)
+  bio_p <- h3sdm_extract_num(bio, h7)
+  head(bio_p)
 
 }

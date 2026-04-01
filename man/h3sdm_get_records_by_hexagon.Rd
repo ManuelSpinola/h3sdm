@@ -57,11 +57,34 @@ The function ensures column names derived from species names are safe in R
 by replacing spaces with underscores and handles API failures gracefully.
 }
 \examples{
-\dontrun{
-# Assuming aoi_sf is a valid sf polygon
-# species_list <- c("Agalychnis callidryas", "Smilisca baudinii")
-# hex_counts <- h3sdm_get_records_by_hexagon(species_list, aoi_sf, res = 7, limit = 1000)
-# head(hex_counts)
+\donttest{
+  library(sf)
+
+  # Create a simple AOI polygon in Costa Rica
+  aoi_sf <- sf::st_as_sf(
+    data.frame(id = 1),
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(-84.5, 9.5,
+          -83.5, 9.5,
+          -83.5, 10.5,
+          -84.5, 10.5,
+          -84.5, 9.5),
+        ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
+  )
+
+  hex_counts <- h3sdm_get_records_by_hexagon(
+    species = c("Agalychnis callidryas", "Smilisca baudinii"),
+    aoi_sf  = aoi_sf,
+    res     = 7,
+    providers = "gbif",
+    limit   = 100
+  )
+
+  print(hex_counts)
 }
 
 }

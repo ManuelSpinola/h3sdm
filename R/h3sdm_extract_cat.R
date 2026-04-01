@@ -34,11 +34,40 @@
 #'
 #'
 #' @examples
-#' \dontrun{
-#' # Assuming 'lulc' is a categorical SpatRaster and 'h7' is an sf hexagon grid
-#' # lulc_p <- h3sdm_extract_cat(lulc, h7, proportion = TRUE)
-#' # head(lulc_p)
-#' }
+#'   library(sf)
+#'   library(terra)
+#'
+#'   # Create a simple categorical SpatRaster
+#'   lulc <- terra::rast(
+#'     nrows = 20, ncols = 20,
+#'     xmin = -85.0, xmax = -83.0,
+#'     ymin = 9.0,  ymax = 11.0,
+#'     crs = "EPSG:4326"
+#'   )
+#'   terra::values(lulc) <- sample(1:4, terra::ncell(lulc), replace = TRUE)
+#'   names(lulc) <- "landuse"
+#'
+#'   # Define categorical levels explicitly
+#'   levels(lulc) <- data.frame(
+#'     value = 1:4,
+#'     class = c("forest", "grassland", "urban", "water")
+#'   )
+#'
+#'   # Create a simple hexagon grid as sf polygons (smaller than raster extent)
+#'   hex_grid <- sf::st_make_grid(
+#'     sf::st_as_sfc(sf::st_bbox(c(
+#'       xmin = -84.5, xmax = -83.5,
+#'       ymin = 9.5,  ymax = 10.5
+#'     ), crs = sf::st_crs(4326))),
+#'     n = c(3, 3),
+#'     square = FALSE
+#'   )
+#'   h7 <- sf::st_sf(h3_address = paste0("hex_", seq_along(hex_grid)),
+#'                   geometry = hex_grid)
+#'
+#'   # Extract categorical raster values by hexagon
+#'   lulc_p <- h3sdm_extract_cat(lulc, h7, proportion = TRUE)
+#'   head(lulc_p)
 #'
 #' @export
 

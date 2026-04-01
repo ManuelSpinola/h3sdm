@@ -48,9 +48,26 @@ containment. A critical check is included to prevent errors when the API returns
 data (addressing the 'column not found' error).
 }
 \examples{
-\dontrun{
-# Assuming aoi_sf is a valid sf polygon
-# h3_records <- h3sdm_get_records("Puma concolor", aoi_sf, providers = "gbif", limit = 1000)
-# head(h3_records)
+\donttest{
+  library(sf)
+
+  # Create a simple AOI polygon in Costa Rica
+  aoi_sf <- sf::st_as_sf(
+    data.frame(
+      lon = c(-84.5, -83.5, -83.5, -84.5, -84.5),
+      lat = c(9.5, 9.5, 10.5, 10.5, 9.5)
+    ) |>
+      {\(d) sf::st_sfc(sf::st_polygon(list(as.matrix(d))), crs = 4326)}(),
+    data.frame(id = 1)
+  )
+
+  records <- h3sdm_get_records(
+    species = "Puma concolor",
+    aoi_sf = aoi_sf,
+    providers = "gbif",
+    limit = 100
+  )
+
+  print(records)
 }
 }
