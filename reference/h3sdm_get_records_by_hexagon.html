@@ -122,12 +122,63 @@ by replacing spaces with underscores and handles API failures gracefully.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># Assuming aoi_sf is a valid sf polygon</span></span></span>
-<span class="r-in"><span><span class="co"># species_list &lt;- c("Agalychnis callidryas", "Smilisca baudinii")</span></span></span>
-<span class="r-in"><span><span class="co"># hex_counts &lt;- h3sdm_get_records_by_hexagon(species_list, aoi_sf, res = 7, limit = 1000)</span></span></span>
-<span class="r-in"><span><span class="co"># head(hex_counts)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Create a simple AOI polygon in Costa Rica</span></span></span>
+<span class="r-in"><span>  <span class="va">aoi_sf</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    geometry <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">st_sfc</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_polygon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">84.5</span>, <span class="fl">9.5</span>,</span></span>
+<span class="r-in"><span>          <span class="op">-</span><span class="fl">83.5</span>, <span class="fl">9.5</span>,</span></span>
+<span class="r-in"><span>          <span class="op">-</span><span class="fl">83.5</span>, <span class="fl">10.5</span>,</span></span>
+<span class="r-in"><span>          <span class="op">-</span><span class="fl">84.5</span>, <span class="fl">10.5</span>,</span></span>
+<span class="r-in"><span>          <span class="op">-</span><span class="fl">84.5</span>, <span class="fl">9.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        ncol <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>      crs <span class="op">=</span> <span class="fl">4326</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">hex_counts</span> <span class="op">&lt;-</span> <span class="fu">h3sdm_get_records_by_hexagon</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    species <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Agalychnis callidryas"</span>, <span class="st">"Smilisca baudinii"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    aoi_sf  <span class="op">=</span> <span class="va">aoi_sf</span>,</span></span>
+<span class="r-in"><span>    res     <span class="op">=</span> <span class="fl">7</span>,</span></span>
+<span class="r-in"><span>    providers <span class="op">=</span> <span class="st">"gbif"</span>,</span></span>
+<span class="r-in"><span>    limit   <span class="op">=</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">hex_counts</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 2476 features and 3 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: MULTIPOLYGON</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -84.5 ymin: 9.5 xmax: -83.5 ymax: 10.50039</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Geodetic CRS:  WGS 84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> First 10 features:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         h3_address Agalychnis_callidryas Smilisca_baudinii</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  8766b459bffffff                     0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  8766b4516ffffff                     0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  87679a6f6ffffff                     0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  87679a671ffffff                     0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  87679a4e2ffffff                     0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  876d69322ffffff                     0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  876d6929dffffff                     0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  87679a45dffffff                     0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  876d69218ffffff                     0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 876d6910effffff                     0                 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          geometry</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  MULTIPOLYGON (((-84.15606 9...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  MULTIPOLYGON (((-84.07649 9...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  MULTIPOLYGON (((-83.71694 1...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  MULTIPOLYGON (((-83.53215 1...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  MULTIPOLYGON (((-83.89897 1...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  MULTIPOLYGON (((-84.23194 1...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  MULTIPOLYGON (((-84.40951 9...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  MULTIPOLYGON (((-83.76182 1...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  MULTIPOLYGON (((-84.28254 9...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 MULTIPOLYGON (((-84.46113 1...</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -74,15 +74,15 @@ explainer <- h3sdm_explain(model, data = dat, response = "presence")
 #>   -> predict function  :  custom_predict 
 #>   -> predicted values  :  No value for predict function target column. (  default  )
 #>   -> model_info        :  package parsnip , ver. 1.4.1 , task classification (  default  ) 
-#>   -> predicted values  :  numerical, min =  0.2073021 , mean =  0.6 , max =  0.9190452  
+#>   -> predicted values  :  numerical, min =  0.2388432 , mean =  0.45 , max =  0.6875722  
 #>   -> residual function :  difference between y and yhat (  default  )
-#>   -> residuals         :  numerical, min =  -0.8424846 , mean =  1.239972e-10 , max =  0.6379214  
+#>   -> residuals         :  numerical, min =  -0.5605912 , mean =  -4.805741e-14 , max =  0.750073  
 #>   A new explainer has been created!  
 feature_importance(explainer)
 #>       variable mean_dropout_loss          label
-#> 1 _full_model_         0.2916667 h3sdm workflow
-#> 2           x2         0.3104167 h3sdm workflow
-#> 3           x1         0.5177083 h3sdm workflow
-#> 4   _baseline_         0.4510417 h3sdm workflow
+#> 1 _full_model_         0.3535354 h3sdm workflow
+#> 2           x1         0.3535354 h3sdm workflow
+#> 3           x2         0.5686869 h3sdm workflow
+#> 4   _baseline_         0.5292929 h3sdm workflow
 # }
 ```

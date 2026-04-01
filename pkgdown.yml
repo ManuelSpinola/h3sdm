@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   h3sdm: h3sdm.html
   articles/multi_model_workflow: multi_model_workflow.html
-last_built: 2026-03-25T20:47Z
+last_built: 2026-04-01T15:10Z
 urls:
   reference: https://manuelspinola.github.io/h3sdm/reference
   article: https://manuelspinola.github.io/h3sdm/articles

@@ -97,10 +97,61 @@ gracefully.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# Assuming aoi_sf is a valid sf polygon
-# species_list <- c("Agalychnis callidryas", "Smilisca baudinii")
-# hex_counts <- h3sdm_get_records_by_hexagon(species_list, aoi_sf, res = 7, limit = 1000)
-# head(hex_counts)
-} # }
+# \donttest{
+  library(sf)
+
+  # Create a simple AOI polygon in Costa Rica
+  aoi_sf <- sf::st_as_sf(
+    data.frame(id = 1),
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(-84.5, 9.5,
+          -83.5, 9.5,
+          -83.5, 10.5,
+          -84.5, 10.5,
+          -84.5, 9.5),
+        ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
+  )
+
+  hex_counts <- h3sdm_get_records_by_hexagon(
+    species = c("Agalychnis callidryas", "Smilisca baudinii"),
+    aoi_sf  = aoi_sf,
+    res     = 7,
+    providers = "gbif",
+    limit   = 100
+  )
+
+  print(hex_counts)
+#> Simple feature collection with 2476 features and 3 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: -84.5 ymin: 9.5 xmax: -83.5 ymax: 10.50039
+#> Geodetic CRS:  WGS 84
+#> First 10 features:
+#>         h3_address Agalychnis_callidryas Smilisca_baudinii
+#> 1  8766b459bffffff                     0                 0
+#> 2  8766b4516ffffff                     0                 0
+#> 3  87679a6f6ffffff                     0                 0
+#> 4  87679a671ffffff                     0                 0
+#> 5  87679a4e2ffffff                     0                 0
+#> 6  876d69322ffffff                     0                 0
+#> 7  876d6929dffffff                     0                 0
+#> 8  87679a45dffffff                     0                 0
+#> 9  876d69218ffffff                     0                 0
+#> 10 876d6910effffff                     0                 1
+#>                          geometry
+#> 1  MULTIPOLYGON (((-84.15606 9...
+#> 2  MULTIPOLYGON (((-84.07649 9...
+#> 3  MULTIPOLYGON (((-83.71694 1...
+#> 4  MULTIPOLYGON (((-83.53215 1...
+#> 5  MULTIPOLYGON (((-83.89897 1...
+#> 6  MULTIPOLYGON (((-84.23194 1...
+#> 7  MULTIPOLYGON (((-84.40951 9...
+#> 8  MULTIPOLYGON (((-83.76182 1...
+#> 9  MULTIPOLYGON (((-84.28254 9...
+#> 10 MULTIPOLYGON (((-84.46113 1...
+# }
 ```
