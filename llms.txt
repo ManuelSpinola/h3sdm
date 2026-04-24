@@ -100,6 +100,8 @@ habitat analysis using H3 grids.
   : Download Species Records and Count Occurrences per H3 Hexagon
 - [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
   : Generate presence/pseudo-absence dataset for a species
+- [`h3sdm_pa_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa_from_records.md)
+  : Generate presence/pseudo-absence dataset from user-provided records
 - [`h3sdm_predict()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predict.md)
   : Predict species presence probability using H3 hexagons
 - [`h3sdm_predictors()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predictors.md)

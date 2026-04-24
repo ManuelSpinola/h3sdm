@@ -73,7 +73,7 @@ explainer <- h3sdm_explain(model, data = dat, response = "presence")
 #>   -> target variable   :  20  values 
 #>   -> predict function  :  custom_predict 
 #>   -> predicted values  :  No value for predict function target column. (  default  )
-#>   -> model_info        :  package parsnip , ver. 1.4.1 , task classification (  default  ) 
+#>   -> model_info        :  package parsnip , ver. 1.5.0 , task classification (  default  ) 
 #>   -> predicted values  :  numerical, min =  0.2388432 , mean =  0.45 , max =  0.6875722  
 #>   -> residual function :  difference between y and yhat (  default  )
 #>   -> residuals         :  numerical, min =  -0.5605912 , mean =  -4.805741e-14 , max =  0.750073  
