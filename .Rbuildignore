@@ -16,3 +16,5 @@
 ^data-raw$
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
+^\.positai$
+^\.claude$
