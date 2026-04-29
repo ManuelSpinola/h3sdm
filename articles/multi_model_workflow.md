@@ -425,7 +425,7 @@ e <- h3sdm_explain(rf_fitted, data = dat)
 #>   -> target variable   :  425  values 
 #>   -> predict function  :  custom_predict 
 #>   -> predicted values  :  No value for predict function target column. (  default  )
-#>   -> model_info        :  package tidymodels , ver. 1.4.1 , task classification (  default  ) 
+#>   -> model_info        :  package tidymodels , ver. 1.5.0 , task classification (  default  ) 
 #>   -> predicted values  :  numerical, min =  0 , mean =  0.410587 , max =  0.9972198  
 #>   -> residual function :  difference between y and yhat (  default  )
 #>   -> residuals         :  numerical, min =  -0.9884127 , mean =  -0.1164693 , max =  0.740946  
