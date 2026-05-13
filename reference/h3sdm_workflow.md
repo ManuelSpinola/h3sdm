@@ -20,13 +20,19 @@ h3sdm_workflow(model_spec, recipe)
   [`rand_forest()`](https://parsnip.tidymodels.org/reference/rand_forest.html),
   or
   [`boost_tree()`](https://parsnip.tidymodels.org/reference/boost_tree.html)),
-  describing the model type and engine to use for fitting.
+  describing the model type and engine to use for fitting. Use
+  `set_mode("classification")` for presence/absence models and
+  `set_mode("regression")` for count-based models (species richness,
+  detections, or individuals).
 
 - recipe:
 
   A `tidymodels` recipe object, typically created with
   [`h3sdm_recipe()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe.md),
-  which preprocesses the data and defines predictor/response roles.
+  which preprocesses the data and defines predictor/response roles. Use
+  `response_col = "count"` in
+  [`h3sdm_recipe()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe.md)
+  when working with count data.
 
 ## Value
 
@@ -43,22 +49,35 @@ evaluation with `tidymodels` functions like
 `fit_resamples()`, and is particularly useful when applying multiple
 models in parallel.
 
+**Choosing the model mode:**
+
+- For **presence/absence** data: use `set_mode("classification")`.
+
+- For **count** data (species richness, detections, individuals): use
+  `set_mode("regression")`.
+
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
 library(parsnip)
-# Example: Create a tidymodels workflow for H3-based species distribution modeling
 
-# Step 1: Define model specification
-my_model_spec <- logistic_reg() %>%
-  set_mode("classification") %>%
-  set_engine("glm")
+# --- Presence/absence model ---
+rf_spec_pa <- rand_forest() %>%
+  set_engine("ranger") %>%
+  set_mode("classification")
 
-# Step 2: Create recipe
-my_recipe <- h3sdm_recipe(combined_data)
+rec_pa <- h3sdm_recipe(combined_data)
 
-# Step 3: Combine into workflow
-sdm_wf <- h3sdm_workflow(model_spec = my_model_spec, sdm_recipe = my_recipe)
+wf_pa <- h3sdm_workflow(model_spec = rf_spec_pa, recipe = rec_pa)
+
+# --- Count-based model ---
+rf_spec_count <- rand_forest() %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+rec_count <- h3sdm_recipe(combined_data, response_col = "count")
+
+wf_count <- h3sdm_workflow(model_spec = rf_spec_count, recipe = rec_count)
 } # }
 ```

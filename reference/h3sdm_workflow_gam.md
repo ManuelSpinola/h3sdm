@@ -21,7 +21,9 @@ h3sdm_workflow_gam(gam_spec, recipe = NULL, formula = NULL)
 
   A `parsnip` model specification of type
   [`gen_additive_mod()`](https://parsnip.tidymodels.org/reference/gen_additive_mod.html),
-  configured with `set_engine("mgcv")`.
+  configured with `set_engine("mgcv")`. Use `set_mode("classification")`
+  for presence/absence models and `set_mode("regression")` for
+  count-based models.
 
 - recipe:
 
@@ -55,6 +57,16 @@ with `fit_resamples()` or `tune_grid()`.
   the `mgcv` engine for fitting, enabling the use of specialized terms
   like `s(x, y)`.
 
+**Choosing the model mode and family:**
+
+- For **presence/absence** data: use `set_mode("classification")`. The
+  `mgcv` engine uses [`binomial()`](https://rdrr.io/r/stats/family.html)
+  family by default.
+
+- For **count** data (species richness, detections, individuals): use
+  `set_mode("regression")` and specify
+  `set_engine("mgcv", family = poisson())`.
+
 ## See also
 
 Other h3sdm_tools:
@@ -66,22 +78,35 @@ Other h3sdm_tools:
 ``` r
 if (FALSE) { # \dontrun{
 library(parsnip)
-# 1. Define the model specification
-gam_spec <- gen_additive_mod() %>%
+
+# --- Presence/absence model (binomial) ---
+gam_spec_pa <- gen_additive_mod() %>%
   set_engine("mgcv") %>%
   set_mode("classification")
 
-# 2. Define a specialized GAM formula
-gam_formula <- presence ~ s(bio1) + s(x, y, bs = "tp")
+gam_formula_pa <- presence ~ s(bio1) + s(bio12) + s(x, y, bs = "tp")
 
-# 3. Define a base recipe (assuming 'data' exists)
-# base_rec <- h3sdm_recipe_gam(data)
+base_rec_pa <- h3sdm_recipe_gam(data)
 
-# 4. Create the combined workflow
-# h3sdm_wf <- h3sdm_workflow_gam(
-#   gam_spec = gam_spec,
-#   recipe = base_rec,
-#   formula = gam_formula
-# )
+h3sdm_wf_pa <- h3sdm_workflow_gam(
+  gam_spec = gam_spec_pa,
+  recipe   = base_rec_pa,
+  formula  = gam_formula_pa
+)
+
+# --- Count-based model (Poisson) ---
+gam_spec_count <- gen_additive_mod() %>%
+  set_engine("mgcv", family = poisson()) %>%
+  set_mode("regression")
+
+gam_formula_count <- count ~ s(bio1) + s(bio12) + s(x, y, bs = "tp")
+
+base_rec_count <- h3sdm_recipe_gam(data, response_col = "count")
+
+h3sdm_wf_count <- h3sdm_workflow_gam(
+  gam_spec = gam_spec_count,
+  recipe   = base_rec_count,
+  formula  = gam_formula_count
+)
 } # }
 ```

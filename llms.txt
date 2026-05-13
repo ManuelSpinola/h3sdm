@@ -115,7 +115,7 @@ habitat analysis using H3 grids.
   : Create a tidymodels recipe for H3-based SDMs
 - [`h3sdm_recipe_gam()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe_gam.md)
   : Creates a 'recipe' object for Generalized Additive Models (GAM) in
-  SDM.
+  SDM
 - [`h3sdm_spatial_cv()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_spatial_cv.md)
   : Create a spatial-aware cross-validation split for H3 data
 - [`h3sdm_stack_fit()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_stack_fit.md)
