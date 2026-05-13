@@ -8,29 +8,60 @@ h3sdm_workflows(model_specs, recipe)
 }
 \arguments{
 \item{model_specs}{A named list of \code{tidymodels} model specifications
-(e.g., \code{logistic_reg()}, \code{rand_forest()}, \code{boost_tree()}), where each element
-specifies a different modeling approach to be included in the workflow set.}
+(e.g., \code{logistic_reg()}, \code{rand_forest()}, \code{boost_tree()}), where each
+element specifies a different modeling approach. All specifications must
+use the same mode: \code{set_mode("classification")} for presence/absence models
+or \code{set_mode("regression")} for count-based models.}
 
-\item{recipe}{A \code{tidymodels} recipe object, typically created with \code{h3sdm_recipe()},
-which prepares and preprocesses the data for modeling.}
+\item{recipe}{A \code{tidymodels} recipe object, typically created with
+\code{h3sdm_recipe()}, which prepares and preprocesses the data for modeling.
+Use \code{response_col = "count"} in \code{h3sdm_recipe()} when working with
+count data.}
 }
 \value{
 A named list of \code{workflow} objects, one per model specification.
 }
 \description{
-Creates a list of tidymodels workflows from multiple model specifications and a prepared recipe.
-This is useful for comparing different modeling approaches in species distribution modeling
-using H3 hexagonal grids. The returned workflows can be used for model fitting and resampling.
+Creates a list of tidymodels workflows from multiple model specifications
+and a prepared recipe. This is useful for comparing different modeling
+approaches in species distribution modeling using H3 hexagonal grids.
 }
 \details{
-This function automates the creation of workflows for multiple model specifications.
-Each workflow combines the same preprocessing steps (recipe) with a different
-modeling method. This facilitates systematic comparison of models and is
-especially useful in ensemble and stacking approaches.
+This function automates the creation of workflows for multiple model
+specifications. Each workflow combines the same preprocessing steps (recipe)
+with a different modeling method, facilitating systematic comparison of models.
+
+\strong{Choosing the model mode:}
+\itemize{
+\item For \strong{presence/absence} data: use \code{set_mode("classification")}
+for all model specifications.
+\item For \strong{count} data (species richness, detections, individuals):
+use \code{set_mode("regression")} for all model specifications.
+}
 }
 \examples{
 \dontrun{
-# ... (examples are correct as is) ...
+library(parsnip)
+
+# --- Presence/absence models ---
+specs_pa <- list(
+  rf  = rand_forest() \%>\% set_engine("ranger") \%>\% set_mode("classification"),
+  glm = logistic_reg() \%>\% set_engine("glm") \%>\% set_mode("classification")
+)
+
+rec_pa <- h3sdm_recipe(combined_data)
+
+wfs_pa <- h3sdm_workflows(model_specs = specs_pa, recipe = rec_pa)
+
+# --- Count-based models ---
+specs_count <- list(
+  rf  = rand_forest() \%>\% set_engine("ranger") \%>\% set_mode("regression"),
+  xgb = boost_tree() \%>\% set_engine("xgboost") \%>\% set_mode("regression")
+)
+
+rec_count <- h3sdm_recipe(combined_data, response_col = "count")
+
+wfs_count <- h3sdm_workflows(model_specs = specs_count, recipe = rec_count)
 }
 
 }

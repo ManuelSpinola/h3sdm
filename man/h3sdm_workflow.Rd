@@ -7,41 +7,60 @@
 h3sdm_workflow(model_spec, recipe)
 }
 \arguments{
-\item{model_spec}{A \code{tidymodels} model specification (e.g., \code{logistic_reg()}, \code{rand_forest()}, or \code{boost_tree()}),
-describing the model type and engine to use for fitting.}
+\item{model_spec}{A \code{tidymodels} model specification (e.g., \code{logistic_reg()},
+\code{rand_forest()}, or \code{boost_tree()}), describing the model type and engine
+to use for fitting. Use \code{set_mode("classification")} for presence/absence
+models and \code{set_mode("regression")} for count-based models (species richness,
+detections, or individuals).}
 
-\item{recipe}{A \code{tidymodels} recipe object, typically created with \code{h3sdm_recipe()},
-which preprocesses the data and defines predictor/response roles.}
+\item{recipe}{A \code{tidymodels} recipe object, typically created with
+\code{h3sdm_recipe()}, which preprocesses the data and defines predictor/response
+roles. Use \code{response_col = "count"} in \code{h3sdm_recipe()} when working with
+count data.}
 }
 \value{
-A \code{workflow} object ready to be used for model fitting with \code{fit()} or cross-validation.
+A \code{workflow} object ready to be used for model fitting with \code{fit()}
+or cross-validation.
 }
 \description{
-Combines a model specification and a prepared recipe into a single \code{tidymodels} workflow.
-This workflow is suitable for species distribution modeling using H3 hexagonal grids
-and can be directly fitted or cross-validated.
+Combines a model specification and a prepared recipe into a single \code{tidymodels}
+workflow. This workflow is suitable for species distribution modeling using H3
+hexagonal grids and can be directly fitted or cross-validated.
 }
 \details{
 The function creates a \code{workflow} that combines preprocessing and modeling
 steps. This encapsulation allows consistent model training and evaluation
 with \code{tidymodels} functions like \code{fit()} or \code{fit_resamples()}, and is
 particularly useful when applying multiple models in parallel.
+
+\strong{Choosing the model mode:}
+\itemize{
+\item For \strong{presence/absence} data: use \code{set_mode("classification")}.
+\item For \strong{count} data (species richness, detections, individuals):
+use \code{set_mode("regression")}.
+}
 }
 \examples{
 \dontrun{
 library(parsnip)
-# Example: Create a tidymodels workflow for H3-based species distribution modeling
 
-# Step 1: Define model specification
-my_model_spec <- logistic_reg() \%>\%
-  set_mode("classification") \%>\%
-  set_engine("glm")
+# --- Presence/absence model ---
+rf_spec_pa <- rand_forest() \%>\%
+  set_engine("ranger") \%>\%
+  set_mode("classification")
 
-# Step 2: Create recipe
-my_recipe <- h3sdm_recipe(combined_data)
+rec_pa <- h3sdm_recipe(combined_data)
 
-# Step 3: Combine into workflow
-sdm_wf <- h3sdm_workflow(model_spec = my_model_spec, sdm_recipe = my_recipe)
+wf_pa <- h3sdm_workflow(model_spec = rf_spec_pa, recipe = rec_pa)
+
+# --- Count-based model ---
+rf_spec_count <- rand_forest() \%>\%
+  set_engine("ranger") \%>\%
+  set_mode("regression")
+
+rec_count <- h3sdm_recipe(combined_data, response_col = "count")
+
+wf_count <- h3sdm_workflow(model_spec = rf_spec_count, recipe = rec_count)
 }
 
 }

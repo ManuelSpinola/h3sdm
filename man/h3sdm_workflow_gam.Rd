@@ -8,7 +8,9 @@ h3sdm_workflow_gam(gam_spec, recipe = NULL, formula = NULL)
 }
 \arguments{
 \item{gam_spec}{A \code{parsnip} model specification of type
-\code{gen_additive_mod()}, configured with \code{set_engine("mgcv")}.}
+\code{gen_additive_mod()}, configured with \code{set_engine("mgcv")}.
+Use \code{set_mode("classification")} for presence/absence models and
+\code{set_mode("regression")} for count-based models.}
 
 \item{recipe}{(Optional) A \code{recipes} package \code{recipe} object (e.g.,
 the output of \code{\link[h3sdm]{h3sdm_recipe_gam}}). Used for general data
@@ -43,27 +45,49 @@ uses the \code{recipe} for data preprocessing but explicitly passes the
 \code{formula} to the \code{mgcv} engine for fitting, enabling the use
 of specialized terms like \code{s(x, y)}.
 }
+
+\strong{Choosing the model mode and family:}
+\itemize{
+\item For \strong{presence/absence} data: use \code{set_mode("classification")}.
+The \code{mgcv} engine uses \code{binomial()} family by default.
+\item For \strong{count} data (species richness, detections, individuals):
+use \code{set_mode("regression")} and specify
+\code{set_engine("mgcv", family = poisson())}.
+}
 }
 \examples{
 \dontrun{
 library(parsnip)
-# 1. Define the model specification
-gam_spec <- gen_additive_mod() \%>\%
+
+# --- Presence/absence model (binomial) ---
+gam_spec_pa <- gen_additive_mod() \%>\%
   set_engine("mgcv") \%>\%
   set_mode("classification")
 
-# 2. Define a specialized GAM formula
-gam_formula <- presence ~ s(bio1) + s(x, y, bs = "tp")
+gam_formula_pa <- presence ~ s(bio1) + s(bio12) + s(x, y, bs = "tp")
 
-# 3. Define a base recipe (assuming 'data' exists)
-# base_rec <- h3sdm_recipe_gam(data)
+base_rec_pa <- h3sdm_recipe_gam(data)
 
-# 4. Create the combined workflow
-# h3sdm_wf <- h3sdm_workflow_gam(
-#   gam_spec = gam_spec,
-#   recipe = base_rec,
-#   formula = gam_formula
-# )
+h3sdm_wf_pa <- h3sdm_workflow_gam(
+  gam_spec = gam_spec_pa,
+  recipe   = base_rec_pa,
+  formula  = gam_formula_pa
+)
+
+# --- Count-based model (Poisson) ---
+gam_spec_count <- gen_additive_mod() \%>\%
+  set_engine("mgcv", family = poisson()) \%>\%
+  set_mode("regression")
+
+gam_formula_count <- count ~ s(bio1) + s(bio12) + s(x, y, bs = "tp")
+
+base_rec_count <- h3sdm_recipe_gam(data, response_col = "count")
+
+h3sdm_wf_count <- h3sdm_workflow_gam(
+  gam_spec = gam_spec_count,
+  recipe   = base_rec_count,
+  formula  = gam_formula_count
+)
 }
 
 }

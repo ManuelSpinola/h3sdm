@@ -14,6 +14,8 @@
 #'
 #' @param gam_spec A \code{parsnip} model specification of type
 #'   \code{gen_additive_mod()}, configured with \code{set_engine("mgcv")}.
+#'   Use \code{set_mode("classification")} for presence/absence models and
+#'   \code{set_mode("regression")} for count-based models.
 #' @param recipe (Optional) A \code{recipes} package \code{recipe} object (e.g.,
 #'   the output of \code{\link[h3sdm]{h3sdm_recipe_gam}}). Used for general data
 #'   preprocessing like normalization or dummy variable creation.
@@ -36,53 +38,80 @@
 #'     of specialized terms like \code{s(x, y)}.
 #' }
 #'
+#' \strong{Choosing the model mode and family:}
+#' \itemize{
+#'   \item For \strong{presence/absence} data: use \code{set_mode("classification")}.
+#'     The \code{mgcv} engine uses \code{binomial()} family by default.
+#'   \item For \strong{count} data (species richness, detections, individuals):
+#'     use \code{set_mode("regression")} and specify
+#'     \code{set_engine("mgcv", family = poisson())}.
+#' }
+#'
 #' @family h3sdm_tools
 #'
 #' @importFrom workflows workflow add_model add_recipe
+#'
 #' @examples
 #' \dontrun{
 #' library(parsnip)
-#' # 1. Define the model specification
-#' gam_spec <- gen_additive_mod() %>%
+#'
+#' # --- Presence/absence model (binomial) ---
+#' gam_spec_pa <- gen_additive_mod() %>%
 #'   set_engine("mgcv") %>%
 #'   set_mode("classification")
 #'
-#' # 2. Define a specialized GAM formula
-#' gam_formula <- presence ~ s(bio1) + s(x, y, bs = "tp")
+#' gam_formula_pa <- presence ~ s(bio1) + s(bio12) + s(x, y, bs = "tp")
 #'
-#' # 3. Define a base recipe (assuming 'data' exists)
-#' # base_rec <- h3sdm_recipe_gam(data)
+#' base_rec_pa <- h3sdm_recipe_gam(data)
 #'
-#' # 4. Create the combined workflow
-#' # h3sdm_wf <- h3sdm_workflow_gam(
-#' #   gam_spec = gam_spec,
-#' #   recipe = base_rec,
-#' #   formula = gam_formula
-#' # )
+#' h3sdm_wf_pa <- h3sdm_workflow_gam(
+#'   gam_spec = gam_spec_pa,
+#'   recipe   = base_rec_pa,
+#'   formula  = gam_formula_pa
+#' )
+#'
+#' # --- Count-based model (Poisson) ---
+#' gam_spec_count <- gen_additive_mod() %>%
+#'   set_engine("mgcv", family = poisson()) %>%
+#'   set_mode("regression")
+#'
+#' gam_formula_count <- count ~ s(bio1) + s(bio12) + s(x, y, bs = "tp")
+#'
+#' base_rec_count <- h3sdm_recipe_gam(data, response_col = "count")
+#'
+#' h3sdm_wf_count <- h3sdm_workflow_gam(
+#'   gam_spec = gam_spec_count,
+#'   recipe   = base_rec_count,
+#'   formula  = gam_formula_count
+#' )
 #' }
 #'
 #' @export
-
 h3sdm_workflow_gam <- function(gam_spec, recipe = NULL, formula = NULL) {
+
   # Input validations
-  if (!inherits(gam_spec, "model_spec")) stop("gam_spec must be a parsnip model specification")
-  if (is.null(recipe) && is.null(formula)) stop("Either a formula or a recipe must be provided")
-  if (!is.null(formula) && !inherits(formula, "formula")) stop("formula must be a formula object")
-
-  wf <- workflow()
-
-  # 1. Add the Recipe (if provided) for preprocessing
-  if (!is.null(recipe)) {
-    wf <- wf %>% add_recipe(recipe)
+  if (!inherits(gam_spec, "model_spec")) {
+    stop("gam_spec must be a parsnip model specification")
+  }
+  if (is.null(recipe) && is.null(formula)) {
+    stop("Either a formula or a recipe must be provided")
+  }
+  if (!is.null(formula) && !inherits(formula, "formula")) {
+    stop("formula must be a formula object")
   }
 
-  # 2. Add the Model, prioritizing the explicit GAM formula for fitting.
+  wf <- workflows::workflow()
+
+  # 1. Add the recipe for preprocessing
+  if (!is.null(recipe)) {
+    wf <- wf %>% workflows::add_recipe(recipe)
+  }
+
+  # 2. Add the model, prioritizing the explicit GAM formula for fitting
   if (!is.null(formula)) {
-    # The explicit formula (e.g., with s() terms) is passed to the model argument
-    wf <- wf %>% add_model(gam_spec, formula = formula)
+    wf <- wf %>% workflows::add_model(gam_spec, formula = formula)
   } else {
-    # If no explicit formula, the model attempts to use the recipe's formula
-    wf <- wf %>% add_model(gam_spec)
+    wf <- wf %>% workflows::add_model(gam_spec)
   }
 
   wf
