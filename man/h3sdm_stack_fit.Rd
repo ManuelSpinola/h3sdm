@@ -29,8 +29,8 @@ training set (\code{fit_members()}) into a single step.
 It requires that the fitting results were generated using \code{h3sdm_fit_model(..., for_stacking = TRUE)}.
 }
 \seealso{
-Other h3sdm_tools: 
-\code{\link{h3sdm_recipe_gam}()},
-\code{\link{h3sdm_workflow_gam}()}
+Other h3sdm_tools:
+\code{\link[=h3sdm_recipe_gam]{h3sdm_recipe_gam()}},
+\code{\link[=h3sdm_workflow_gam]{h3sdm_workflow_gam()}}
 }
 \concept{h3sdm_tools}

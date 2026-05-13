@@ -75,8 +75,8 @@ requirements of the \code{mgcv} engine.
 
 }
 \seealso{
-Other h3sdm_tools: 
-\code{\link{h3sdm_stack_fit}()},
-\code{\link{h3sdm_workflow_gam}()}
+Other h3sdm_tools:
+\code{\link[=h3sdm_stack_fit]{h3sdm_stack_fit()}},
+\code{\link[=h3sdm_workflow_gam]{h3sdm_workflow_gam()}}
 }
 \concept{h3sdm_tools}

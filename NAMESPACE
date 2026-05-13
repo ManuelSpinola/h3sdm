@@ -3,6 +3,7 @@
 export(h3sdm_calculate_it_metrics)
 export(h3sdm_classify)
 export(h3sdm_compare_models)
+export(h3sdm_count_from_records)
 export(h3sdm_data)
 export(h3sdm_eval_metrics)
 export(h3sdm_explain)

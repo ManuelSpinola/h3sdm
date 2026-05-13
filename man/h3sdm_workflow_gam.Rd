@@ -68,8 +68,8 @@ gam_formula <- presence ~ s(bio1) + s(x, y, bs = "tp")
 
 }
 \seealso{
-Other h3sdm_tools: 
-\code{\link{h3sdm_recipe_gam}()},
-\code{\link{h3sdm_stack_fit}()}
+Other h3sdm_tools:
+\code{\link[=h3sdm_recipe_gam]{h3sdm_recipe_gam()}},
+\code{\link[=h3sdm_stack_fit]{h3sdm_stack_fit()}}
 }
 \concept{h3sdm_tools}
