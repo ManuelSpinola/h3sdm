@@ -38,11 +38,11 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.1" id="h3sdm-011">h3sdm 0.1.1<a class="anchor" aria-label="anchor" href="#h3sdm-011"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.1" id="h3sdm-011">h3sdm 0.1.1<a class="anchor" aria-label="anchor" href="#h3sdm-011"></a></h2><p class="text-muted">CRAN release: 2026-05-13</p>
 <div class="section level3">
 <h3 id="new-functions-0-1-1">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-1-1"></a></h3>
-<ul><li>
-<code><a href="../reference/h3sdm_pa_from_records.html">h3sdm_pa_from_records()</a></code>: generates a presence/pseudo-absence dataset from user-provided records. Accepts a <code>data.frame</code> or <code>sf</code> object with coordinates in WGS84 (EPSG:4326). Supports optional filtering by <code>geospatialKosher</code> column, making it directly compatible with records downloaded via <code>bdcr_occurrences()</code> from the BiodataCR API.</li>
+<ul><li><p><code><a href="../reference/h3sdm_pa_from_records.html">h3sdm_pa_from_records()</a></code>: generates a presence/pseudo-absence dataset from user-provided records. Accepts a <code>data.frame</code> or <code>sf</code> object with coordinates in WGS84 (EPSG:4326). Supports optional filtering by a <code>geospatialKosher</code> column to remove records with questionable spatial quality.</p></li>
+<li><p><code><a href="../reference/h3sdm_count_from_records.html">h3sdm_count_from_records()</a></code>: generates a hexagonal grid with count-based response variables (species richness, total detections, or individual abundance) from user-provided records. Accepts a <code>data.frame</code> or <code>sf</code> object. Supports optional filtering by presence column, confidence threshold, and date range.</p></li>
 </ul></div>
 </div>
     <div class="section level2">

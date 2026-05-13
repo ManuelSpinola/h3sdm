@@ -14,6 +14,8 @@
   : Classify predictions based on an optimal threshold
 - [`h3sdm_compare_models()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_compare_models.md)
   : Compare multiple H3SDM species distribution models
+- [`h3sdm_count_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_count_from_records.md)
+  : Generate species richness or abundance count dataset from records
 - [`h3sdm_data()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_data.md)
   : Combine species and environmental data for SDMs using H3 grids
 - [`h3sdm_eval_metrics()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_eval_metrics.md)

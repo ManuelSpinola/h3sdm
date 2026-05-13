@@ -37,16 +37,19 @@ You can install the development version of **h3sdm from**
 [GitHub](https://github.com/) using one of the following methods:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("ManuelSpinola/h3sdm")
 ```
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("ManuelSpinola/h3sdm")
 ```
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("ManuelSpinola/h3sdm")
 ```
