@@ -1,3 +1,17 @@
+# h3sdm 0.1.2
+
+## Improvements
+
+* `h3sdm_fit_model()` now automatically detects model mode (classification or regression),
+  enabling count-based models (Poisson, Negative Binomial) with appropriate metrics
+  (RMSE, R², MAE) without requiring manual configuration.
+  
+
+* `h3sdm_fit_model()` and `h3sdm_predict()` now automatically detect model mode
+  (classification or regression), enabling count-based models (Poisson, Negative
+  Binomial) without manual configuration. Full backward compatibility maintained.
+
+
 # h3sdm 0.1.1
 
 ## New functions

@@ -8,8 +8,8 @@ h3sdm_fit_model(
   workflow,
   data_split,
   presence_data = NULL,
-  truth_col = "presence",
-  pred_col = ".pred_1",
+  truth_col = NULL,
+  pred_col = NULL,
   for_stacking = FALSE,
   ...
 )
@@ -21,9 +21,11 @@ h3sdm_fit_model(
 
 \item{presence_data}{(Optional) Original presence data (used for extended metrics).}
 
-\item{truth_col}{Column name of the response variable (defaults to "presence").}
+\item{truth_col}{Column name of the response variable. Defaults to \code{"presence"} for
+classification models and \code{"count"} for regression models.}
 
-\item{pred_col}{Column name for the prediction of the class of interest (defaults to ".pred_1").}
+\item{pred_col}{Column name for the prediction of the class of interest. Defaults to
+\code{".pred_1"} for classification models and \code{".pred"} for regression models.}
 
 \item{for_stacking}{Logical. If \code{TRUE}, uses \code{control_stack_resamples()}
 to save all workflow information required for the 'stacks' package.
@@ -42,5 +44,6 @@ A list with three elements:
 \description{
 Fits a Species Distribution Model (SDM) workflow to resampling data (cross-validation).
 This function is the main training step and optionally configures the results
-to be used with the 'stacks' package.
+to be used with the 'stacks' package. Supports both classification (presence/absence)
+and regression (count-based) models, detected automatically from the workflow mode.
 }

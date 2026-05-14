@@ -2,7 +2,7 @@
 % Please edit documentation in R/h3sdm_predict.R
 \name{h3sdm_predict}
 \alias{h3sdm_predict}
-\title{Predict species presence probability using H3 hexagons}
+\title{Predict species presence probability or counts using H3 hexagons}
 \usage{
 h3sdm_predict(fit_object, new_data)
 }
@@ -13,13 +13,15 @@ h3sdm_predict(fit_object, new_data)
 }
 \value{
 An \code{sf} object with the original geometry and a new column \code{prediction} containing
-the predicted probability of presence for each hexagon.
+the predicted probability of presence (classification) or predicted count (regression)
+for each hexagon.
 }
 \description{
 Uses a fitted tidymodels workflow (from \code{h3sdm_fit_model} or a standalone workflow)
-to predict species presence probabilities on a new spatial H3 grid.
+to predict species presence probabilities or counts on a new spatial H3 grid.
 Automatically generates centroid coordinates (\code{x} and \code{y}) if missing.
 The \code{new_data} must contain the same predictor variables as used in model training.
+Model mode (classification or regression) is detected automatically.
 }
 \examples{
 \dontrun{
