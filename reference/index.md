@@ -42,7 +42,7 @@
 - [`h3sdm_pa_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa_from_records.md)
   : Generate presence/pseudo-absence dataset from user-provided records
 - [`h3sdm_predict()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predict.md)
-  : Predict species presence probability using H3 hexagons
+  : Predict species presence probability or counts using H3 hexagons
 - [`h3sdm_predictors()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predictors.md)
   : Combine Predictor Data from Multiple sf Objects
 - [`h3sdm_recipe()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe.md)

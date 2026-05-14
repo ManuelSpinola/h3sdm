@@ -1,5 +1,22 @@
 # Changelog
 
+## h3sdm 0.1.2
+
+### Improvements
+
+- [`h3sdm_fit_model()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.md)
+  now automatically detects model mode (classification or regression),
+  enabling count-based models (Poisson, Negative Binomial) with
+  appropriate metrics (RMSE, R², MAE) without requiring manual
+  configuration.
+
+- [`h3sdm_fit_model()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.md)
+  and
+  [`h3sdm_predict()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predict.md)
+  now automatically detect model mode (classification or regression),
+  enabling count-based models (Poisson, Negative Binomial) without
+  manual configuration. Full backward compatibility maintained.
+
 ## h3sdm 0.1.1
 
 CRAN release: 2026-05-13

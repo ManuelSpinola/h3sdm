@@ -3,6 +3,8 @@
 Fits a Species Distribution Model (SDM) workflow to resampling data
 (cross-validation). This function is the main training step and
 optionally configures the results to be used with the 'stacks' package.
+Supports both classification (presence/absence) and regression
+(count-based) models, detected automatically from the workflow mode.
 
 ## Usage
 
@@ -11,8 +13,8 @@ h3sdm_fit_model(
   workflow,
   data_split,
   presence_data = NULL,
-  truth_col = "presence",
-  pred_col = ".pred_1",
+  truth_col = NULL,
+  pred_col = NULL,
   for_stacking = FALSE,
   ...
 )
@@ -35,12 +37,14 @@ h3sdm_fit_model(
 
 - truth_col:
 
-  Column name of the response variable (defaults to "presence").
+  Column name of the response variable. Defaults to `"presence"` for
+  classification models and `"count"` for regression models.
 
 - pred_col:
 
-  Column name for the prediction of the class of interest (defaults to
-  ".pred_1").
+  Column name for the prediction of the class of interest. Defaults to
+  `".pred_1"` for classification models and `".pred"` for regression
+  models.
 
 - for_stacking:
 
