@@ -1,16 +1,18 @@
 #' @name h3sdm_predict
-#' @title Predict species presence probability using H3 hexagons
+#' @title Predict species presence probability or counts using H3 hexagons
 #' @description
 #' Uses a fitted tidymodels workflow (from `h3sdm_fit_model` or a standalone workflow)
-#' to predict species presence probabilities on a new spatial H3 grid.
+#' to predict species presence probabilities or counts on a new spatial H3 grid.
 #' Automatically generates centroid coordinates (`x` and `y`) if missing.
 #' The `new_data` must contain the same predictor variables as used in model training.
+#' Model mode (classification or regression) is detected automatically.
 #'
 #' @param fit_object A fitted `tidymodels` workflow or the output list from `h3sdm_fit_model`.
 #' @param new_data An `sf` object containing the spatial grid and the same predictor variables used for model training.
 #'
 #' @return An `sf` object with the original geometry and a new column `prediction` containing
-#'   the predicted probability of presence for each hexagon.
+#'   the predicted probability of presence (classification) or predicted count (regression)
+#'   for each hexagon.
 #'
 #' @examples
 #' \dontrun{
@@ -33,6 +35,9 @@ h3sdm_predict <- function(fit_object, new_data) {
     workflow <- fit_object
   }
 
+  # Detectar modo del modelo automáticamente
+  model_mode <- workflow$fit$actions$model$spec$mode
+
   # Crear coordenadas si faltan
   if (!all(c("x", "y") %in% names(new_data))) {
     message("Missing x and y coordinates. Creating them from polygon centroids.")
@@ -44,14 +49,17 @@ h3sdm_predict <- function(fit_object, new_data) {
   # Eliminar geometría
   new_data_no_geom <- sf::st_drop_geometry(new_data)
 
-  # Predicciones
-  predictions <- predict(workflow, new_data = new_data_no_geom, type = "prob")
-
-  # Asignar predicción de presencia
-  if (".pred_1" %in% names(predictions)) {
-    new_data$prediction <- predictions$.pred_1
+  # Predicciones según modo
+  if (model_mode == "regression") {
+    predictions <- predict(workflow, new_data = new_data_no_geom, type = "numeric")
+    new_data$prediction <- predictions$.pred
   } else {
-    stop("No '.pred_1' column found in predictions. Check your workflow and response variable.")
+    predictions <- predict(workflow, new_data = new_data_no_geom, type = "prob")
+    if (".pred_1" %in% names(predictions)) {
+      new_data$prediction <- predictions$.pred_1
+    } else {
+      stop("No '.pred_1' column found in predictions. Check your workflow and response variable.")
+    }
   }
 
   return(new_data)

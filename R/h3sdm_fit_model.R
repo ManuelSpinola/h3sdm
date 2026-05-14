@@ -5,13 +5,16 @@
 #' @description
 #' Fits a Species Distribution Model (SDM) workflow to resampling data (cross-validation).
 #' This function is the main training step and optionally configures the results
-#' to be used with the 'stacks' package.
+#' to be used with the 'stacks' package. Supports both classification (presence/absence)
+#' and regression (count-based) models, detected automatically from the workflow mode.
 #'
 #' @param workflow A 'workflow' object from tidymodels (e.g., GAM or Random Forest).
 #' @param data_split An 'rsplit' or 'rset' object (e.g., result of vfold_cv or spatial_block_cv).
 #' @param presence_data (Optional) Original presence data (used for extended metrics).
-#' @param truth_col Column name of the response variable (defaults to "presence").
-#' @param pred_col Column name for the prediction of the class of interest (defaults to ".pred_1").
+#' @param truth_col Column name of the response variable. Defaults to \code{"presence"} for
+#'   classification models and \code{"count"} for regression models.
+#' @param pred_col Column name for the prediction of the class of interest. Defaults to
+#'   \code{".pred_1"} for classification models and \code{".pred"} for regression models.
 #' @param for_stacking Logical. If \code{TRUE}, uses \code{control_stack_resamples()}
 #'   to save all workflow information required for the 'stacks' package.
 #'   If \code{FALSE}, uses the standard control with \code{save_pred = TRUE}.
@@ -25,7 +28,7 @@
 #' }
 #' @export
 #'
-#' @importFrom yardstick metric_set roc_auc accuracy sens spec f_meas kap
+#' @importFrom yardstick metric_set roc_auc accuracy sens spec f_meas kap rmse rsq mae
 #' @importFrom tune fit_resamples control_resamples
 #' @importFrom stacks control_stack_resamples
 #' @importFrom workflows fit
@@ -33,10 +36,21 @@
 #' @importFrom sf st_drop_geometry
 #'
 h3sdm_fit_model <- function(workflow, data_split, presence_data = NULL,
-                            truth_col = "presence", pred_col = ".pred_1",
+                            truth_col = NULL, pred_col = NULL,
                             for_stacking = FALSE, ...) {
 
-  sdm_metrics <- yardstick::metric_set(roc_auc, accuracy, sens, spec, f_meas, kap)
+  # Detect model mode automatically
+  model_mode <- workflow$fit$actions$model$spec$mode
+
+  if (model_mode == "regression") {
+    sdm_metrics <- yardstick::metric_set(rmse, rsq, mae)
+    if (is.null(truth_col)) truth_col <- "count"
+    if (is.null(pred_col))  pred_col  <- ".pred"
+  } else {
+    sdm_metrics <- yardstick::metric_set(roc_auc, accuracy, sens, spec, f_meas, kap)
+    if (is.null(truth_col)) truth_col <- "presence"
+    if (is.null(pred_col))  pred_col  <- ".pred_1"
+  }
 
   # 1. Dynamic control configuration
   if (for_stacking) {
