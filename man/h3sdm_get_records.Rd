@@ -14,44 +14,52 @@ h3sdm_get_records(
 )
 }
 \arguments{
-\item{species}{Character string specifying the species name to query (e.g., "Puma concolor").}
+\item{species}{Character string specifying the species name to query
+(e.g., \code{"Puma concolor"}).}
 
-\item{aoi_sf}{An \code{sf} object defining the Area of Interest (AOI). Its CRS will be
-transformed to WGS84 (\code{EPSG:4326}) before query.}
+\item{aoi_sf}{An \code{sf} object defining the Area of Interest (AOI).
+Its CRS will be transformed to WGS84 (\code{EPSG:4326}) before query.}
 
-\item{providers}{Character vector of data providers to query (e.g., "gbif", "bison").
-If \code{NULL} (default), all available providers are used.}
+\item{providers}{Character vector of data providers to query.
+Accepted values: any provider supported by \code{spocc} (e.g.,
+\code{"gbif"}, \code{"inat"}) plus \code{"biodatacr"} for BiodataCR
+(Costa Rica). If \code{NULL} (default), all \code{spocc} providers are used.}
 
-\item{limit}{Numeric. The maximum number of records to retrieve per provider. Default is 500.}
+\item{limit}{Numeric. Maximum number of records to retrieve per provider.
+Default is 500.}
 
-\item{remove_duplicates}{Logical. If \code{TRUE}, records with identical longitude and
-latitude are removed using \code{dplyr::distinct()}. Default is \code{FALSE}.}
+\item{remove_duplicates}{Logical. If \code{TRUE}, records with identical
+coordinates are removed. Default is \code{FALSE}.}
 
-\item{date}{Character vector specifying a date range (e.g., \code{c('2000-01-01', '2020-12-31')}).}
+\item{date}{Character vector specifying a date range
+(e.g., \code{c('2000-01-01', '2020-12-31')}). Applied to \code{spocc}
+providers only.}
 }
 \value{
-An \code{sf} object of points containing the filtered occurrence records,
-with geometry confirmed to fall strictly within the \code{aoi_sf} boundary. If no
-records are found or the download fails, an empty \code{sf} object with the
-expected structure is returned.
+An \code{sf} object of points with the filtered occurrence records
+whose geometry falls strictly within the \code{aoi_sf} boundary. If no
+records are found, an empty \code{sf} object with the expected structure
+is returned.
 }
 \description{
-Downloads species occurrence records from providers (e.g., GBIF) using the \code{spocc}
-package, filtering the initial query by the exact polygonal boundary of the
-Area of Interest (AOI) for maximum efficiency and precision.
+Downloads species occurrence records from providers (e.g., GBIF, iNaturalist,
+BiodataCR) and filters them by the exact polygonal boundary of the Area of
+Interest (AOI). Providers supported by \code{spocc} (e.g., \code{"gbif"},
+\code{"inat"}) are queried via \code{spocc::occ()}. \code{"biodatacr"} is
+queried via \code{rbiodatacr::bdcr_occurrences()} and its output is
+standardized to the same \code{sf} format.
 }
 \details{
-The function transforms the \code{aoi_sf} polygon into a WKT string, which is used in
-the \code{spocc::occ} geometry argument for \strong{efficient WKT-based querying}. Final
-spatial filtering is performed using \code{sf::st_intersection} to ensure strict
-containment. A critical check is included to prevent errors when the API returns no
-data (addressing the 'column not found' error).
+When \code{"biodatacr"} is included in \code{providers}, the function calls
+\code{rbiodatacr::bdcr_occurrences()} and standardizes its output
+(\code{decimalLatitude}/\code{decimalLongitude}) to the same \code{sf}
+geometry format used by the \code{spocc} providers. Records from all
+providers are then combined and clipped to the AOI.
 }
 \examples{
 \donttest{
   library(sf)
 
-  # Create a simple AOI polygon in Costa Rica
   aoi_sf <- sf::st_as_sf(
     data.frame(
       lon = c(-84.5, -83.5, -83.5, -84.5, -84.5),
@@ -61,13 +69,20 @@ data (addressing the 'column not found' error).
     data.frame(id = 1)
   )
 
+  # GBIF only
   records <- h3sdm_get_records(
-    species = "Puma concolor",
-    aoi_sf = aoi_sf,
+    species   = "Puma concolor",
+    aoi_sf    = aoi_sf,
     providers = "gbif",
-    limit = 100
+    limit     = 100
   )
 
-  print(records)
+  # GBIF + BiodataCR (Costa Rica)
+  records_cr <- h3sdm_get_records(
+    species   = "Agalychnis callidryas",
+    aoi_sf    = aoi_sf,
+    providers = c("gbif", "biodatacr"),
+    limit     = 200
+  )
 }
 }

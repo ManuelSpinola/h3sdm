@@ -8,7 +8,11 @@
 #' @param aoi_sf `sf` AOI (area of interest) polygon.
 #' @param res `integer` H3 resolution for the hexagonal grid.
 #' @param n_pseudoabs `integer` Number of pseudo-absence hexagons to sample.
-#' @param providers `character` Optional vector of data providers (e.g., "gbif", "inat").
+#' @param providers `character` Optional vector of data providers. Accepted values:
+#'   any provider supported by \code{spocc} (e.g., \code{"gbif"}, \code{"inat"})
+#'   plus \code{"biodatacr"} for BiodataCR (Costa Rica), queried via the
+#'   \code{rbiodatacr} package. If \code{NULL} (default), all \code{spocc}
+#'   providers are used.
 #' @param remove_duplicates `logical` Remove duplicate records at the same coordinates.
 #' @param date `character` Optional date filter for records.
 #' @param limit `integer` Maximum number of records to download.

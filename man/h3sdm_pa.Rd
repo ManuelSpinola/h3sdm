@@ -25,7 +25,11 @@ h3sdm_pa(
 
 \item{n_pseudoabs}{\code{integer} Number of pseudo-absence hexagons to sample.}
 
-\item{providers}{\code{character} Optional vector of data providers (e.g., "gbif", "inat").}
+\item{providers}{\code{character} Optional vector of data providers. Accepted values:
+any provider supported by \code{spocc} (e.g., \code{"gbif"}, \code{"inat"})
+plus \code{"biodatacr"} for BiodataCR (Costa Rica), queried via the
+\code{rbiodatacr} package. If \code{NULL} (default), all \code{spocc}
+providers are used.}
 
 \item{remove_duplicates}{\code{logical} Remove duplicate records at the same coordinates.}
 
