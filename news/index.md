@@ -17,6 +17,14 @@
   enabling count-based models (Poisson, Negative Binomial) without
   manual configuration. Full backward compatibility maintained.
 
+- [`h3sdm_get_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_get_records.md)
+  now supports `"biodatacr"` as an optional provider, querying
+  occurrence records from BiodataCR (Costa Rica) via the `rbiodatacr`
+  package.
+  [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  inherits this support automatically through its `providers` argument.
+  `rbiodatacr` is listed as a suggested dependency.
+
 ## h3sdm 0.1.1
 
 CRAN release: 2026-05-13

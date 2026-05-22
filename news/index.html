@@ -43,6 +43,7 @@
 <h3 id="improvements-0-1-2">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-1-2"></a></h3>
 <ul><li><p><code><a href="../reference/h3sdm_fit_model.html">h3sdm_fit_model()</a></code> now automatically detects model mode (classification or regression), enabling count-based models (Poisson, Negative Binomial) with appropriate metrics (RMSE, R², MAE) without requiring manual configuration.</p></li>
 <li><p><code><a href="../reference/h3sdm_fit_model.html">h3sdm_fit_model()</a></code> and <code><a href="../reference/h3sdm_predict.html">h3sdm_predict()</a></code> now automatically detect model mode (classification or regression), enabling count-based models (Poisson, Negative Binomial) without manual configuration. Full backward compatibility maintained.</p></li>
+<li><p><code><a href="../reference/h3sdm_get_records.html">h3sdm_get_records()</a></code> now supports <code>"biodatacr"</code> as an optional provider, querying occurrence records from BiodataCR (Costa Rica) via the <code>rbiodatacr</code> package. <code><a href="../reference/h3sdm_pa.html">h3sdm_pa()</a></code> inherits this support automatically through its <code>providers</code> argument. <code>rbiodatacr</code> is listed as a suggested dependency.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
