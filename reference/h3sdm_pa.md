@@ -41,7 +41,10 @@ h3sdm_pa(
 
 - providers:
 
-  `character` Optional vector of data providers (e.g., "gbif", "inat").
+  `character` Optional vector of data providers. Accepted values: any
+  provider supported by `spocc` (e.g., `"gbif"`, `"inat"`) plus
+  `"biodatacr"` for BiodataCR (Costa Rica), queried via the `rbiodatacr`
+  package. If `NULL` (default), all `spocc` providers are used.
 
 - remove_duplicates:
 

@@ -81,7 +81,11 @@ and samples pseudo-absences from hexagons with no records.</p>
 
 
 <dt id="arg-providers">providers<a class="anchor" aria-label="anchor" href="#arg-providers"></a></dt>
-<dd><p><code>character</code> Optional vector of data providers (e.g., "gbif", "inat").</p></dd>
+<dd><p><code>character</code> Optional vector of data providers. Accepted values:
+any provider supported by <code>spocc</code> (e.g., <code>"gbif"</code>, <code>"inat"</code>)
+plus <code>"biodatacr"</code> for BiodataCR (Costa Rica), queried via the
+<code>rbiodatacr</code> package. If <code>NULL</code> (default), all <code>spocc</code>
+providers are used.</p></dd>
 
 
 <dt id="arg-remove-duplicates">remove_duplicates<a class="anchor" aria-label="anchor" href="#arg-remove-duplicates"></a></dt>

@@ -1,9 +1,13 @@
 # Query Species Occurrence Records within an H3 Area of Interest (AOI)
 
-Downloads species occurrence records from providers (e.g., GBIF) using
-the `spocc` package, filtering the initial query by the exact polygonal
-boundary of the Area of Interest (AOI) for maximum efficiency and
-precision.
+Downloads species occurrence records from providers (e.g., GBIF,
+iNaturalist, BiodataCR) and filters them by the exact polygonal boundary
+of the Area of Interest (AOI). Providers supported by `spocc` (e.g.,
+`"gbif"`, `"inat"`) are queried via
+[`spocc::occ()`](https://docs.ropensci.org/spocc/reference/occ.html).
+`"biodatacr"` is queried via
+[`rbiodatacr::bdcr_occurrences()`](https://manuelspinola.github.io/rbiodatacr/reference/bdcr_occurrences.html)
+and its output is standardized to the same `sf` format.
 
 ## Usage
 
@@ -22,8 +26,8 @@ h3sdm_get_records(
 
 - species:
 
-  Character string specifying the species name to query (e.g., "Puma
-  concolor").
+  Character string specifying the species name to query (e.g.,
+  `"Puma concolor"`).
 
 - aoi_sf:
 
@@ -32,44 +36,39 @@ h3sdm_get_records(
 
 - providers:
 
-  Character vector of data providers to query (e.g., "gbif", "bison").
-  If `NULL` (default), all available providers are used.
+  Character vector of data providers to query. Accepted values: any
+  provider supported by `spocc` (e.g., `"gbif"`, `"inat"`) plus
+  `"biodatacr"` for BiodataCR (Costa Rica). If `NULL` (default), all
+  `spocc` providers are used.
 
 - limit:
 
-  Numeric. The maximum number of records to retrieve per provider.
-  Default is 500.
+  Numeric. Maximum number of records to retrieve per provider. Default
+  is 500.
 
 - remove_duplicates:
 
-  Logical. If `TRUE`, records with identical longitude and latitude are
-  removed using
-  [`dplyr::distinct()`](https://dplyr.tidyverse.org/reference/distinct.html).
+  Logical. If `TRUE`, records with identical coordinates are removed.
   Default is `FALSE`.
 
 - date:
 
   Character vector specifying a date range (e.g.,
-  `c('2000-01-01', '2020-12-31')`).
+  `c('2000-01-01', '2020-12-31')`). Applied to `spocc` providers only.
 
 ## Value
 
-An `sf` object of points containing the filtered occurrence records,
-with geometry confirmed to fall strictly within the `aoi_sf` boundary.
-If no records are found or the download fails, an empty `sf` object with
-the expected structure is returned.
+An `sf` object of points with the filtered occurrence records whose
+geometry falls strictly within the `aoi_sf` boundary. If no records are
+found, an empty `sf` object with the expected structure is returned.
 
 ## Details
 
-The function transforms the `aoi_sf` polygon into a WKT string, which is
-used in the
-[`spocc::occ`](https://docs.ropensci.org/spocc/reference/occ.html)
-geometry argument for **efficient WKT-based querying**. Final spatial
-filtering is performed using
-[`sf::st_intersection`](https://r-spatial.github.io/sf/reference/geos_binary_ops.html)
-to ensure strict containment. A critical check is included to prevent
-errors when the API returns no data (addressing the 'column not found'
-error).
+When `"biodatacr"` is included in `providers`, the function calls
+[`rbiodatacr::bdcr_occurrences()`](https://manuelspinola.github.io/rbiodatacr/reference/bdcr_occurrences.html)
+and standardizes its output (`decimalLatitude`/`decimalLongitude`) to
+the same `sf` geometry format used by the `spocc` providers. Records
+from all providers are then combined and clipped to the AOI.
 
 ## Examples
 
@@ -77,7 +76,6 @@ error).
 # \donttest{
   library(sf)
 
-  # Create a simple AOI polygon in Costa Rica
   aoi_sf <- sf::st_as_sf(
     data.frame(
       lon = c(-84.5, -83.5, -83.5, -84.5, -84.5),
@@ -87,32 +85,20 @@ error).
     data.frame(id = 1)
   )
 
+  # GBIF only
   records <- h3sdm_get_records(
-    species = "Puma concolor",
-    aoi_sf = aoi_sf,
+    species   = "Puma concolor",
+    aoi_sf    = aoi_sf,
     providers = "gbif",
-    limit = 100
+    limit     = 100
   )
 
-  print(records)
-#> Simple feature collection with 100 features and 3 fields
-#> Geometry type: POINT
-#> Dimension:     XY
-#> Bounding box:  xmin: -84.47708 ymin: 9.51482 xmax: -83.53498 ymax: 10.49709
-#> Geodetic CRS:  WGS 84
-#> # A tibble: 100 × 4
-#>    name                        provider    id             geometry
-#>  * <chr>                       <chr>    <dbl>          <POINT [°]>
-#>  1 Puma concolor (Linnaeus, 1… gbif         1 (-83.71914 10.22468)
-#>  2 Puma concolor (Linnaeus, 1… gbif         1 (-84.01068 10.43068)
-#>  3 Puma concolor (Linnaeus, 1… gbif         1  (-83.68964 9.99557)
-#>  4 Puma concolor (Linnaeus, 1… gbif         1 (-84.04335 9.592563)
-#>  5 Puma concolor (Linnaeus, 1… gbif         1 (-83.75343 9.748917)
-#>  6 Puma concolor (Linnaeus, 1… gbif         1 (-83.76754 9.554898)
-#>  7 Puma concolor (Linnaeus, 1… gbif         1 (-83.58003 10.04675)
-#>  8 Puma concolor (Linnaeus, 1… gbif         1 (-84.01002 10.43693)
-#>  9 Puma concolor (Linnaeus, 1… gbif         1 (-84.47061 10.02827)
-#> 10 Puma concolor (Linnaeus, 1… gbif         1  (-84.3503 10.29371)
-#> # ℹ 90 more rows
+  # GBIF + BiodataCR (Costa Rica)
+  records_cr <- h3sdm_get_records(
+    species   = "Agalychnis callidryas",
+    aoi_sf    = aoi_sf,
+    providers = c("gbif", "biodatacr"),
+    limit     = 200
+  )
 # }
 ```
