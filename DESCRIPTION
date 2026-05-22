@@ -56,7 +56,8 @@ Suggests:
     xgboost,
     ggbrick,
     parsnip,
-    tidyverse
+    tidyverse,
+    rbiodatacr
 VignetteBuilder: 
     knitr
 LazyData: true
