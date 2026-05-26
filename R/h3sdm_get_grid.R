@@ -45,6 +45,9 @@ h3sdm_get_grid <- function(sf_object, res = 6, expand_factor = 0.1, clip_to_aoi 
   if (!inherits(sf_object, "sf")) stop("Input must be an sf object")
   if (res < 1 || res > 16) stop("Resolution must be between 1 and 16")
 
+  # Guardar CRS original
+  crs_original <- sf::st_crs(sf_object)
+
   # Transformar a WGS84 y asegurar geometrías válidas
   sf_object <- sf::st_transform(sf_object, 4326)
   sf_object <- sf::st_make_valid(sf_object)
@@ -69,6 +72,10 @@ h3sdm_get_grid <- function(sf_object, res = 6, expand_factor = 0.1, clip_to_aoi 
   # Asegurar geometrías válidas
   hexagons <- sf::st_make_valid(hexagons)
 
-  # Devolver
+  # Reprojectar al CRS original si no era WGS84
+  if (!is.na(crs_original$epsg) && crs_original$epsg != 4326) {
+    hexagons <- sf::st_transform(hexagons, crs_original)
+  }
+
   return(hexagons)
 }

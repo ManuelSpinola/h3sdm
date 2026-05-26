@@ -1,3 +1,12 @@
+# h3sdm 0.1.3
+
+## Improvements
+* `h3sdm_get_grid()` now preserves the CRS of the input `sf_object`.
+  Previously, the function always returned the grid in WGS84 (EPSG:4326)
+  regardless of the input CRS. Now, if the AOI is in a projected CRS,
+  the output grid will be reprojected to match it. The internal H3
+  computation still uses WGS84 as required by the H3 system.
+
 # h3sdm 0.1.2
 
 ## Improvements
