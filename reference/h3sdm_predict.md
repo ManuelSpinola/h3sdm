@@ -31,6 +31,11 @@ An `sf` object with the original geometry and a new column `prediction`
 containing the predicted probability of presence (classification) or
 predicted count (regression) for each hexagon.
 
+## See also
+
+[`h3sdm_fit_model()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.md),
+[`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
+
 ## Examples
 
 ``` r

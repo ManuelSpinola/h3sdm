@@ -8,6 +8,8 @@
   : Future bioclimatic raster
 - [`cr_outline_c`](https://manuelspinola.github.io/h3sdm/reference/cr_outline_c.md)
   : Costa Rica Continental Outline
+- [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
+  : Area of Applicability (AOA) of spatial prediction models
 - [`h3sdm_calculate_it_metrics()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_calculate_it_metrics.md)
   : Calculate Information Theory Landscape Metrics for Hexagonal Grid
 - [`h3sdm_classify()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_classify.md)

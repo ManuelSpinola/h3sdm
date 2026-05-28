@@ -1,6 +1,29 @@
 # Changelog
 
+## h3sdm 0.1.3
+
+### New functions
+
+- [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
+  estimates the Dissimilarity Index (DI) and the Area of Applicability
+  (AOA) for spatial prediction models, based on Meyer & Pebesma (2021).
+
+### Improvements
+
+- [`h3sdm_get_grid()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_get_grid.md)
+  now preserves the CRS of the input `sf_object`. Previously, the
+  function always returned the grid in WGS84 (EPSG:4326) regardless of
+  the input CRS. Now, if the AOI is in a projected CRS, the output grid
+  will be reprojected to match it. The internal H3 computation still
+  uses WGS84 as required by the H3 system.
+- [`h3sdm_predict()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predict.md)
+  internal comments translated to English and `@seealso` updated to
+  include
+  [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md).
+
 ## h3sdm 0.1.2
+
+CRAN release: 2026-05-22
 
 ### Improvements
 

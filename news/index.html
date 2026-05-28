@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">h3sdm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,22 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.2" id="h3sdm-012">h3sdm 0.1.2<a class="anchor" aria-label="anchor" href="#h3sdm-012"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.3" id="h3sdm-013">h3sdm 0.1.3<a class="anchor" aria-label="anchor" href="#h3sdm-013"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-0-1-3">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-1-3"></a></h3>
+<ul><li>
+<code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> estimates the Dissimilarity Index (DI) and the Area of Applicability (AOA) for spatial prediction models, based on Meyer &amp; Pebesma (2021).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-0-1-3">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-1-3"></a></h3>
+<ul><li>
+<code><a href="../reference/h3sdm_get_grid.html">h3sdm_get_grid()</a></code> now preserves the CRS of the input <code>sf_object</code>. Previously, the function always returned the grid in WGS84 (EPSG:4326) regardless of the input CRS. Now, if the AOI is in a projected CRS, the output grid will be reprojected to match it. The internal H3 computation still uses WGS84 as required by the H3 system.</li>
+<li>
+<code><a href="../reference/h3sdm_predict.html">h3sdm_predict()</a></code> internal comments translated to English and <code>@seealso</code> updated to include <code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code>.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.2" id="h3sdm-012">h3sdm 0.1.2<a class="anchor" aria-label="anchor" href="#h3sdm-012"></a></h2><p class="text-muted">CRAN release: 2026-05-22</p>
 <div class="section level3">
 <h3 id="improvements-0-1-2">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-1-2"></a></h3>
 <ul><li><p><code><a href="../reference/h3sdm_fit_model.html">h3sdm_fit_model()</a></code> now automatically detects model mode (classification or regression), enabling count-based models (Poisson, Negative Binomial) with appropriate metrics (RMSE, R², MAE) without requiring manual configuration.</p></li>
