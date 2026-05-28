@@ -32,8 +32,8 @@ h3sdm_aoa(newdata, train, fit_object, cv = NULL, verbose = TRUE)
 
   The list returned by
   [`h3sdm_fit_model()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.md),
-  used to extract the recipe (predictor variable names) and variable
-  importances when available.
+  used to extract the model formula (predictor variable names) and
+  variable importances when available.
 
 - cv:
 
@@ -63,8 +63,8 @@ The input `newdata` `sf` object with two additional columns:
 ## Details
 
 The algorithm follows Meyer & Pebesma (2021). Predictor variables are
-extracted automatically from the recipe inside `fit_object`. They are
-standardized using z-score scaling computed from `train`, then
+extracted automatically from the model formula inside `fit_object`. They
+are standardized using z-score scaling computed from `train`, then
 optionally weighted by variable importance. The mean nearest-neighbor
 distance among training points (`trainDist_avrgmean`) is used to
 normalize DI values. The AOA threshold is the maximum cross-validated

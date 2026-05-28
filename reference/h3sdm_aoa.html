@@ -77,7 +77,7 @@ predictor variables used in <code>fit_object</code>.</p></dd>
 
 <dt id="arg-fit-object">fit_object<a class="anchor" aria-label="anchor" href="#arg-fit-object"></a></dt>
 <dd><p>The list returned by <code><a href="h3sdm_fit_model.html">h3sdm_fit_model()</a></code>, used to
-extract the recipe (predictor variable names) and variable
+extract the model formula (predictor variable names) and variable
 importances when available.</p></dd>
 
 
@@ -109,10 +109,10 @@ training data; larger values indicate increasing dissimilarity.</p></dd>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The algorithm follows Meyer &amp; Pebesma (2021). Predictor variables are
-extracted automatically from the recipe inside <code>fit_object</code>.
-They are standardized using z-score scaling computed from
-<code>train</code>, then optionally weighted by variable importance.
-The mean nearest-neighbor distance among training points
+extracted automatically from the model formula inside
+<code>fit_object</code>. They are standardized using z-score scaling
+computed from <code>train</code>, then optionally weighted by variable
+importance. The mean nearest-neighbor distance among training points
 (<code>trainDist_avrgmean</code>) is used to normalize DI values. The AOA
 threshold is the maximum cross-validated training DI after removing
 outliers with Tukey's rule (Q3 + 1.5 * IQR). Locations with
