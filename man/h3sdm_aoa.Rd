@@ -16,7 +16,7 @@ h3sdm_aoa(newdata, train, fit_object, cv = NULL, verbose = TRUE)
 predictor variables used in \code{fit_object}.}
 
 \item{fit_object}{The list returned by \code{\link[=h3sdm_fit_model]{h3sdm_fit_model()}}, used to
-extract the recipe (predictor variable names) and variable
+extract the model formula (predictor variable names) and variable
 importances when available.}
 
 \item{cv}{An \code{rset} object returned by \code{\link[=h3sdm_spatial_cv]{h3sdm_spatial_cv()}},
@@ -46,10 +46,10 @@ are available in a single \code{sf} object ready for mapping.
 }
 \details{
 The algorithm follows Meyer & Pebesma (2021). Predictor variables are
-extracted automatically from the recipe inside \code{fit_object}.
-They are standardized using z-score scaling computed from
-\code{train}, then optionally weighted by variable importance.
-The mean nearest-neighbor distance among training points
+extracted automatically from the model formula inside
+\code{fit_object}. They are standardized using z-score scaling
+computed from \code{train}, then optionally weighted by variable
+importance. The mean nearest-neighbor distance among training points
 (\code{trainDist_avrgmean}) is used to normalize DI values. The AOA
 threshold is the maximum cross-validated training DI after removing
 outliers with Tukey's rule (Q3 + 1.5 * IQR). Locations with
