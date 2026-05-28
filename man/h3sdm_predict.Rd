@@ -33,3 +33,6 @@ predictions_sf <- h3sdm_predict(
 }
 
 }
+\seealso{
+\code{\link[=h3sdm_fit_model]{h3sdm_fit_model()}}, \code{\link[=h3sdm_aoa]{h3sdm_aoa()}}
+}

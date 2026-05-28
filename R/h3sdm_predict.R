@@ -1,6 +1,5 @@
-#' @name h3sdm_predict
-#' @title Predict species presence probability or counts using H3 hexagons
-#' @description
+#' Predict species presence probability or counts using H3 hexagons
+#'
 #' Uses a fitted tidymodels workflow (from `h3sdm_fit_model` or a standalone workflow)
 #' to predict species presence probabilities or counts on a new spatial H3 grid.
 #' Automatically generates centroid coordinates (`x` and `y`) if missing.
@@ -23,22 +22,24 @@
 #' )
 #' }
 #'
+#' @seealso [h3sdm_fit_model()], [h3sdm_aoa()]
+#'
 #' @importFrom sf st_drop_geometry st_centroid st_coordinates
 #' @importFrom dplyr mutate
 #' @export
 
 h3sdm_predict <- function(fit_object, new_data) {
-  # Si se pasa la lista completa de h3sdm_fit, usar el workflow final
+  # If the full list from h3sdm_fit_model() is passed, use the final workflow
   if (is.list(fit_object) && "final_model" %in% names(fit_object)) {
     workflow <- fit_object$final_model
   } else {
     workflow <- fit_object
   }
 
-  # Detectar modo del modelo automáticamente
+  # Detect model mode automatically
   model_mode <- workflow$fit$actions$model$spec$mode
 
-  # Crear coordenadas si faltan
+  # Add centroid coordinates if missing
   if (!all(c("x", "y") %in% names(new_data))) {
     message("Missing x and y coordinates. Creating them from polygon centroids.")
     coords <- suppressWarnings(sf::st_coordinates(sf::st_centroid(new_data)))
@@ -46,10 +47,10 @@ h3sdm_predict <- function(fit_object, new_data) {
       dplyr::mutate(x = coords[, 1], y = coords[, 2])
   }
 
-  # Eliminar geometría
+  # Drop geometry before predicting
   new_data_no_geom <- sf::st_drop_geometry(new_data)
 
-  # Predicciones según modo
+  # Generate predictions according to model mode
   if (model_mode == "regression") {
     predictions <- predict(workflow, new_data = new_data_no_geom, type = "numeric")
     new_data$prediction <- predictions$.pred

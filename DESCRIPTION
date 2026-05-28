@@ -20,6 +20,7 @@ Roxygen: list(markdown = TRUE)
 Depends: R (>= 4.1)
 Config/Needs/website: tidyverse/tidytemplate
 Imports:
+    stats,
     sf,
     dplyr,
     purrr,
@@ -57,7 +58,8 @@ Suggests:
     ggbrick,
     parsnip,
     tidyverse,
-    rbiodatacr
+    rbiodatacr,
+    vip
 VignetteBuilder: 
     knitr
 LazyData: true
