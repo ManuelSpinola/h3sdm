@@ -69,6 +69,7 @@ h3sdm_pa <- function(species,
 
   # 4. Asignar registros a hexágonos
   sp_sf_clean <- sp_sf %>% dplyr::select(geometry)
+  sp_sf_clean <- sf::st_transform(sp_sf_clean, sf::st_crs(hex_grid))
 
   joined <- suppressWarnings(
     sf::st_join(sp_sf_clean, hex_grid, left = FALSE)
