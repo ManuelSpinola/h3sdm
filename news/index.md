@@ -1,6 +1,16 @@
 # Changelog
 
+## h3sdm 0.1.4
+
+### Bug fixes
+
+- [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  now transforms presence records to the CRS of the H3 grid before
+  joining, fixing an error when the grid is in a projected CRS.
+
 ## h3sdm 0.1.3
+
+CRAN release: 2026-05-28
 
 ### New functions
 
