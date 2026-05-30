@@ -70,15 +70,15 @@
 #' @export
 h3sdm_aoa <- function(newdata, train, fit_object, cv = NULL, verbose = TRUE) {
 
-  # --- 1. Extract predictor variable names from model formula -----------
-  fit       <- workflows::extract_fit_parsnip(fit_object$final_model)
-  variables <- setdiff(
-    all.vars(fit$fit$formula),
-    c("presence", "count", "x", "y")
-  )
+  # --- 1. Extract predictor variable names from the recipe --------------
+  # Using the recipe var_info is more robust than all.vars(formula) because
+  # some engines (e.g. glm via parsnip) store a generic formula internally
+  # (presence ~ .) rather than the explicit predictor names.
+  var_info  <- fit_object$final_model$pre$actions$recipe$recipe$var_info
+  variables <- var_info$variable[var_info$role == "predictor"]
 
   if (length(variables) == 0L) {
-    stop("No predictor variables found in the model inside 'fit_object'.")
+    stop("No predictor variables found in the recipe inside 'fit_object'.")
   }
 
   # --- 2. Extract variable importance -----------------------------------
@@ -158,7 +158,7 @@ h3sdm_aoa <- function(newdata, train, fit_object, cv = NULL, verbose = TRUE) {
   aoa_mask <- as.integer(di <= threshold)
 
   if (verbose) {
-    n_in <- sum(aoa_mask)
+    n_in <- sum(aoa_mask, na.rm = TRUE)
     message(sprintf(
       "h3sdm_aoa: inside AOA = %d/%d (%.1f%%)  |  outside AOA = %d/%d (%.1f%%)",
       n_in, m, 100 * n_in / m, m - n_in, m, 100 * (m - n_in) / m

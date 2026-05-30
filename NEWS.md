@@ -1,3 +1,12 @@
+# h3sdm 0.1.5
+## Bug fixes
+* `h3sdm_aoa()` now extracts predictor variable names from the model recipe
+  instead of the model formula, fixing an error with GLM and other engines
+  where parsnip stores a generic formula internally.
+* `h3sdm_aoa()` now uses `na.rm = TRUE` when computing the inside/outside AOA
+  summary, avoiding `NA` in the progress message when hexagons have missing
+  values.
+
 # h3sdm 0.1.4
 
 ## Bug fixes
