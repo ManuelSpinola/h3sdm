@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">h3sdm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,17 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.4" id="h3sdm-014">h3sdm 0.1.4<a class="anchor" aria-label="anchor" href="#h3sdm-014"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.5" id="h3sdm-015">h3sdm 0.1.5<a class="anchor" aria-label="anchor" href="#h3sdm-015"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-1-5">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-5"></a></h3>
+<ul><li>
+<code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> now extracts predictor variable names from the model recipe instead of the model formula, fixing an error with GLM and other engines where parsnip stores a generic formula internally.</li>
+<li>
+<code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> now uses <code>na.rm = TRUE</code> when computing the inside/outside AOA summary, avoiding <code>NA</code> in the progress message when hexagons have missing values.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.4" id="h3sdm-014">h3sdm 0.1.4<a class="anchor" aria-label="anchor" href="#h3sdm-014"></a></h2><p class="text-muted">CRAN release: 2026-05-29</p>
 <div class="section level3">
 <h3 id="bug-fixes-0-1-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-4"></a></h3>
 <ul><li>
