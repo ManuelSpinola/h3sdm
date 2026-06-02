@@ -12,6 +12,12 @@
   The function now receives presence hexagons from `h3sdm_pres()` and the full
   hexagonal grid with extracted variables from `h3sdm_predictors()`.
 
+## Improvements
+* `h3sdm_pa_from_records()` now accepts an optional `predictors_sf` argument.
+  When provided, pseudo-absences are selected by stratified sampling in
+  environmental space using k-means clustering. If `NULL` (default), the
+  previous random geographic sampling behaviour is preserved.
+
 ## Bug fixes
 * `h3sdm_aoa()` now extracts predictor variable names from the model recipe
   instead of the model formula, fixing an error with GLM and other engines
