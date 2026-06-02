@@ -26,6 +26,11 @@
 #' @param geospatial_filter \code{logical} If \code{TRUE} (default) and the input contains
 #'   a \code{geospatialKosher} column, records with \code{geospatialKosher == FALSE} are
 #'   removed before processing. Ignored if the column is absent.
+#' @param buffer_k \code{integer} Number of H3 grid rings to exclude around each
+#'   presence hexagon when building the pseudo-absence candidate pool. Hexagons
+#'   within \code{buffer_k} rings of any presence are removed before sampling,
+#'   preventing pseudo-absences from being placed in areas likely occupied but
+#'   not yet recorded. Default is \code{1}. Set to \code{0} to disable.
 #'
 #' @return \code{sf} object with columns:
 #'   \describe{
@@ -65,7 +70,8 @@ h3sdm_pa_from_records <- function(records,
                                   lat_col = "lat",
                                   species_col = NULL,
                                   predictors_sf = NULL,
-                                  geospatial_filter = TRUE) {
+                                  geospatial_filter = TRUE,
+                                  buffer_k = 1L) {
 
   # 1. Validate inputs
   if (!inherits(aoi_sf, "sf")) stop("aoi_sf must be an sf object")
@@ -73,6 +79,9 @@ h3sdm_pa_from_records <- function(records,
   if (!inherits(records, c("data.frame", "sf"))) {
     stop("records must be a data.frame or sf object")
   }
+  if (!is.numeric(buffer_k) || length(buffer_k) != 1L || buffer_k < 0)
+    stop("buffer_k must be a non-negative integer.")
+  buffer_k <- as.integer(buffer_k)
 
   # 2. Convert to sf if input is a data.frame
   if (!inherits(records, "sf")) {
@@ -149,7 +158,16 @@ h3sdm_pa_from_records <- function(records,
 
   # 9. Split into presence and absence hexagons
   pos_hex <- hex_grid[hex_grid$presence == 1, ]
-  neg_hex <- hex_grid[hex_grid$presence == 0, ]
+
+  # Expand exclusion zone using H3 disk rings around each presence hexagon
+  pres_ids <- pos_hex$h3_address
+  if (buffer_k > 0L) {
+    disk_ids    <- unique(unlist(h3jsr::get_disk(pres_ids, ring_size = buffer_k)))
+    exclude_ids <- union(pres_ids, disk_ids)
+  } else {
+    exclude_ids <- pres_ids
+  }
+  neg_hex <- hex_grid[!hex_grid$h3_address %in% exclude_ids, ]
 
   # 10. Sample pseudo-absences
   n_sample <- min(n_pseudoabs, nrow(neg_hex))

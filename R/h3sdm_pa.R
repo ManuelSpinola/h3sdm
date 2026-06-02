@@ -14,6 +14,11 @@
 #' @param n_pseudoabs `integer` Number of pseudo-absence hexagons to sample.
 #'   If larger than the number of available hexagons without presence, all
 #'   available hexagons are used. Default is \code{500}.
+#' @param buffer_k `integer` Number of H3 grid rings to exclude around each
+#'   presence hexagon when building the pseudo-absence candidate pool. Hexagons
+#'   within \code{buffer_k} rings of any presence are removed before sampling,
+#'   preventing pseudo-absences from being placed in areas likely occupied but
+#'   not yet recorded. Default is \code{1}. Set to \code{0} to disable.
 #'
 #' @return `sf` object with columns:
 #'   - `h3_address`: H3 index of the hexagon.
@@ -49,7 +54,8 @@
 
 h3sdm_pa <- function(pres_sf,
                      predictors_sf,
-                     n_pseudoabs = 500) {
+                     n_pseudoabs = 500,
+                     buffer_k = 1L) {
 
   # --- Validate inputs -------------------------------------------------------
   if (!inherits(pres_sf, "sf"))
@@ -60,10 +66,24 @@ h3sdm_pa <- function(pres_sf,
     stop("pres_sf must contain an 'h3_address' column.")
   if (!"h3_address" %in% names(predictors_sf))
     stop("predictors_sf must contain an 'h3_address' column.")
+  if (!is.numeric(buffer_k) || length(buffer_k) != 1L || buffer_k < 0)
+    stop("buffer_k must be a non-negative integer.")
+  buffer_k <- as.integer(buffer_k)
 
   # --- 1. Identify absence hexagons ------------------------------------------
   pres_ids <- pres_sf$h3_address
-  neg_sf   <- predictors_sf[!predictors_sf$h3_address %in% pres_ids, ]
+
+  # Expand exclusion zone using H3 disk rings around each presence hexagon
+  if (buffer_k > 0L) {
+    disk_ids <- unique(unlist(
+      h3jsr::get_disk(pres_ids, ring_size = buffer_k)
+    ))
+    exclude_ids <- union(pres_ids, disk_ids)
+  } else {
+    exclude_ids <- pres_ids
+  }
+
+  neg_sf   <- predictors_sf[!predictors_sf$h3_address %in% exclude_ids, ]
 
   if (nrow(neg_sf) == 0)
     stop("No hexagons without presence records found in predictors_sf.")

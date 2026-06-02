@@ -4,7 +4,7 @@
 \alias{h3sdm_pa}
 \title{Generate presence/pseudo-absence dataset stratified in environmental space}
 \usage{
-h3sdm_pa(pres_sf, predictors_sf, n_pseudoabs = 500)
+h3sdm_pa(pres_sf, predictors_sf, n_pseudoabs = 500, buffer_k = 1L)
 }
 \arguments{
 \item{pres_sf}{\code{sf} Presence hexagons returned by \code{h3sdm_pres()}.}
@@ -15,6 +15,12 @@ variables, returned by \code{h3sdm_predictors()}.}
 \item{n_pseudoabs}{\code{integer} Number of pseudo-absence hexagons to sample.
 If larger than the number of available hexagons without presence, all
 available hexagons are used. Default is \code{500}.}
+
+\item{buffer_k}{\code{integer} Number of H3 grid rings to exclude around each
+presence hexagon when building the pseudo-absence candidate pool. Hexagons
+within \code{buffer_k} rings of any presence are removed before sampling,
+preventing pseudo-absences from being placed in areas likely occupied but
+not yet recorded. Default is \code{1}. Set to \code{0} to disable.}
 }
 \value{
 \code{sf} object with columns:

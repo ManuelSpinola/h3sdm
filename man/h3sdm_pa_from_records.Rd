@@ -14,7 +14,8 @@ h3sdm_pa_from_records(
   lat_col = "lat",
   species_col = NULL,
   predictors_sf = NULL,
-  geospatial_filter = TRUE
+  geospatial_filter = TRUE,
+  buffer_k = 1L
 )
 }
 \arguments{
@@ -47,6 +48,12 @@ are sampled randomly in geographic space.}
 \item{geospatial_filter}{\code{logical} If \code{TRUE} (default) and the input contains
 a \code{geospatialKosher} column, records with \code{geospatialKosher == FALSE} are
 removed before processing. Ignored if the column is absent.}
+
+\item{buffer_k}{\code{integer} Number of H3 grid rings to exclude around each
+presence hexagon when building the pseudo-absence candidate pool. Hexagons
+within \code{buffer_k} rings of any presence are removed before sampling,
+preventing pseudo-absences from being placed in areas likely occupied but
+not yet recorded. Default is \code{1}. Set to \code{0} to disable.}
 }
 \value{
 \code{sf} object with columns:

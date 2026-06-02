@@ -13,6 +13,11 @@
   hexagonal grid with extracted variables from `h3sdm_predictors()`.
 
 ## Improvements
+* `h3sdm_pa()` and `h3sdm_pa_from_records()` now accept a `buffer_k` argument
+  (default `1`). Hexagons within `buffer_k` H3 rings of any presence hexagon
+  are excluded from the pseudo-absence candidate pool, preventing pseudo-absences
+  from being placed in areas likely occupied but not yet recorded. Set to `0`
+  to disable.
 * `h3sdm_pa_from_records()` now accepts an optional `predictors_sf` argument.
   When provided, pseudo-absences are selected by stratified sampling in
   environmental space using k-means clustering. If `NULL` (default), the
