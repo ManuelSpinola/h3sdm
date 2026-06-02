@@ -1,4 +1,17 @@
 # h3sdm 0.1.5
+
+## New functions
+* `h3sdm_pres()` assigns species occurrence records to H3 hexagons and returns
+  only hexagons with at least one presence record. This is the first step of a
+  two-stage workflow where pseudo-absences are generated after environmental
+  variables have been extracted.
+* `h3sdm_pa()` has been redesigned to generate pseudo-absences stratified in
+  environmental space using k-means clustering. Pseudo-absences now cover the
+  full range of environmental conditions available in the AOI, reducing
+  environmental bias introduced by spatially clustered occurrence records.
+  The function now receives presence hexagons from `h3sdm_pres()` and the full
+  hexagonal grid with extracted variables from `h3sdm_predictors()`.
+
 ## Bug fixes
 * `h3sdm_aoa()` now extracts predictor variable names from the model recipe
   instead of the model formula, fixing an error with GLM and other engines

@@ -1,101 +1,120 @@
 #' @name h3sdm_pa
-#' @title Generate presence/pseudo-absence dataset for a species
+#' @title Generate presence/pseudo-absence dataset stratified in environmental space
 #' @description
-#' Generates a hexagonal grid over the AOI, assigns species presence records to hexagons,
-#' and samples pseudo-absences from hexagons with no records.
+#' Combines presence hexagons with pseudo-absences sampled in environmental
+#' space. Pseudo-absences are selected by clustering the environmental
+#' conditions of hexagons without presence records using k-means, then choosing
+#' the hexagon closest to each cluster centroid. This ensures pseudo-absences
+#' cover the full range of environmental conditions available in the AOI,
+#' reducing bias from spatially clustered occurrence records.
 #'
-#' @param species `character` Species name (single string) for which records are requested.
-#' @param aoi_sf `sf` AOI (area of interest) polygon.
-#' @param res `integer` H3 resolution for the hexagonal grid.
+#' @param pres_sf `sf` Presence hexagons returned by \code{h3sdm_pres()}.
+#' @param predictors_sf `sf` Full hexagonal grid with extracted environmental
+#'   variables, returned by \code{h3sdm_predictors()}.
 #' @param n_pseudoabs `integer` Number of pseudo-absence hexagons to sample.
-#' @param providers `character` Optional vector of data providers. Accepted values:
-#'   any provider supported by \code{spocc} (e.g., \code{"gbif"}, \code{"inat"})
-#'   plus \code{"biodatacr"} for BiodataCR (Costa Rica), queried via the
-#'   \code{rbiodatacr} package. If \code{NULL} (default), all \code{spocc}
-#'   providers are used.
-#' @param remove_duplicates `logical` Remove duplicate records at the same coordinates.
-#' @param date `character` Optional date filter for records.
-#' @param limit `integer` Maximum number of records to download.
-#' @param expand_factor `numeric` Factor to expand AOI before creating hex grid.
+#'   If larger than the number of available hexagons without presence, all
+#'   available hexagons are used. Default is \code{500}.
 #'
 #' @return `sf` object with columns:
 #'   - `h3_address`: H3 index of the hexagon.
-#'   - `presence`: factor with levels "0" (pseudo-absence) and "1" (presence).
+#'   - `presence`: factor with levels \code{"0"} (pseudo-absence) and
+#'     \code{"1"} (presence).
 #'   - `geometry`: MULTIPOLYGON of each hexagon.
+#'
+#' @details
+#' The function scales all numeric predictor columns before clustering.
+#' Non-numeric columns and columns with zero variance are excluded from
+#' clustering. Pseudo-absences are selected as the hexagon nearest to each
+#' k-means centroid in scaled environmental space (Euclidean distance).
+#'
+#' This function is designed to be used after \code{h3sdm_pres()} and
+#' \code{h3sdm_predictors()} in the following workflow:
+#' \preformatted{
+#' pres        <- h3sdm_pres("Species name", aoi_sf, res = 7)
+#' num_vars    <- h3sdm_extract_num(raster_stack, grid)
+#' predictors  <- h3sdm_predictors(num_vars)
+#' pa          <- h3sdm_pa(pres, predictors, n_pseudoabs = 500)
+#' }
 #'
 #' @examples
 #' \dontrun{
 #' data(cr_outline_c, package = "h3sdm")
-#' dataset <- h3sdm_pa("Agalychnis callidryas", cr_outline_c, res = 7, n_pseudoabs = 100)
+#' pres       <- h3sdm_pres("Agalychnis callidryas", cr_outline_c, res = 7)
+#' grid       <- h3sdm_get_grid(cr_outline_c, res = 7)
+#' num_vars   <- h3sdm_extract_num(bio, grid)
+#' predictors <- h3sdm_predictors(num_vars)
+#' pa         <- h3sdm_pa(pres, predictors, n_pseudoabs = 300)
 #' }
 #' @export
 
-h3sdm_pa <- function(species,
-                     aoi_sf,
-                     res = 6,
-                     n_pseudoabs = 500,
-                     providers = NULL,
-                     remove_duplicates = FALSE,
-                     date = NULL,
-                     limit = 500,
-                     expand_factor = 0.1) {
+h3sdm_pa <- function(pres_sf,
+                     predictors_sf,
+                     n_pseudoabs = 500) {
 
-  # Validar inputs
-  if (!inherits(aoi_sf, "sf")) stop("aoi_sf must be an sf object")
-  if (!is.character(species)) stop("species must be a character vector")
+  # --- Validate inputs -------------------------------------------------------
+  if (!inherits(pres_sf, "sf"))
+    stop("pres_sf must be an sf object returned by h3sdm_pres().")
+  if (!inherits(predictors_sf, "sf"))
+    stop("predictors_sf must be an sf object returned by h3sdm_predictors().")
+  if (!"h3_address" %in% names(pres_sf))
+    stop("pres_sf must contain an 'h3_address' column.")
+  if (!"h3_address" %in% names(predictors_sf))
+    stop("predictors_sf must contain an 'h3_address' column.")
 
-  # 1. Generar hexagonal grid
-  hex_grid <- suppressWarnings(
-    h3sdm_get_grid(aoi_sf, res = res, expand_factor = expand_factor)
-  )
-  hex_grid <- hex_grid[, c("h3_address", "geometry")]
-  hex_grid <- sf::st_cast(hex_grid, "MULTIPOLYGON")
+  # --- 1. Identify absence hexagons ------------------------------------------
+  pres_ids <- pres_sf$h3_address
+  neg_sf   <- predictors_sf[!predictors_sf$h3_address %in% pres_ids, ]
 
-  # 2. Obtener registros
-  sp_sf <- suppressWarnings(
-    h3sdm_get_records(species, aoi_sf,
-                      providers = providers,
-                      remove_duplicates = remove_duplicates,
-                      date = date,
-                      limit = limit)
-  )
+  if (nrow(neg_sf) == 0)
+    stop("No hexagons without presence records found in predictors_sf.")
 
-  # 3. Si no hay registros, retornar temprano
-  if (nrow(sp_sf) == 0) {
-    warning("No records found for species: ", species)
-    hex_grid$presence <- factor(0, levels = c("0", "1"))
-    return(hex_grid)
-  }
+  n_sample <- min(n_pseudoabs, nrow(neg_sf))
 
-  # 4. Asignar registros a hexágonos
-  sp_sf_clean <- sp_sf %>% dplyr::select(geometry)
-  sp_sf_clean <- sf::st_transform(sp_sf_clean, sf::st_crs(hex_grid))
+  # --- 2. Prepare environmental matrix for clustering ------------------------
+  neg_df <- sf::st_drop_geometry(neg_sf)
 
-  joined <- suppressWarnings(
-    sf::st_join(sp_sf_clean, hex_grid, left = FALSE)
-  )
+  # Keep only numeric predictor columns (exclude h3_address and identifiers)
+  num_cols <- names(neg_df)[sapply(neg_df, is.numeric)]
 
-  rec_count <- joined %>%
-    sf::st_drop_geometry() %>%
-    dplyr::group_by(hex_id = h3_address) %>%
-    dplyr::summarise(n = dplyr::n(), .groups = "drop")
+  # Remove columns with zero variance (kmeans cannot handle them)
+  zero_var <- sapply(neg_df[, num_cols, drop = FALSE],
+                     function(x) stats::var(x, na.rm = TRUE) == 0 | is.na(stats::var(x, na.rm = TRUE)))
+  num_cols  <- num_cols[!zero_var]
 
-  # 5. Crear columna presence
-  hex_grid$presence <- 0
-  hex_grid$presence[hex_grid$h3_address %in% rec_count$hex_id] <- 1
+  if (length(num_cols) == 0)
+    stop("No numeric predictor columns with non-zero variance found in predictors_sf.")
 
-  # 6. Sample pseudo-absences
-  pos_hex <- hex_grid[hex_grid$presence == 1, ]
-  neg_hex <- hex_grid[hex_grid$presence == 0, ]
-  n_sample <- min(n_pseudoabs, nrow(neg_hex))
+  # Scale environmental variables
+  env_mat <- scale(as.matrix(neg_df[, num_cols, drop = FALSE]))
 
-  if (n_sample > 0) {
-    neg_hex <- neg_hex[sample(seq_len(nrow(neg_hex)), n_sample), ]
-    neg_hex$presence <- 0
-  }
+  # Handle any remaining NAs after scaling (e.g. from constant columns)
+  env_mat[is.na(env_mat)] <- 0
 
-  # 7. Combinar y retornar
-  dataset_sf <- rbind(pos_hex, neg_hex)
+  # --- 3. Cluster absence hexagons in environmental space --------------------
+  set.seed(42L)
+  km <- stats::kmeans(env_mat, centers = n_sample, nstart = 5, iter.max = 100)
+
+  # --- 4. Select hexagon nearest to each cluster centroid --------------------
+  centroids  <- km$centers  # n_sample x length(num_cols) matrix
+  selected_idx <- vapply(seq_len(n_sample), function(k) {
+    cluster_members <- which(km$cluster == k)
+    if (length(cluster_members) == 1L) return(cluster_members)
+    member_mat <- matrix(env_mat[cluster_members, ],
+                         nrow = length(cluster_members))
+    centroid   <- matrix(centroids[k, ], nrow = 1)
+    dists      <- rowSums((member_mat -
+                             centroid[rep(1, nrow(member_mat)), ])^2)
+    cluster_members[which.min(dists)]
+  }, integer(1L))
+
+  neg_selected <- neg_sf[selected_idx, c("h3_address", "geometry")]
+  neg_selected$presence <- 0L
+
+  # --- 5. Combine presences and pseudo-absences ------------------------------
+  pres_out <- pres_sf[, c("h3_address", "geometry")]
+  pres_out$presence <- 1L
+
+  dataset_sf <- rbind(pres_out, neg_selected)
   dataset_sf$presence <- factor(dataset_sf$presence, levels = c("0", "1"))
 
   return(dataset_sf)

@@ -2,58 +2,59 @@
 % Please edit documentation in R/h3sdm_pa.R
 \name{h3sdm_pa}
 \alias{h3sdm_pa}
-\title{Generate presence/pseudo-absence dataset for a species}
+\title{Generate presence/pseudo-absence dataset stratified in environmental space}
 \usage{
-h3sdm_pa(
-  species,
-  aoi_sf,
-  res = 6,
-  n_pseudoabs = 500,
-  providers = NULL,
-  remove_duplicates = FALSE,
-  date = NULL,
-  limit = 500,
-  expand_factor = 0.1
-)
+h3sdm_pa(pres_sf, predictors_sf, n_pseudoabs = 500)
 }
 \arguments{
-\item{species}{\code{character} Species name (single string) for which records are requested.}
+\item{pres_sf}{\code{sf} Presence hexagons returned by \code{h3sdm_pres()}.}
 
-\item{aoi_sf}{\code{sf} AOI (area of interest) polygon.}
+\item{predictors_sf}{\code{sf} Full hexagonal grid with extracted environmental
+variables, returned by \code{h3sdm_predictors()}.}
 
-\item{res}{\code{integer} H3 resolution for the hexagonal grid.}
-
-\item{n_pseudoabs}{\code{integer} Number of pseudo-absence hexagons to sample.}
-
-\item{providers}{\code{character} Optional vector of data providers. Accepted values:
-any provider supported by \code{spocc} (e.g., \code{"gbif"}, \code{"inat"})
-plus \code{"biodatacr"} for BiodataCR (Costa Rica), queried via the
-\code{rbiodatacr} package. If \code{NULL} (default), all \code{spocc}
-providers are used.}
-
-\item{remove_duplicates}{\code{logical} Remove duplicate records at the same coordinates.}
-
-\item{date}{\code{character} Optional date filter for records.}
-
-\item{limit}{\code{integer} Maximum number of records to download.}
-
-\item{expand_factor}{\code{numeric} Factor to expand AOI before creating hex grid.}
+\item{n_pseudoabs}{\code{integer} Number of pseudo-absence hexagons to sample.
+If larger than the number of available hexagons without presence, all
+available hexagons are used. Default is \code{500}.}
 }
 \value{
 \code{sf} object with columns:
 \itemize{
 \item \code{h3_address}: H3 index of the hexagon.
-\item \code{presence}: factor with levels "0" (pseudo-absence) and "1" (presence).
+\item \code{presence}: factor with levels \code{"0"} (pseudo-absence) and
+\code{"1"} (presence).
 \item \code{geometry}: MULTIPOLYGON of each hexagon.
 }
 }
 \description{
-Generates a hexagonal grid over the AOI, assigns species presence records to hexagons,
-and samples pseudo-absences from hexagons with no records.
+Combines presence hexagons with pseudo-absences sampled in environmental
+space. Pseudo-absences are selected by clustering the environmental
+conditions of hexagons without presence records using k-means, then choosing
+the hexagon closest to each cluster centroid. This ensures pseudo-absences
+cover the full range of environmental conditions available in the AOI,
+reducing bias from spatially clustered occurrence records.
+}
+\details{
+The function scales all numeric predictor columns before clustering.
+Non-numeric columns and columns with zero variance are excluded from
+clustering. Pseudo-absences are selected as the hexagon nearest to each
+k-means centroid in scaled environmental space (Euclidean distance).
+
+This function is designed to be used after \code{h3sdm_pres()} and
+\code{h3sdm_predictors()} in the following workflow:
+\preformatted{
+pres        <- h3sdm_pres("Species name", aoi_sf, res = 7)
+num_vars    <- h3sdm_extract_num(raster_stack, grid)
+predictors  <- h3sdm_predictors(num_vars)
+pa          <- h3sdm_pa(pres, predictors, n_pseudoabs = 500)
+}
 }
 \examples{
 \dontrun{
 data(cr_outline_c, package = "h3sdm")
-dataset <- h3sdm_pa("Agalychnis callidryas", cr_outline_c, res = 7, n_pseudoabs = 100)
+pres       <- h3sdm_pres("Agalychnis callidryas", cr_outline_c, res = 7)
+grid       <- h3sdm_get_grid(cr_outline_c, res = 7)
+num_vars   <- h3sdm_extract_num(bio, grid)
+predictors <- h3sdm_predictors(num_vars)
+pa         <- h3sdm_pa(pres, predictors, n_pseudoabs = 300)
 }
 }
