@@ -1,0 +1,161 @@
+# Changelog
+
+## h3sdm 0.1.5
+
+### New functions
+
+- [`h3sdm_pres()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pres.md)
+  assigns species occurrence records to H3 hexagons and returns only
+  hexagons with at least one presence record. This is the first step of
+  a two-stage workflow where pseudo-absences are generated after
+  environmental variables have been extracted.
+- [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  has been redesigned to generate pseudo-absences stratified in
+  environmental space using k-means clustering. Pseudo-absences now
+  cover the full range of environmental conditions available in the AOI,
+  reducing environmental bias introduced by spatially clustered
+  occurrence records. The function now receives presence hexagons from
+  [`h3sdm_pres()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pres.md)
+  and the full hexagonal grid with extracted variables from
+  [`h3sdm_predictors()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predictors.md).
+
+### Improvements
+
+- [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  and
+  [`h3sdm_pa_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa_from_records.md)
+  now accept a `buffer_k` argument (default `1`). Hexagons within
+  `buffer_k` H3 rings of any presence hexagon are excluded from the
+  pseudo-absence candidate pool, preventing pseudo-absences from being
+  placed in areas likely occupied but not yet recorded. Set to `0` to
+  disable.
+- [`h3sdm_pa_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa_from_records.md)
+  now accepts an optional `predictors_sf` argument. When provided,
+  pseudo-absences are selected by stratified sampling in environmental
+  space using k-means clustering. If `NULL` (default), the previous
+  random geographic sampling behaviour is preserved.
+
+### Bug fixes
+
+- [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
+  now extracts predictor variable names from the model recipe instead of
+  the model formula, fixing an error with GLM and other engines where
+  parsnip stores a generic formula internally.
+- [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
+  now uses `na.rm = TRUE` when computing the inside/outside AOA summary,
+  avoiding `NA` in the progress message when hexagons have missing
+  values.
+
+## h3sdm 0.1.4
+
+CRAN release: 2026-05-29
+
+### Bug fixes
+
+- [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  now transforms presence records to the CRS of the H3 grid before
+  joining, fixing an error when the grid is in a projected CRS.
+
+## h3sdm 0.1.3
+
+CRAN release: 2026-05-28
+
+### New functions
+
+- [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
+  estimates the Dissimilarity Index (DI) and the Area of Applicability
+  (AOA) for spatial prediction models, based on Meyer & Pebesma (2021).
+
+### Improvements
+
+- [`h3sdm_get_grid()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_get_grid.md)
+  now preserves the CRS of the input `sf_object`. Previously, the
+  function always returned the grid in WGS84 (EPSG:4326) regardless of
+  the input CRS. Now, if the AOI is in a projected CRS, the output grid
+  will be reprojected to match it. The internal H3 computation still
+  uses WGS84 as required by the H3 system.
+- [`h3sdm_predict()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predict.md)
+  internal comments translated to English and `@seealso` updated to
+  include
+  [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md).
+
+## h3sdm 0.1.2
+
+CRAN release: 2026-05-22
+
+### Improvements
+
+- [`h3sdm_fit_model()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.md)
+  now automatically detects model mode (classification or regression),
+  enabling count-based models (Poisson, Negative Binomial) with
+  appropriate metrics (RMSE, R², MAE) without requiring manual
+  configuration.
+
+- [`h3sdm_fit_model()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.md)
+  and
+  [`h3sdm_predict()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predict.md)
+  now automatically detect model mode (classification or regression),
+  enabling count-based models (Poisson, Negative Binomial) without
+  manual configuration. Full backward compatibility maintained.
+
+- [`h3sdm_get_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_get_records.md)
+  now supports `"biodatacr"` as an optional provider, querying
+  occurrence records from BiodataCR (Costa Rica) via the `rbiodatacr`
+  package.
+  [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  inherits this support automatically through its `providers` argument.
+  `rbiodatacr` is listed as a suggested dependency.
+
+## h3sdm 0.1.1
+
+CRAN release: 2026-05-13
+
+### New functions
+
+- [`h3sdm_pa_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa_from_records.md):
+  generates a presence/pseudo-absence dataset from user-provided
+  records. Accepts a `data.frame` or `sf` object with coordinates in
+  WGS84 (EPSG:4326). Supports optional filtering by a `geospatialKosher`
+  column to remove records with questionable spatial quality.
+
+- [`h3sdm_count_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_count_from_records.md):
+  generates a hexagonal grid with count-based response variables
+  (species richness, total detections, or individual abundance) from
+  user-provided records. Accepts a `data.frame` or `sf` object. Supports
+  optional filtering by presence column, confidence threshold, and date
+  range.
+
+### Changes to existing functions
+
+- [`h3sdm_recipe()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe.md):
+  added `response_col` parameter (default `"presence"`) to support
+  count-based response variables. Use `response_col = "count"` when
+  working with data generated by
+  [`h3sdm_count_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_count_from_records.md).
+
+- [`h3sdm_recipe_gam()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe_gam.md):
+  added `response_col` parameter (default `"presence"`) with the same
+  behavior as
+  [`h3sdm_recipe()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe.md).
+  Also added documentation examples for both presence/absence and
+  count-based models.
+
+- [`h3sdm_workflow_gam()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_workflow_gam.md):
+  updated documentation to clarify the use of
+  `set_mode("classification")` for presence/absence models and
+  `set_mode("regression")` with `family = poisson()` for count-based
+  models.
+
+- [`h3sdm_workflow()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_workflow.md):
+  updated documentation to clarify model mode selection for
+  presence/absence and count-based models.
+
+- [`h3sdm_workflows()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_workflows.md):
+  updated documentation to clarify model mode selection for
+  presence/absence and count-based models.
+
+## h3sdm 0.1.0
+
+CRAN release: 2026-04-15
+
+- Initial CRAN submission.

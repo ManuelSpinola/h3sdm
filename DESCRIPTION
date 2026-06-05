@@ -59,7 +59,9 @@ Suggests:
     parsnip,
     tidyverse,
     rbiodatacr,
-    vip
+    vip,
+    DALEXtra,
+    tidytemplate
 VignetteBuilder: 
     knitr
 LazyData: true

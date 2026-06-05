@@ -17,8 +17,8 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-This vignette demonstrates a complete workflow for species distribution 
-modeling (SDM) for a single species using `h3sdm`. We cover data preparation, 
+This vignette demonstrates a complete workflow for species distribution
+modeling (SDM) for a single species using `h3sdm`. We cover data preparation,
 model fitting, spatial cross-validation, prediction, and feature importance.
 
 ## Load packages
@@ -45,16 +45,64 @@ bio <- terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sd
 names(bio) <- gsub(".*bio_", "bio", names(bio))
 ```
 
-## 3. Species Occurrence Data
+## 3. Create the Hexagonal Grid
 
-The package includes a precomputed presence/pseudo-absence dataset for 
-*Silverstoneia flotator* at H3 resolution 7.
+The hexagonal grid is the backbone of the `h3sdm` workflow. All subsequent
+steps — predictor extraction, presence assignment, and pseudo-absence generation —
+are built on top of it. The resolution controls the spatial scale of the analysis.
+At resolution 7, each hexagon covers approximately 514 ha, which is appropriate
+for many vertebrate species.
+
 ```{r}
-data(records)
-head(records)
-table(records$presence)
+h7 <- h3sdm_get_grid(cr, res = 7)
 ```
 
+## 4. Prepare Predictors
+
+Environmental variables are extracted for every hexagon in the grid. Here we
+use three WorldClim bioclimatic variables: Bio1 (Annual Mean Temperature),
+Bio12 (Annual Precipitation), and Bio15 (Precipitation Seasonality).
+
+```{r}
+bio_predictors <- h3sdm_extract_num(bio, h7)
+predictors <- h3sdm_predictors(bio_predictors) |>
+  dplyr::select(h3_address, bio1, bio12, bio15, geometry)
+```
+
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_sf(data = predictors, aes(fill = bio1)) +
+  scale_fill_viridis_c(option = "B")
+```
+
+## 5. Species Occurrence Data
+
+Presence hexagons are generated using `h3sdm_pres()`, which downloads occurrence
+records and assigns them to hexagons. Multiple records within the same hexagon
+are consolidated into a single presence, reducing spatial sampling bias. Since
+each hexagon represents an area (~514 ha at resolution 7), this better reflects
+how organisms actually occupy space.
+
+Pseudo-absences are then generated with `h3sdm_pa()`. They are placed outside
+the known distribution — excluding hexagons with presences and their immediate
+neighbors (`buffer_k = 1`) — and are selected using k-means clustering in
+environmental space. This ensures pseudo-absences represent the full range of
+environmental conditions available in the study area, not just their geographic
+distribution. Since there are approximately 100 presence hexagons, we request
+300 pseudo-absences (3×).
+
+```{r}
+pres <- h3sdm_pres("Silverstoneia flotator", cr, res = 7, limit = 10000)
+```
+
+```{r}
+records <- h3sdm_pa(pres, predictors, n_pseudoabs = 300)
+```
+
+```{r}
+table(records$presence)
+```
 
 ```{r}
 ggplot() +
@@ -67,34 +115,18 @@ ggplot() +
   )
 ```
 
-## 4. Prepare Predictors
-```{r}
-h7 <- h3sdm_get_grid(cr, res = 7)
-bio_predictors <- h3sdm_extract_num(bio, h7)
-predictors <- h3sdm_predictors(bio_predictors) |>
-  dplyr::select(h3_address, bio1, bio12, bio15, geometry)
-```
-
-
-```{r}
-ggplot() +
-  theme_minimal() +
-  geom_sf(data = predictors, aes(fill = bio1)) +
-  scale_fill_viridis_c(option = "B")
-```
-
-## 5. Combine Records and Predictors
+## 6. Combine Records and Predictors
 ```{r}
 dat <- h3sdm_data(records, predictors)
 ```
 
-## 6. Spatial Cross-Validation
+## 7. Spatial Cross-Validation
 ```{r}
 scv <- h3sdm_spatial_cv(dat, v = 5, repeats = 1)
 autoplot(scv) + theme_minimal()
 ```
 
-## 7. Define Recipe and Model
+## 8. Define Recipe and Model
 ```{r}
 receta <- h3sdm_recipe(dat) |>
   themis::step_downsample(presence)
@@ -104,12 +136,12 @@ modelo <- parsnip::logistic_reg() |>
   parsnip::set_mode("classification")
 ```
 
-## 8. Create Workflow
+## 9. Create Workflow
 ```{r}
 wf <- h3sdm_workflow(modelo, receta)
 ```
 
-## 9. Fit the Model
+## 10. Fit the Model
 ```{r}
 presence_data <- dat |>
   dplyr::filter(presence == 1)
@@ -117,7 +149,7 @@ presence_data <- dat |>
 f <- h3sdm_fit_model(wf, scv, presence_data)
 ```
 
-## 10. Evaluate Model Performance
+## 11. Evaluate Model Performance
 ```{r}
 evaluation_metrics <- h3sdm_eval_metrics(
   fitted_model  = f$cv_model,
@@ -125,7 +157,6 @@ evaluation_metrics <- h3sdm_eval_metrics(
 )
 evaluation_metrics
 ```
-
 
 ```{r}
 ggplot(evaluation_metrics, aes(.metric, mean)) +
@@ -135,11 +166,10 @@ ggplot(evaluation_metrics, aes(.metric, mean)) +
   ylim(0, 1)
 ```
 
-## 11. Make Predictions
+## 12. Make Predictions
 ```{r}
 p <- h3sdm_predict(f, predictors)
 ```
-
 
 ```{r}
 ggplot() +
@@ -148,7 +178,7 @@ ggplot() +
   scale_fill_viridis_c(name = "Habitat\nsuitability", option = "B", direction = -1)
 ```
 
-## 12. Model Interpretation
+## 13. Model Interpretation
 ```{r}
 e <- h3sdm_explain(f$final_model, data = dat)
 
@@ -161,13 +191,12 @@ var_imp <- DALEX::model_parts(
 plot(var_imp)
 ```
 
-
 ```{r}
 pdp_glm <- ingredients::partial_dependence(e, variables = c("bio12", "bio1", "bio15"))
 plot(pdp_glm)
 ```
 
-## 13. Future Scenario Predictions
+## 14. Future Scenario Predictions
 ```{r}
 bio_future <- terra::rast(system.file("extdata", "bioclim_future.tif", package = "h3sdm"))
 names(bio_future) <- c("bio1", "bio12", "bio15")
@@ -177,6 +206,7 @@ predictors_future <- h3sdm_predictors(bio_future_predictors)
 
 p_future <- h3sdm_predict(f, predictors_future)
 ```
+
 ```{r}
 ggplot() +
   theme_minimal() +
@@ -187,6 +217,7 @@ ggplot() +
 ## Conclusions
 
 This vignette demonstrated a complete SDM workflow using `h3sdm`, including
-data preparation, model fitting with spatial cross-validation, performance
-evaluation, predictions, and variable importance analysis for both current
-and future climate scenarios.
+data preparation with a hexagonal grid, presence assignment, environmentally
+stratified pseudo-absence generation, model fitting with spatial cross-validation,
+performance evaluation, predictions, and variable importance analysis for both
+current and future climate scenarios.
