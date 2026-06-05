@@ -62,7 +62,9 @@ columns or an <code>sf</code> object. Coordinates are assumed to be in WGS84 (EP
 <span>  lon_col <span class="op">=</span> <span class="st">"lon"</span>,</span>
 <span>  lat_col <span class="op">=</span> <span class="st">"lat"</span>,</span>
 <span>  species_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  geospatial_filter <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  predictors_sf <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  geospatial_filter <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  buffer_k <span class="op">=</span> <span class="fl">1L</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -105,10 +107,27 @@ is already an <code>sf</code> object.</p></dd>
 name. If provided, the column is retained in the output as metadata.</p></dd>
 
 
+<dt id="arg-predictors-sf">predictors_sf<a class="anchor" aria-label="anchor" href="#arg-predictors-sf"></a></dt>
+<dd><p><code>sf</code> Optional. Full hexagonal grid with extracted
+environmental variables, returned by <code><a href="h3sdm_predictors.html">h3sdm_predictors()</a></code>. If provided,
+pseudo-absences are selected by stratified sampling in environmental space
+using k-means clustering, ensuring coverage of the full range of
+environmental conditions in the AOI. If <code>NULL</code> (default), pseudo-absences
+are sampled randomly in geographic space.</p></dd>
+
+
 <dt id="arg-geospatial-filter">geospatial_filter<a class="anchor" aria-label="anchor" href="#arg-geospatial-filter"></a></dt>
 <dd><p><code>logical</code> If <code>TRUE</code> (default) and the input contains
 a <code>geospatialKosher</code> column, records with <code>geospatialKosher == FALSE</code> are
 removed before processing. Ignored if the column is absent.</p></dd>
+
+
+<dt id="arg-buffer-k">buffer_k<a class="anchor" aria-label="anchor" href="#arg-buffer-k"></a></dt>
+<dd><p><code>integer</code> Number of H3 grid rings to exclude around each
+presence hexagon when building the pseudo-absence candidate pool. Hexagons
+within <code>buffer_k</code> rings of any presence are removed before sampling,
+preventing pseudo-absences from being placed in areas likely occupied but
+not yet recorded. Default is <code>1</code>. Set to <code>0</code> to disable.</p></dd>
 
 </dl></div>
     <div class="section level2">

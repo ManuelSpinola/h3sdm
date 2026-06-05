@@ -18,7 +18,9 @@ h3sdm_pa_from_records(
   lon_col = "lon",
   lat_col = "lat",
   species_col = NULL,
-  geospatial_filter = TRUE
+  predictors_sf = NULL,
+  geospatial_filter = TRUE,
+  buffer_k = 1L
 )
 ```
 
@@ -59,11 +61,29 @@ h3sdm_pa_from_records(
   `character` Optional. Name of the column containing the species name.
   If provided, the column is retained in the output as metadata.
 
+- predictors_sf:
+
+  `sf` Optional. Full hexagonal grid with extracted environmental
+  variables, returned by
+  [`h3sdm_predictors()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predictors.md).
+  If provided, pseudo-absences are selected by stratified sampling in
+  environmental space using k-means clustering, ensuring coverage of the
+  full range of environmental conditions in the AOI. If `NULL`
+  (default), pseudo-absences are sampled randomly in geographic space.
+
 - geospatial_filter:
 
   `logical` If `TRUE` (default) and the input contains a
   `geospatialKosher` column, records with `geospatialKosher == FALSE`
   are removed before processing. Ignored if the column is absent.
+
+- buffer_k:
+
+  `integer` Number of H3 grid rings to exclude around each presence
+  hexagon when building the pseudo-absence candidate pool. Hexagons
+  within `buffer_k` rings of any presence are removed before sampling,
+  preventing pseudo-absences from being placed in areas likely occupied
+  but not yet recorded. Default is `1`. Set to `0` to disable.
 
 ## Value
 

@@ -2,6 +2,39 @@
 
 ## h3sdm 0.1.5
 
+### New functions
+
+- [`h3sdm_pres()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pres.md)
+  assigns species occurrence records to H3 hexagons and returns only
+  hexagons with at least one presence record. This is the first step of
+  a two-stage workflow where pseudo-absences are generated after
+  environmental variables have been extracted.
+- [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  has been redesigned to generate pseudo-absences stratified in
+  environmental space using k-means clustering. Pseudo-absences now
+  cover the full range of environmental conditions available in the AOI,
+  reducing environmental bias introduced by spatially clustered
+  occurrence records. The function now receives presence hexagons from
+  [`h3sdm_pres()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pres.md)
+  and the full hexagonal grid with extracted variables from
+  [`h3sdm_predictors()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predictors.md).
+
+### Improvements
+
+- [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  and
+  [`h3sdm_pa_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa_from_records.md)
+  now accept a `buffer_k` argument (default `1`). Hexagons within
+  `buffer_k` H3 rings of any presence hexagon are excluded from the
+  pseudo-absence candidate pool, preventing pseudo-absences from being
+  placed in areas likely occupied but not yet recorded. Set to `0` to
+  disable.
+- [`h3sdm_pa_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa_from_records.md)
+  now accepts an optional `predictors_sf` argument. When provided,
+  pseudo-absences are selected by stratified sampling in environmental
+  space using k-means clustering. If `NULL` (default), the previous
+  random geographic sampling behaviour is preserved.
+
 ### Bug fixes
 
 - [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)

@@ -40,6 +40,20 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.5" id="h3sdm-015">h3sdm 0.1.5<a class="anchor" aria-label="anchor" href="#h3sdm-015"></a></h2>
 <div class="section level3">
+<h3 id="new-functions-0-1-5">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-1-5"></a></h3>
+<ul><li>
+<code><a href="../reference/h3sdm_pres.html">h3sdm_pres()</a></code> assigns species occurrence records to H3 hexagons and returns only hexagons with at least one presence record. This is the first step of a two-stage workflow where pseudo-absences are generated after environmental variables have been extracted.</li>
+<li>
+<code><a href="../reference/h3sdm_pa.html">h3sdm_pa()</a></code> has been redesigned to generate pseudo-absences stratified in environmental space using k-means clustering. Pseudo-absences now cover the full range of environmental conditions available in the AOI, reducing environmental bias introduced by spatially clustered occurrence records. The function now receives presence hexagons from <code><a href="../reference/h3sdm_pres.html">h3sdm_pres()</a></code> and the full hexagonal grid with extracted variables from <code><a href="../reference/h3sdm_predictors.html">h3sdm_predictors()</a></code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-0-1-5">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-1-5"></a></h3>
+<ul><li>
+<code><a href="../reference/h3sdm_pa.html">h3sdm_pa()</a></code> and <code><a href="../reference/h3sdm_pa_from_records.html">h3sdm_pa_from_records()</a></code> now accept a <code>buffer_k</code> argument (default <code>1</code>). Hexagons within <code>buffer_k</code> H3 rings of any presence hexagon are excluded from the pseudo-absence candidate pool, preventing pseudo-absences from being placed in areas likely occupied but not yet recorded. Set to <code>0</code> to disable.</li>
+<li>
+<code><a href="../reference/h3sdm_pa_from_records.html">h3sdm_pa_from_records()</a></code> now accepts an optional <code>predictors_sf</code> argument. When provided, pseudo-absences are selected by stratified sampling in environmental space using k-means clustering. If <code>NULL</code> (default), the previous random geographic sampling behaviour is preserved.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="bug-fixes-0-1-5">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-5"></a></h3>
 <ul><li>
 <code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> now extracts predictor variable names from the model recipe instead of the model formula, fixing an error with GLM and other engines where parsnip stores a generic formula internally.</li>
