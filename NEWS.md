@@ -1,6 +1,16 @@
 # h3sdm 0.1.5
 
 ## New functions
+* `h3sdm_filter_outliers()` removes environmental outliers from presence
+  records prior to model training using Mahalanobis distance (D²) in
+  environmental space. Only presences (`presence == "1"`) are evaluated;
+  pseudo-absences are always retained unchanged. The outlier threshold is
+  derived from the chi-squared distribution (`qchisq(threshold, df = k)`,
+  default `threshold = 0.975`). Returns a list with the cleaned PA dataset,
+  a data frame of removed records with their D² values, the count of removed
+  records, and the threshold value used. Complements `h3sdm_aoa()`: while the
+  AOA evaluates prediction reliability after training, this function improves
+  input data quality before training.
 * `h3sdm_pres()` assigns species occurrence records to H3 hexagons and returns
   only hexagons with at least one presence record. This is the first step of a
   two-stage workflow where pseudo-absences are generated after environmental
