@@ -28,6 +28,9 @@
   : Calculate Area Proportions for Categorical Raster Classes
 - [`h3sdm_extract_num()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_extract_num.md)
   : Extract Area-Weighted Mean from Numeric Raster Stack
+- [`h3sdm_filter_outliers()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_filter_outliers.md)
+  : Filter environmental outliers from presence records using
+  Mahalanobis distance
 - [`h3sdm_fit_model()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.md)
   : Fits an SDM workflow to data using resampling and prepares it for
   stacking.
