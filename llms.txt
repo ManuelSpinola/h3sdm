@@ -72,6 +72,8 @@ habitat analysis using H3 grids.
   : Current bioclimatic raster
 - [`bioclim_future`](https://manuelspinola.github.io/h3sdm/reference/bioclim_future.md)
   : Future bioclimatic raster
+- [`cr_outline`](https://manuelspinola.github.io/h3sdm/reference/cr_outline.md)
+  : Costa Rica Full Outline (Continental + Islands)
 - [`cr_outline_c`](https://manuelspinola.github.io/h3sdm/reference/cr_outline_c.md)
   : Costa Rica Continental Outline
 - [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
