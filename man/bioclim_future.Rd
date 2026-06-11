@@ -14,10 +14,10 @@ This dataset corresponds to the climate projection:
 \itemize{
 \item Model: INM-CM4-8
 \item Scenario: SSP1-2.6
-\item Period: 2021–2040
+\item Period: 2021-2040
 }
 
-The file is stored in \verb{inst/extdata/} and can be accessed with:
+The file is stored in \code{inst/extdata/} and can be accessed with:
 \code{terra::rast(system.file("extdata", "bioclim_future.tif", package = "h3sdm"))}
 }
 \examples{

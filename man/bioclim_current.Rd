@@ -10,7 +10,7 @@ GeoTIFF file, readable with \code{terra::rast()}.
 A GeoTIFF with current bioclimatic variables for Costa Rica.
 }
 \details{
-This file is stored in \verb{inst/extdata/} and can be accessed with:
+This file is stored in \code{inst/extdata/} and can be accessed with:
 \code{terra::rast(system.file("extdata", "bioclim_current.tif", package = "h3sdm"))}
 }
 \examples{
