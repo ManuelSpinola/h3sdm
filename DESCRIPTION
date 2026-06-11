@@ -61,7 +61,8 @@ Suggests:
     rbiodatacr,
     vip,
     DALEXtra,
-    tidytemplate
+    tidytemplate,
+    geodata
 VignetteBuilder: 
     knitr
 LazyData: true

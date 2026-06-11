@@ -5,19 +5,51 @@
 \alias{cr_outline_c}
 \title{Costa Rica Continental Outline}
 \format{
-An \code{sf} object containing polygon geometry of Costa Rica.
+An \code{sf} object with 1 feature and 1 column:
+\describe{
+\item{geometry}{POLYGON in WGS 84 (EPSG:4326) with 30,261 vertices,
+representing the continental outline of Costa Rica.}
+}
 }
 \source{
-Adapted from publicly available geographic data.
+Global Administrative Areas (GADM) version 4.1.
+Downloaded via \code{geodata::gadm("CRI", level = 0)}.
+\url{https://gadm.org}
 }
 \usage{
 cr_outline_c
 }
 \description{
-A simplified outline of Costa Rica as an \code{sf} object.
+An \code{sf} polygon containing the continental outline of Costa Rica,
+derived from GADM 4.1. The Isla del Coco and all other minor oceanic
+islands have been removed, retaining only the largest polygon
+(the continental landmass).
+
+For the full outline including all islands, see \code{\link{cr_outline}}.
+}
+\details{
+\subsection{Island removal}{
+
+Costa Rica includes the Isla del Coco (~550 km offshore in the Pacific),
+which is excluded here. The continental polygon is obtained by casting the
+GADM multipolygon to individual polygons and retaining the one with the
+largest area. For analyses requiring all national territory use
+\code{\link{cr_outline}}.
+}
+
+\subsection{Reproducibility}{
+
+Generated with \code{data-raw/cr_outline.R}. To regenerate:
+\preformatted{source("data-raw/cr_outline.R")}
+}
 }
 \examples{
-library(sf)
-plot(cr_outline_c)
+data(cr_outline_c)
+plot(sf::st_geometry(cr_outline_c), main = "Costa Rica (continental)")
+}
+\seealso{
+\itemize{
+\item \code{\link{cr_outline}} -- full outline including all islands.
+}
 }
 \keyword{datasets}
