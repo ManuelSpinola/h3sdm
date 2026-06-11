@@ -1,20 +1,28 @@
 # h3sdm 0.1.5
 
+## New datasets
+
+* `cr_outline` -- Costa Rica full outline (continental landmass + Isla del
+  Coco and all minor oceanic islands), derived from GADM 4.1.
+
 ## New functions
+
 * `h3sdm_filter_outliers()` removes environmental outliers from presence
-  records prior to model training using Mahalanobis distance (D²) in
+  records prior to model training using Mahalanobis distance (D2) in
   environmental space. Only presences (`presence == "1"`) are evaluated;
   pseudo-absences are always retained unchanged. The outlier threshold is
   derived from the chi-squared distribution (`qchisq(threshold, df = k)`,
   default `threshold = 0.975`). Returns a list with the cleaned PA dataset,
-  a data frame of removed records with their D² values, the count of removed
+  a data frame of removed records with their D2 values, the count of removed
   records, and the threshold value used. Complements `h3sdm_aoa()`: while the
   AOA evaluates prediction reliability after training, this function improves
   input data quality before training.
+
 * `h3sdm_pres()` assigns species occurrence records to H3 hexagons and returns
   only hexagons with at least one presence record. This is the first step of a
   two-stage workflow where pseudo-absences are generated after environmental
   variables have been extracted.
+
 * `h3sdm_pa()` has been redesigned to generate pseudo-absences stratified in
   environmental space using k-means clustering. Pseudo-absences now cover the
   full range of environmental conditions available in the AOI, reducing
@@ -23,20 +31,28 @@
   hexagonal grid with extracted variables from `h3sdm_predictors()`.
 
 ## Improvements
+
+* `cr_outline_c` dataset regenerated from GADM 4.1 with a fully reproducible
+  script in `data-raw/cr_outline.R`. Source attribution updated to GADM 4.1.
+  Geometry is now consistent with the `cr_outline_c` dataset in `paisaje`.
+
 * `h3sdm_pa()` and `h3sdm_pa_from_records()` now accept a `buffer_k` argument
   (default `1`). Hexagons within `buffer_k` H3 rings of any presence hexagon
   are excluded from the pseudo-absence candidate pool, preventing pseudo-absences
   from being placed in areas likely occupied but not yet recorded. Set to `0`
   to disable.
+
 * `h3sdm_pa_from_records()` now accepts an optional `predictors_sf` argument.
   When provided, pseudo-absences are selected by stratified sampling in
   environmental space using k-means clustering. If `NULL` (default), the
   previous random geographic sampling behaviour is preserved.
 
 ## Bug fixes
+
 * `h3sdm_aoa()` now extracts predictor variable names from the model recipe
   instead of the model formula, fixing an error with GLM and other engines
   where parsnip stores a generic formula internally.
+
 * `h3sdm_aoa()` now uses `na.rm = TRUE` when computing the inside/outside AOA
   summary, avoiding `NA` in the progress message when hexagons have missing
   values.
@@ -68,7 +84,7 @@
 ## Improvements
 * `h3sdm_fit_model()` now automatically detects model mode (classification or regression),
   enabling count-based models (Poisson, Negative Binomial) with appropriate metrics
-  (RMSE, R², MAE) without requiring manual configuration.
+  (RMSE, R2, MAE) without requiring manual configuration.
 
 * `h3sdm_fit_model()` and `h3sdm_predict()` now automatically detect model mode
   (classification or regression), enabling count-based models (Poisson, Negative
@@ -116,5 +132,3 @@
 # h3sdm 0.1.0
 
 * Initial CRAN submission.
-
-
