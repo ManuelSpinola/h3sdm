@@ -15,7 +15,7 @@ This dataset corresponds to the climate projection:
 
 - Scenario: SSP1-2.6
 
-- Period: 2021–2040
+- Period: 2021-2040
 
 The file is stored in `inst/extdata/` and can be accessed with:
 `terra::rast(system.file("extdata", "bioclim_future.tif", package = "h3sdm"))`
