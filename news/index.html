@@ -40,27 +40,26 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.5" id="h3sdm-015">h3sdm 0.1.5<a class="anchor" aria-label="anchor" href="#h3sdm-015"></a></h2>
 <div class="section level3">
-<h3 id="new-functions-0-1-5">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-1-5"></a></h3>
+<h3 id="new-datasets-0-1-5">New datasets<a class="anchor" aria-label="anchor" href="#new-datasets-0-1-5"></a></h3>
 <ul><li>
-<code><a href="../reference/h3sdm_filter_outliers.html">h3sdm_filter_outliers()</a></code> removes environmental outliers from presence records prior to model training using Mahalanobis distance (D²) in environmental space. Only presences (<code>presence == "1"</code>) are evaluated; pseudo-absences are always retained unchanged. The outlier threshold is derived from the chi-squared distribution (<code>qchisq(threshold, df = k)</code>, default <code>threshold = 0.975</code>). Returns a list with the cleaned PA dataset, a data frame of removed records with their D² values, the count of removed records, and the threshold value used. Complements <code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code>: while the AOA evaluates prediction reliability after training, this function improves input data quality before training.</li>
-<li>
-<code><a href="../reference/h3sdm_pres.html">h3sdm_pres()</a></code> assigns species occurrence records to H3 hexagons and returns only hexagons with at least one presence record. This is the first step of a two-stage workflow where pseudo-absences are generated after environmental variables have been extracted.</li>
-<li>
-<code><a href="../reference/h3sdm_pa.html">h3sdm_pa()</a></code> has been redesigned to generate pseudo-absences stratified in environmental space using k-means clustering. Pseudo-absences now cover the full range of environmental conditions available in the AOI, reducing environmental bias introduced by spatially clustered occurrence records. The function now receives presence hexagons from <code><a href="../reference/h3sdm_pres.html">h3sdm_pres()</a></code> and the full hexagonal grid with extracted variables from <code><a href="../reference/h3sdm_predictors.html">h3sdm_predictors()</a></code>.</li>
+<code>cr_outline</code> – Costa Rica full outline (continental landmass + Isla del Coco and all minor oceanic islands), derived from GADM 4.1.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-functions-0-1-5">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-1-5"></a></h3>
+<ul><li><p><code><a href="../reference/h3sdm_filter_outliers.html">h3sdm_filter_outliers()</a></code> removes environmental outliers from presence records prior to model training using Mahalanobis distance (D2) in environmental space. Only presences (<code>presence == "1"</code>) are evaluated; pseudo-absences are always retained unchanged. The outlier threshold is derived from the chi-squared distribution (<code>qchisq(threshold, df = k)</code>, default <code>threshold = 0.975</code>). Returns a list with the cleaned PA dataset, a data frame of removed records with their D2 values, the count of removed records, and the threshold value used. Complements <code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code>: while the AOA evaluates prediction reliability after training, this function improves input data quality before training.</p></li>
+<li><p><code><a href="../reference/h3sdm_pres.html">h3sdm_pres()</a></code> assigns species occurrence records to H3 hexagons and returns only hexagons with at least one presence record. This is the first step of a two-stage workflow where pseudo-absences are generated after environmental variables have been extracted.</p></li>
+<li><p><code><a href="../reference/h3sdm_pa.html">h3sdm_pa()</a></code> has been redesigned to generate pseudo-absences stratified in environmental space using k-means clustering. Pseudo-absences now cover the full range of environmental conditions available in the AOI, reducing environmental bias introduced by spatially clustered occurrence records. The function now receives presence hexagons from <code><a href="../reference/h3sdm_pres.html">h3sdm_pres()</a></code> and the full hexagonal grid with extracted variables from <code><a href="../reference/h3sdm_predictors.html">h3sdm_predictors()</a></code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-0-1-5">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-1-5"></a></h3>
-<ul><li>
-<code><a href="../reference/h3sdm_pa.html">h3sdm_pa()</a></code> and <code><a href="../reference/h3sdm_pa_from_records.html">h3sdm_pa_from_records()</a></code> now accept a <code>buffer_k</code> argument (default <code>1</code>). Hexagons within <code>buffer_k</code> H3 rings of any presence hexagon are excluded from the pseudo-absence candidate pool, preventing pseudo-absences from being placed in areas likely occupied but not yet recorded. Set to <code>0</code> to disable.</li>
-<li>
-<code><a href="../reference/h3sdm_pa_from_records.html">h3sdm_pa_from_records()</a></code> now accepts an optional <code>predictors_sf</code> argument. When provided, pseudo-absences are selected by stratified sampling in environmental space using k-means clustering. If <code>NULL</code> (default), the previous random geographic sampling behaviour is preserved.</li>
+<ul><li><p><code>cr_outline_c</code> dataset regenerated from GADM 4.1 with a fully reproducible script in <code>data-raw/cr_outline.R</code>. Source attribution updated to GADM 4.1. Geometry is now consistent with the <code>cr_outline_c</code> dataset in <code>paisaje</code>.</p></li>
+<li><p><code><a href="../reference/h3sdm_pa.html">h3sdm_pa()</a></code> and <code><a href="../reference/h3sdm_pa_from_records.html">h3sdm_pa_from_records()</a></code> now accept a <code>buffer_k</code> argument (default <code>1</code>). Hexagons within <code>buffer_k</code> H3 rings of any presence hexagon are excluded from the pseudo-absence candidate pool, preventing pseudo-absences from being placed in areas likely occupied but not yet recorded. Set to <code>0</code> to disable.</p></li>
+<li><p><code><a href="../reference/h3sdm_pa_from_records.html">h3sdm_pa_from_records()</a></code> now accepts an optional <code>predictors_sf</code> argument. When provided, pseudo-absences are selected by stratified sampling in environmental space using k-means clustering. If <code>NULL</code> (default), the previous random geographic sampling behaviour is preserved.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-1-5">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-5"></a></h3>
-<ul><li>
-<code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> now extracts predictor variable names from the model recipe instead of the model formula, fixing an error with GLM and other engines where parsnip stores a generic formula internally.</li>
-<li>
-<code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> now uses <code>na.rm = TRUE</code> when computing the inside/outside AOA summary, avoiding <code>NA</code> in the progress message when hexagons have missing values.</li>
+<ul><li><p><code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> now extracts predictor variable names from the model recipe instead of the model formula, fixing an error with GLM and other engines where parsnip stores a generic formula internally.</p></li>
+<li><p><code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> now uses <code>na.rm = TRUE</code> when computing the inside/outside AOA summary, avoiding <code>NA</code> in the progress message when hexagons have missing values.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -90,7 +89,7 @@
 <h2 class="pkg-version" data-toc-text="0.1.2" id="h3sdm-012">h3sdm 0.1.2<a class="anchor" aria-label="anchor" href="#h3sdm-012"></a></h2><p class="text-muted">CRAN release: 2026-05-22</p>
 <div class="section level3">
 <h3 id="improvements-0-1-2">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-1-2"></a></h3>
-<ul><li><p><code><a href="../reference/h3sdm_fit_model.html">h3sdm_fit_model()</a></code> now automatically detects model mode (classification or regression), enabling count-based models (Poisson, Negative Binomial) with appropriate metrics (RMSE, R², MAE) without requiring manual configuration.</p></li>
+<ul><li><p><code><a href="../reference/h3sdm_fit_model.html">h3sdm_fit_model()</a></code> now automatically detects model mode (classification or regression), enabling count-based models (Poisson, Negative Binomial) with appropriate metrics (RMSE, R2, MAE) without requiring manual configuration.</p></li>
 <li><p><code><a href="../reference/h3sdm_fit_model.html">h3sdm_fit_model()</a></code> and <code><a href="../reference/h3sdm_predict.html">h3sdm_predict()</a></code> now automatically detect model mode (classification or regression), enabling count-based models (Poisson, Negative Binomial) without manual configuration. Full backward compatibility maintained.</p></li>
 <li><p><code><a href="../reference/h3sdm_get_records.html">h3sdm_get_records()</a></code> now supports <code>"biodatacr"</code> as an optional provider, querying occurrence records from BiodataCR (Costa Rica) via the <code>rbiodatacr</code> package. <code><a href="../reference/h3sdm_pa.html">h3sdm_pa()</a></code> inherits this support automatically through its <code>providers</code> argument. <code>rbiodatacr</code> is listed as a suggested dependency.</p></li>
 </ul></div>
