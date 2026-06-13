@@ -4,9 +4,10 @@
 
 ### New functions
 
-- `h3sdm_filter_range()` filters spatial predictions outside the
-  univariate range of training data. Adds a `range_filter` column (1 =
-  within range, 0 = outside range) to the prediction object. Complements
+- [`h3sdm_filter_range()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_filter_range.md)
+  filters spatial predictions outside the univariate range of training
+  data. Adds a `range_filter` column (1 = within range, 0 = outside
+  range) to the prediction object. Complements
   [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
   and
   [`h3sdm_filter_outliers()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_filter_outliers.md):

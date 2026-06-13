@@ -76,7 +76,7 @@ explainer <- h3sdm_explain(model, data = dat, response = "presence")
 #>   -> model_info        :  package parsnip , ver. 1.6.0 , task classification (  default  ) 
 #>   -> predicted values  :  numerical, min =  0.2388432 , mean =  0.45 , max =  0.6875722  
 #>   -> residual function :  difference between y and yhat (  default  )
-#>   -> residuals         :  numerical, min =  -0.5605912 , mean =  -4.805741e-14 , max =  0.750073  
+#>   -> residuals         :  numerical, min =  -0.5605912 , mean =  -4.806294e-14 , max =  0.750073  
 #>   A new explainer has been created!  
 feature_importance(explainer)
 #>       variable mean_dropout_loss          label
