@@ -1,3 +1,15 @@
+# h3sdm 0.1.6
+
+## New functions
+
+* `h3sdm_filter_range()` filters spatial predictions outside the univariate 
+  range of training data. Adds a `range_filter` column (1 = within range, 
+  0 = outside range) to the prediction object. Complements `h3sdm_aoa()` and 
+  `h3sdm_filter_outliers()`: while AOA detects combinations without analogues 
+  in the training data and Mahalanobis distance identifies multivariate outliers, 
+  this function detects extrapolation at the margins of individual variables 
+  that multivariate methods may not capture.
+
 # h3sdm 0.1.5
 
 ## New datasets

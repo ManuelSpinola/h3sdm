@@ -1,7 +1,7 @@
 Package: h3sdm
 Type: Package
 Title: Species Distribution Modeling with H3 Grids
-Version: 0.1.5
+Version: 0.1.6
 Authors@R: 
     person(given = "Manuel",
            family = "Spínola",
@@ -35,22 +35,25 @@ Imports:
     yardstick,
     ecospat,
     DALEX,
-    stacks
+    stacks,
+    h3jsr,
+    landscapemetrics,
+    rbiodatacr,
+    spocc,
+    vip,
+    exactextractr,
+    tidyr,
+    cli
 Suggests:
     ggplot2,
     paisaje,
     knitr,
     rmarkdown,
     here,
-    tidyr,
     themis,
     DALEXtra,
     ingredients,
-    exactextractr,
-    landscapemetrics,
-    h3jsr,
     tidyterra,
-    spocc,
     tidymodels,
     workflowsets,
     ranger,
@@ -58,10 +61,6 @@ Suggests:
     ggbrick,
     parsnip,
     tidyverse,
-    rbiodatacr,
-    vip,
-    DALEXtra,
-    tidytemplate,
     geodata
 VignetteBuilder: 
     knitr
