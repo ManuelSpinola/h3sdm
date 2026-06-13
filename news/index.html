@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">h3sdm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,15 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.5" id="h3sdm-015">h3sdm 0.1.5<a class="anchor" aria-label="anchor" href="#h3sdm-015"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.6" id="h3sdm-016">h3sdm 0.1.6<a class="anchor" aria-label="anchor" href="#h3sdm-016"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-0-1-6">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-1-6"></a></h3>
+<ul><li>
+<code>h3sdm_filter_range()</code> filters spatial predictions outside the univariate range of training data. Adds a <code>range_filter</code> column (1 = within range, 0 = outside range) to the prediction object. Complements <code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> and <code><a href="../reference/h3sdm_filter_outliers.html">h3sdm_filter_outliers()</a></code>: while AOA detects combinations without analogues in the training data and Mahalanobis distance identifies multivariate outliers, this function detects extrapolation at the margins of individual variables that multivariate methods may not capture.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.5" id="h3sdm-015">h3sdm 0.1.5<a class="anchor" aria-label="anchor" href="#h3sdm-015"></a></h2><p class="text-muted">CRAN release: 2026-06-12</p>
 <div class="section level3">
 <h3 id="new-datasets-0-1-5">New datasets<a class="anchor" aria-label="anchor" href="#new-datasets-0-1-5"></a></h3>
 <ul><li>
