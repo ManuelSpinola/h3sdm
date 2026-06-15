@@ -70,6 +70,10 @@ h3sdm_pa <- function(pres_sf,
     stop("buffer_k must be a non-negative integer.")
   buffer_k <- as.integer(buffer_k)
 
+  # Estandarizar nombre de columna de geometría
+  sf::st_geometry(pres_sf)      <- "geometry"
+  sf::st_geometry(predictors_sf) <- "geometry"
+
   # --- 1. Identify absence hexagons ------------------------------------------
   pres_ids <- pres_sf$h3_address
 

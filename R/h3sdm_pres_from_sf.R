@@ -82,6 +82,10 @@ h3sdm_pres_from_sf <- function(records_sf,
     records_sf <- sf::st_transform(records_sf, sf::st_crs(aoi_sf))
   }
 
+  # Estandarizar nombre de columna de geometría
+  sf::st_geometry(records_sf) <- "geometry"
+  sf::st_geometry(aoi_sf)     <- "geometry"
+
   # Generate H3 grid over AOI
   hex_grid <- suppressWarnings(
     h3sdm_get_grid(aoi_sf, res = res, expand_factor = expand_factor)
