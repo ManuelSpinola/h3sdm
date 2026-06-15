@@ -1,20 +1,24 @@
-# CRAN Submission Comments — h3sdm 0.1.5
+# CRAN Submission Comments — h3sdm 0.1.6
 
 ## Resubmission
 
-Addressing feedback from Uwe Ligges (2026-06-11):
+Bug-fix release addressing a critical error introduced in 0.1.5:
 
-* Removed `tidytemplate` from `Suggests`. It is only used internally
-  for building the pkgdown site and is already declared under
-  `Config/Needs/website`, which is the appropriate field for
-  development-only dependencies not required by package users.
+* Fixed hardcoded geometry column name `"geometry"` in `h3sdm_pa()` and
+  `h3sdm_pres_from_sf()`. The geometry column is now standardized at the
+  start of each function using `sf::st_geometry(x) <- "geometry"`, ensuring
+  compatibility with sf objects from `.gpkg` files where the geometry column
+  is named `"geom"` by default.
 
-* Removed duplicate entry of `DALEXtra` from `Suggests`.
+## New functions in 0.1.6
 
-* Moved `h3jsr`, `landscapemetrics`, `spocc`, `rbiodatacr`, `vip`,
-  `exactextractr`, and `tidyr` from `Suggests` to `Imports`, as they
-  are called directly with `::` in package functions without
-  `requireNamespace()` guards.
+* `h3sdm_filter_range()`: filters spatial predictions outside the univariate
+  range of training data, complementing `h3sdm_aoa()` and
+  `h3sdm_filter_outliers()`.
+
+* `h3sdm_pres_from_sf()`: assigns pre-downloaded species occurrence records
+  (an sf object) to H3 hexagons, enabling workflows where records are
+  downloaded once and reused across multiple modeling steps.
 
 ## R CMD check results
 
