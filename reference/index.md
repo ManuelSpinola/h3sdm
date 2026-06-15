@@ -57,6 +57,8 @@
   : Combine Predictor Data from Multiple sf Objects
 - [`h3sdm_pres()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pres.md)
   : Assign species presence records to H3 hexagons
+- [`h3sdm_pres_from_sf()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pres_from_sf.md)
+  : Assign pre-downloaded species presence records to H3 hexagons
 - [`h3sdm_recipe()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe.md)
   : Create a tidymodels recipe for H3-based SDMs
 - [`h3sdm_recipe_gam()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe_gam.md)

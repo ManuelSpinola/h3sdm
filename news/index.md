@@ -16,6 +16,22 @@
   function detects extrapolation at the margins of individual variables
   that multivariate methods may not capture.
 
+- [`h3sdm_pres_from_sf()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pres_from_sf.md)
+  assigns pre-downloaded species occurrence records (an `sf` object,
+  typically from
+  [`h3sdm_get_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_get_records.md))
+  to H3 hexagons, returning only hexagons with at least one presence
+  record. This enables a clean two-stage workflow where records are
+  downloaded once and reused:
+  [`h3sdm_get_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_get_records.md)
+  →
+  [`h3sdm_pres_from_sf()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pres_from_sf.md)
+  →
+  [`h3sdm_filter_outliers()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_filter_outliers.md)
+  →
+  [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  with balanced pseudo-absences (`n_pseudoabs = nrow(pres_clean)`).
+
 ## h3sdm 0.1.5
 
 CRAN release: 2026-06-12
