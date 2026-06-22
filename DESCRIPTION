@@ -2,6 +2,7 @@ Package: h3sdm
 Type: Package
 Title: Species Distribution Modeling with H3 Grids
 Version: 0.1.6
+Date: 2026-06-15
 Authors@R: 
     person(given = "Manuel",
            family = "Spínola",
