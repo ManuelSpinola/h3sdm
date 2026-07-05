@@ -15,7 +15,7 @@ are available in a single sf object ready for mapping."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">h3sdm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -119,8 +119,21 @@ outliers with Tukey's rule (Q3 + 1.5 * IQR). Locations with
 <code>DI &lt;= threshold</code> are inside the AOA; locations above the
 threshold should be interpreted with caution.</p>
 <p>Variable importance is extracted automatically for <code>ranger</code> and
-<code>xgboost</code> models via <code><a href="https://koalaverse.github.io/vip/reference/vi.html" class="external-link">vip::vi()</a></code>. For GAM models, or when
-importance cannot be extracted, all variables receive equal weight.</p>
+<code>xgboost</code> models using each engine's own native importance
+measure (<code><a href="http://imbs-hl.github.io/ranger/reference/importance.ranger.html" class="external-link">ranger::importance()</a></code> / <code><a href="https://rdrr.io/pkg/xgboost/man/xgb.importance.html" class="external-link">xgboost::xgb.importance()</a></code>),
+with no additional package dependency. For <code>ranger</code>, this requires
+the underlying model to have been fit with <code>importance</code> set to
+<code>"impurity"</code>, <code>"impurity_corrected"</code>, or <code>"permutation"</code>
+in <code><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">parsnip::set_engine()</a></code>; if it was not, a warning is issued and
+equal weights are used instead. For GAM/GLM models, or any engine for
+which native importance is not applicable, all variables receive equal
+weight (a message, not a warning, is emitted in that case, since equal
+weighting is the expected behavior for those engines). Extracting
+importance requires the corresponding engine package (<code>ranger</code> or
+<code>xgboost</code>) to be installed; both are listed under <code>Suggests</code>
+in this package, since only one may be needed depending on the model
+used. If the required package is missing, a warning is issued and
+equal weights are used.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

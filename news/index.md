@@ -1,6 +1,34 @@
 # Changelog
 
+## h3sdm 0.1.7
+
+CRAN release: 2026-07-05
+
+### Improvements
+
+- [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
+  no longer depends on `vip`. Variable importance for `ranger` and
+  `xgboost` models is now extracted directly via
+  [`ranger::importance()`](http://imbs-hl.github.io/ranger/reference/importance.ranger.md)
+  and
+  [`xgboost::xgb.importance()`](https://rdrr.io/pkg/xgboost/man/xgb.importance.html),
+  removing an external dependency after `vip` was archived from CRAN on
+  2026-07-13. Behavior is unchanged: importance weighting still uses
+  each engine’s native (non-permutation) importance measure.
+
+- [`h3sdm_workflow()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_workflow.md)
+  and
+  [`h3sdm_workflows()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_workflows.md)
+  now warn when a `ranger` model spec is created without an importance
+  mode (e.g. `set_engine("ranger", importance = "impurity")`). Without
+  it,
+  [`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
+  silently falls back to equal variable weights instead of weighting by
+  native importance.
+
 ## h3sdm 0.1.6
+
+CRAN release: 2026-06-15
 
 ### New functions
 

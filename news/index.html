@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">h3sdm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,15 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.6" id="h3sdm-016">h3sdm 0.1.6<a class="anchor" aria-label="anchor" href="#h3sdm-016"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.7" id="h3sdm-017">h3sdm 0.1.7<a class="anchor" aria-label="anchor" href="#h3sdm-017"></a></h2><p class="text-muted">CRAN release: 2026-07-05</p>
+<div class="section level3">
+<h3 id="improvements-0-1-7">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-1-7"></a></h3>
+<ul><li><p><code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> no longer depends on <code>vip</code>. Variable importance for <code>ranger</code> and <code>xgboost</code> models is now extracted directly via <code><a href="http://imbs-hl.github.io/ranger/reference/importance.ranger.html" class="external-link">ranger::importance()</a></code> and <code><a href="https://rdrr.io/pkg/xgboost/man/xgb.importance.html" class="external-link">xgboost::xgb.importance()</a></code>, removing an external dependency after <code>vip</code> was archived from CRAN on 2026-07-13. Behavior is unchanged: importance weighting still uses each engine’s native (non-permutation) importance measure.</p></li>
+<li><p><code><a href="../reference/h3sdm_workflow.html">h3sdm_workflow()</a></code> and <code><a href="../reference/h3sdm_workflows.html">h3sdm_workflows()</a></code> now warn when a <code>ranger</code> model spec is created without an importance mode (e.g. <code>set_engine("ranger", importance = "impurity")</code>). Without it, <code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> silently falls back to equal variable weights instead of weighting by native importance.</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.6" id="h3sdm-016">h3sdm 0.1.6<a class="anchor" aria-label="anchor" href="#h3sdm-016"></a></h2><p class="text-muted">CRAN release: 2026-06-15</p>
 <div class="section level3">
 <h3 id="new-functions-0-1-6">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-1-6"></a></h3>
 <ul><li><p><code><a href="../reference/h3sdm_filter_range.html">h3sdm_filter_range()</a></code> filters spatial predictions outside the univariate range of training data. Adds a <code>range_filter</code> column (1 = within range, 0 = outside range) to the prediction object. Complements <code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> and <code><a href="../reference/h3sdm_filter_outliers.html">h3sdm_filter_outliers()</a></code>: while AOA detects combinations without analogues in the training data and Mahalanobis distance identifies multivariate outliers, this function detects extrapolation at the margins of individual variables that multivariate methods may not capture.</p></li>

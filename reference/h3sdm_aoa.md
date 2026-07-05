@@ -73,10 +73,23 @@ Locations with `DI <= threshold` are inside the AOA; locations above the
 threshold should be interpreted with caution.
 
 Variable importance is extracted automatically for `ranger` and
-`xgboost` models via
-[`vip::vi()`](https://koalaverse.github.io/vip/reference/vi.html). For
-GAM models, or when importance cannot be extracted, all variables
-receive equal weight.
+`xgboost` models using each engine's own native importance measure
+([`ranger::importance()`](http://imbs-hl.github.io/ranger/reference/importance.ranger.md)
+/
+[`xgboost::xgb.importance()`](https://rdrr.io/pkg/xgboost/man/xgb.importance.html)),
+with no additional package dependency. For `ranger`, this requires the
+underlying model to have been fit with `importance` set to `"impurity"`,
+`"impurity_corrected"`, or `"permutation"` in
+[`parsnip::set_engine()`](https://parsnip.tidymodels.org/reference/set_engine.html);
+if it was not, a warning is issued and equal weights are used instead.
+For GAM/GLM models, or any engine for which native importance is not
+applicable, all variables receive equal weight (a message, not a
+warning, is emitted in that case, since equal weighting is the expected
+behavior for those engines). Extracting importance requires the
+corresponding engine package (`ranger` or `xgboost`) to be installed;
+both are listed under `Suggests` in this package, since only one may be
+needed depending on the model used. If the required package is missing,
+a warning is issued and equal weights are used.
 
 ## References
 

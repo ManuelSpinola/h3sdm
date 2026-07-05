@@ -11,7 +11,7 @@ hexagonal grids and can be directly fitted or cross-validated."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">h3sdm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,7 +86,14 @@ particularly useful when applying multiple models in parallel.</p>
 <p><strong>Choosing the model mode:</strong></p><ul><li><p>For <strong>presence/absence</strong> data: use <code>set_mode("classification")</code>.</p></li>
 <li><p>For <strong>count</strong> data (species richness, detections, individuals):
 use <code>set_mode("regression")</code>.</p></li>
-</ul></div>
+</ul><p><strong>Variable importance for <code>ranger</code> models:</strong> if <code>model_spec</code> uses the
+<code>"ranger"</code> engine without an importance mode (i.e. without
+<code>set_engine("ranger", importance = "impurity")</code>, <code>"impurity_corrected"</code>,
+or <code>"permutation"</code>), a warning is issued. This does not affect model
+fitting, but <code><a href="h3sdm_aoa.html">h3sdm_aoa()</a></code> relies on native variable importance to weight
+the Area of Applicability, and will silently fall back to equal weights
+for all predictors if importance was not configured here.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -94,8 +101,10 @@ use <code>set_mode("regression")</code>.</p></li>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Presence/absence model ---</span></span></span>
+<span class="r-in"><span><span class="co"># 'importance = "impurity"' is recommended so that h3sdm_aoa() can</span></span></span>
+<span class="r-in"><span><span class="co"># weight the Area of Applicability by native variable importance.</span></span></span>
 <span class="r-in"><span><span class="va">rf_spec_pa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span>, importance <span class="op">=</span> <span class="st">"impurity"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">rec_pa</span> <span class="op">&lt;-</span> <span class="fu"><a href="h3sdm_recipe.html">h3sdm_recipe</a></span><span class="op">(</span><span class="va">combined_data</span><span class="op">)</span></span></span>
@@ -104,7 +113,7 @@ use <code>set_mode("regression")</code>.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Count-based model ---</span></span></span>
 <span class="r-in"><span><span class="va">rf_spec_count</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span>, importance <span class="op">=</span> <span class="st">"impurity"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">rec_count</span> <span class="op">&lt;-</span> <span class="fu"><a href="h3sdm_recipe.html">h3sdm_recipe</a></span><span class="op">(</span><span class="va">combined_data</span>, response_col <span class="op">=</span> <span class="st">"count"</span><span class="op">)</span></span></span>

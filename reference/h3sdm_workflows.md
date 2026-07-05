@@ -52,6 +52,16 @@ comparison of models.
 - For **count** data (species richness, detections, individuals): use
   `set_mode("regression")` for all model specifications.
 
+**Variable importance for `ranger` models:** any `model_spec` in
+`model_specs` that uses the `"ranger"` engine without an importance mode
+(i.e. without `set_engine("ranger", importance = "impurity")`,
+`"impurity_corrected"`, or `"permutation"`) triggers a warning naming
+that list element. This does not affect model fitting, but
+[`h3sdm_aoa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_aoa.md)
+relies on native variable importance to weight the Area of
+Applicability, and will silently fall back to equal weights for that
+model's predictors if importance was not configured here.
+
 ## Examples
 
 ``` r
@@ -59,20 +69,32 @@ if (FALSE) { # \dontrun{
 library(parsnip)
 
 # --- Presence/absence models ---
-specs_pa <- list(
-  rf  = rand_forest() %>% set_engine("ranger") %>% set_mode("classification"),
-  glm = logistic_reg() %>% set_engine("glm") %>% set_mode("classification")
-)
+# 'importance = "impurity"' on the ranger spec is recommended so that
+# h3sdm_aoa() can weight the Area of Applicability by native importance.
+rf_spec_pa <- rand_forest() %>%
+  set_engine("ranger", importance = "impurity") %>%
+  set_mode("classification")
+
+glm_spec_pa <- logistic_reg() %>%
+  set_engine("glm") %>%
+  set_mode("classification")
+
+specs_pa <- list(rf = rf_spec_pa, glm = glm_spec_pa)
 
 rec_pa <- h3sdm_recipe(combined_data)
 
 wfs_pa <- h3sdm_workflows(model_specs = specs_pa, recipe = rec_pa)
 
 # --- Count-based models ---
-specs_count <- list(
-  rf  = rand_forest() %>% set_engine("ranger") %>% set_mode("regression"),
-  xgb = boost_tree() %>% set_engine("xgboost") %>% set_mode("regression")
-)
+rf_spec_count <- rand_forest() %>%
+  set_engine("ranger", importance = "impurity") %>%
+  set_mode("regression")
+
+xgb_spec_count <- boost_tree() %>%
+  set_engine("xgboost") %>%
+  set_mode("regression")
+
+specs_count <- list(rf = rf_spec_count, xgb = xgb_spec_count)
 
 rec_count <- h3sdm_recipe(combined_data, response_col = "count")
 
