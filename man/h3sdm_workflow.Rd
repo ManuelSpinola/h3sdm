@@ -39,14 +39,24 @@ particularly useful when applying multiple models in parallel.
 \item For \strong{count} data (species richness, detections, individuals):
 use \code{set_mode("regression")}.
 }
+
+\strong{Variable importance for \code{ranger} models:} if \code{model_spec} uses the
+\code{"ranger"} engine without an importance mode (i.e. without
+\code{set_engine("ranger", importance = "impurity")}, \code{"impurity_corrected"},
+or \code{"permutation"}), a warning is issued. This does not affect model
+fitting, but \code{\link[=h3sdm_aoa]{h3sdm_aoa()}} relies on native variable importance to weight
+the Area of Applicability, and will silently fall back to equal weights
+for all predictors if importance was not configured here.
 }
 \examples{
 \dontrun{
 library(parsnip)
 
 # --- Presence/absence model ---
+# 'importance = "impurity"' is recommended so that h3sdm_aoa() can
+# weight the Area of Applicability by native variable importance.
 rf_spec_pa <- rand_forest() \%>\%
-  set_engine("ranger") \%>\%
+  set_engine("ranger", importance = "impurity") \%>\%
   set_mode("classification")
 
 rec_pa <- h3sdm_recipe(combined_data)
@@ -55,7 +65,7 @@ wf_pa <- h3sdm_workflow(model_spec = rf_spec_pa, recipe = rec_pa)
 
 # --- Count-based model ---
 rf_spec_count <- rand_forest() \%>\%
-  set_engine("ranger") \%>\%
+  set_engine("ranger", importance = "impurity") \%>\%
   set_mode("regression")
 
 rec_count <- h3sdm_recipe(combined_data, response_col = "count")

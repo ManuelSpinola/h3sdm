@@ -57,8 +57,21 @@ outliers with Tukey's rule (Q3 + 1.5 * IQR). Locations with
 threshold should be interpreted with caution.
 
 Variable importance is extracted automatically for \code{ranger} and
-\code{xgboost} models via \code{vip::vi()}. For GAM models, or when
-importance cannot be extracted, all variables receive equal weight.
+\code{xgboost} models using each engine's own native importance
+measure (\code{ranger::importance()} / \code{xgboost::xgb.importance()}),
+with no additional package dependency. For \code{ranger}, this requires
+the underlying model to have been fit with \code{importance} set to
+\code{"impurity"}, \code{"impurity_corrected"}, or \code{"permutation"}
+in \code{parsnip::set_engine()}; if it was not, a warning is issued and
+equal weights are used instead. For GAM/GLM models, or any engine for
+which native importance is not applicable, all variables receive equal
+weight (a message, not a warning, is emitted in that case, since equal
+weighting is the expected behavior for those engines). Extracting
+importance requires the corresponding engine package (\code{ranger} or
+\code{xgboost}) to be installed; both are listed under \code{Suggests}
+in this package, since only one may be needed depending on the model
+used. If the required package is missing, a warning is issued and
+equal weights are used.
 }
 \examples{
 \dontrun{

@@ -18,8 +18,21 @@
 #' threshold should be interpreted with caution.
 #'
 #' Variable importance is extracted automatically for \code{ranger} and
-#' \code{xgboost} models via \code{vip::vi()}. For GAM models, or when
-#' importance cannot be extracted, all variables receive equal weight.
+#' \code{xgboost} models using each engine's own native importance
+#' measure (\code{ranger::importance()} / \code{xgboost::xgb.importance()}),
+#' with no additional package dependency. For \code{ranger}, this requires
+#' the underlying model to have been fit with \code{importance} set to
+#' \code{"impurity"}, \code{"impurity_corrected"}, or \code{"permutation"}
+#' in \code{parsnip::set_engine()}; if it was not, a warning is issued and
+#' equal weights are used instead. For GAM/GLM models, or any engine for
+#' which native importance is not applicable, all variables receive equal
+#' weight (a message, not a warning, is emitted in that case, since equal
+#' weighting is the expected behavior for those engines). Extracting
+#' importance requires the corresponding engine package (\code{ranger} or
+#' \code{xgboost}) to be installed; both are listed under \code{Suggests}
+#' in this package, since only one may be needed depending on the model
+#' used. If the required package is missing, a warning is issued and
+#' equal weights are used.
 #'
 #' @param newdata An \code{sf} object, typically the direct output of
 #'   [h3sdm_predict()], containing the predictor variables and a
@@ -178,27 +191,83 @@ h3sdm_aoa <- function(newdata, train, fit_object, cv = NULL, verbose = TRUE) {
 # Internal helpers (not exported)
 # ---------------------------------------------------------------
 
-# Extract variable importance from a fitted tidymodels workflow.
-# Returns NULL if importances cannot be extracted (e.g. GAM).
+# Extract variable importance from a fitted tidymodels workflow, using
+# each engine's own native importance measure. No 'vip' dependency.
+#
+# - ranger:  requires the model to have been fit with importance =
+#            "impurity", "impurity_corrected", or "permutation" in
+#            set_engine(); otherwise ranger::importance() errors out,
+#            which we catch and turn into a warning (this engine DOES
+#            support importance, so silently falling back would hide a
+#            likely configuration mistake).
+# - xgboost: xgb.importance() works out of the box (Gain-based importance).
+# - any other engine (e.g. GAM, GLM): importance is not attempted; equal
+#   weights are the expected, documented behavior, so we only message().
+#
+# Returns NULL if importances cannot be extracted; the caller
+# (.h3sdm_parse_weights) then falls back to equal weights.
 .h3sdm_extract_weights <- function(final_model, variables, verbose) {
-  tryCatch({
-    fit    <- workflows::extract_fit_parsnip(final_model)
-    engine <- fit$spec$engine
-    if (engine %in% c("ranger", "xgboost")) {
-      imp <- vip::vi(fit$fit)
-      w   <- stats::setNames(imp$Importance, imp$Variable)
-      w   <- w[variables]
-      if (verbose) message("h3sdm_aoa: variable importance extracted from '", engine, "'.")
-      return(w)
-    }
+  fit    <- workflows::extract_fit_parsnip(final_model)
+  engine <- fit$spec$engine
+
+  if (!(engine %in% c("ranger", "xgboost"))) {
     if (verbose) {
       message("h3sdm_aoa: importance not available for '", engine, "'. Using equal weights.")
     }
-    NULL
+    return(NULL)
+  }
+
+  w <- tryCatch({
+    if (engine == "ranger") {
+      if (!requireNamespace("ranger", quietly = TRUE)) {
+        warning(
+          "h3sdm_aoa: package 'ranger' is required to extract native ",
+          "variable importance from a 'ranger' model, but it is not ",
+          "installed. Falling back to equal weights.",
+          call. = FALSE
+        )
+        return(NULL)
+      }
+      imp <- ranger::importance(fit$fit)
+      stats::setNames(as.numeric(imp), names(imp))
+    } else {
+      if (!requireNamespace("xgboost", quietly = TRUE)) {
+        warning(
+          "h3sdm_aoa: package 'xgboost' is required to extract native ",
+          "variable importance from an 'xgboost' model, but it is not ",
+          "installed. Falling back to equal weights.",
+          call. = FALSE
+        )
+        return(NULL)
+      }
+      imp <- xgboost::xgb.importance(model = fit$fit)
+      stats::setNames(imp$Gain, imp$Feature)
+    }
   }, error = function(e) {
-    if (verbose) message("h3sdm_aoa: could not extract importance. Using equal weights.")
+    warning(
+      "h3sdm_aoa: could not extract variable importance from a '", engine,
+      "' model (", conditionMessage(e), "). For 'ranger', make sure the ",
+      "model was fit with set_engine(\"ranger\", importance = \"impurity\") ",
+      "(or \"impurity_corrected\"/\"permutation\"). Falling back to equal weights.",
+      call. = FALSE
+    )
     NULL
   })
+
+  if (is.null(w)) return(NULL)
+
+  w <- w[variables]
+  if (anyNA(w)) {
+    warning(
+      "h3sdm_aoa: some predictor variables were not found in the '", engine,
+      "' importance output. Falling back to equal weights.",
+      call. = FALSE
+    )
+    return(NULL)
+  }
+
+  if (verbose) message("h3sdm_aoa: variable importance extracted from '", engine, "'.")
+  w
 }
 
 # Extract fold assignments from an rset object (spatialsample / rsample).

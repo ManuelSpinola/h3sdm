@@ -28,6 +28,14 @@
 #'     use \code{set_mode("regression")}.
 #' }
 #'
+#' \strong{Variable importance for `ranger` models:} if `model_spec` uses the
+#' `"ranger"` engine without an importance mode (i.e. without
+#' \code{set_engine("ranger", importance = "impurity")}, `"impurity_corrected"`,
+#' or `"permutation"`), a warning is issued. This does not affect model
+#' fitting, but [h3sdm_aoa()] relies on native variable importance to weight
+#' the Area of Applicability, and will silently fall back to equal weights
+#' for all predictors if importance was not configured here.
+#'
 #' @return A `workflow` object ready to be used for model fitting with `fit()`
 #'   or cross-validation.
 #'
@@ -36,8 +44,10 @@
 #' library(parsnip)
 #'
 #' # --- Presence/absence model ---
+#' # 'importance = "impurity"' is recommended so that h3sdm_aoa() can
+#' # weight the Area of Applicability by native variable importance.
 #' rf_spec_pa <- rand_forest() %>%
-#'   set_engine("ranger") %>%
+#'   set_engine("ranger", importance = "impurity") %>%
 #'   set_mode("classification")
 #'
 #' rec_pa <- h3sdm_recipe(combined_data)
@@ -46,7 +56,7 @@
 #'
 #' # --- Count-based model ---
 #' rf_spec_count <- rand_forest() %>%
-#'   set_engine("ranger") %>%
+#'   set_engine("ranger", importance = "impurity") %>%
 #'   set_mode("regression")
 #'
 #' rec_count <- h3sdm_recipe(combined_data, response_col = "count")
@@ -55,12 +65,16 @@
 #' }
 #'
 #' @importFrom workflows workflow add_model add_recipe
+#' @importFrom rlang eval_tidy
 #'
 #' @export
 h3sdm_workflow <- function(model_spec, recipe) {
   if (!inherits(model_spec, "model_spec")) {
     stop("model_spec must be a parsnip model specification")
   }
+
+  .h3sdm_check_ranger_importance(model_spec)
+
   wf <- workflows::workflow() %>%
     workflows::add_model(model_spec) %>%
     workflows::add_recipe(recipe)
