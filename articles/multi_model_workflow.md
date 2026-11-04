@@ -152,7 +152,7 @@ head(records)
 table(records$presence)
 #> 
 #>   0   1 
-#> 300 130
+#> 300 128
 ```
 
 ``` r
@@ -324,15 +324,15 @@ compare
 #> # A tibble: 9 × 7
 #>   model         .metric .estimator  mean std_err conf_low conf_high
 #>   <chr>         <chr>   <chr>      <dbl>   <dbl>    <dbl>     <dbl>
-#> 1 random_forest boyce   binary     0.947 NA        NA        NA    
-#> 2 random_forest roc_auc binary     0.899  0.0254    0.849     0.949
-#> 3 xgboost       roc_auc binary     0.871  0.0302    0.812     0.930
-#> 4 xgboost       boyce   binary     0.84  NA        NA        NA    
-#> 5 reg_log       roc_auc binary     0.749  0.0350    0.681     0.818
-#> 6 reg_log       boyce   binary     0.664 NA        NA        NA    
-#> 7 random_forest tss     binary     0.636 NA        NA        NA    
-#> 8 xgboost       tss     binary     0.626 NA        NA        NA    
-#> 9 reg_log       tss     binary     0.484 NA        NA        NA
+#> 1 random_forest boyce   binary     0.946 NA        NA        NA    
+#> 2 xgboost       roc_auc binary     0.867  0.0232    0.822     0.913
+#> 3 random_forest roc_auc binary     0.867  0.0110    0.845     0.888
+#> 4 xgboost       boyce   binary     0.798 NA        NA        NA    
+#> 5 reg_log       roc_auc binary     0.711  0.0529    0.607     0.815
+#> 6 random_forest tss     binary     0.669 NA        NA        NA    
+#> 7 xgboost       tss     binary     0.668 NA        NA        NA    
+#> 8 reg_log       boyce   binary     0.557 NA        NA        NA    
+#> 9 reg_log       tss     binary     0.478 NA        NA        NA
 ```
 
 Three metrics are reported:
@@ -385,16 +385,16 @@ p_rf
 #> 9  8766b4ab5ffffff 20.26178 2883.596 41.66865
 #> 10 876d69c94ffffff 22.67291 2361.003 70.83282
 #>                          geometry         x         y  prediction
-#> 1  MULTIPOLYGON (((-85.61874 1... -85.61355 10.744993 0.005300000
-#> 2  MULTIPOLYGON (((-85.2204 9.... -85.21517  9.805806 0.005300000
-#> 3  MULTIPOLYGON (((-83.01133 9... -83.00602  9.806921 0.735630952
-#> 4  MULTIPOLYGON (((-83.07362 9... -83.06830  9.295924 0.009811111
-#> 5  MULTIPOLYGON (((-83.93635 9... -83.93107  9.638151 0.034543651
-#> 6  MULTIPOLYGON (((-85.04019 1... -85.03497 10.579597 0.219080159
-#> 7  MULTIPOLYGON (((-84.50184 1... -84.49660 10.874768 0.224339683
-#> 8  MULTIPOLYGON (((-85.69967 1... -85.69448 10.433590 0.004666667
-#> 9  MULTIPOLYGON (((-83.32541 9... -83.32010  9.539664 0.050900794
-#> 10 MULTIPOLYGON (((-84.94068 1... -84.93545 10.420003 0.107940476
+#> 1  MULTIPOLYGON (((-85.61874 1... -85.61355 10.744993 0.001600000
+#> 2  MULTIPOLYGON (((-85.2204 9.... -85.21517  9.805806 0.001600000
+#> 3  MULTIPOLYGON (((-83.01133 9... -83.00602  9.806921 0.693692857
+#> 4  MULTIPOLYGON (((-83.07362 9... -83.06830  9.295924 0.004460317
+#> 5  MULTIPOLYGON (((-83.93635 9... -83.93107  9.638151 0.096382540
+#> 6  MULTIPOLYGON (((-85.04019 1... -85.03497 10.579597 0.082771429
+#> 7  MULTIPOLYGON (((-84.50184 1... -84.49660 10.874768 0.651965079
+#> 8  MULTIPOLYGON (((-85.69967 1... -85.69448 10.433590 0.001000000
+#> 9  MULTIPOLYGON (((-83.32541 9... -83.32010  9.539664 0.093955556
+#> 10 MULTIPOLYGON (((-84.94068 1... -84.93545 10.420003 0.090420635
 ```
 
 ## 13. Map
@@ -432,14 +432,14 @@ Then we create an explainer object using the DALEX package.
 e <- h3sdm_explain(rf_fitted, data = dat)
 #> Preparation of a new explainer is initiated
 #>   -> model label       :  h3sdm workflow 
-#>   -> data              :  430  rows  6  cols 
-#>   -> target variable   :  430  values 
+#>   -> data              :  428  rows  6  cols 
+#>   -> target variable   :  428  values 
 #>   -> predict function  :  custom_predict 
 #>   -> predicted values  :  No value for predict function target column. (  default  )
 #>   -> model_info        :  package tidymodels , ver. 1.5.0 , task classification (  default  ) 
-#>   -> predicted values  :  numerical, min =  0 , mean =  0.408115 , max =  0.9995556  
+#>   -> predicted values  :  numerical, min =  0 , mean =  0.382703 , max =  0.9995778  
 #>   -> residual function :  difference between y and yhat (  default  )
-#>   -> residuals         :  numerical, min =  -0.9789397 , mean =  -0.1057895 , max =  0.6571492  
+#>   -> residuals         :  numerical, min =  -0.9791722 , mean =  -0.08363763 , max =  0.8172611  
 #>   A new explainer has been created!
 ```
 

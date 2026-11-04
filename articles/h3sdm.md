@@ -111,7 +111,7 @@ records <- h3sdm_pa(pres, predictors, n_pseudoabs = 300)
 table(records$presence)
 #> 
 #>   0   1 
-#> 300 130
+#> 300 128
 ```
 
 ``` r
@@ -186,14 +186,14 @@ evaluation_metrics
 #> # A tibble: 8 × 6
 #>   .metric  .estimator  mean std_err conf_low conf_high
 #>   <chr>    <chr>      <dbl>   <dbl>    <dbl>     <dbl>
-#> 1 accuracy binary     0.693  0.0260    0.642     0.744
-#> 2 f_meas   binary     0.748  0.0522    0.646     0.851
-#> 3 kap      binary     0.282  0.0601    0.164     0.400
-#> 4 roc_auc  binary     0.752  0.0370    0.679     0.824
-#> 5 sens     binary     0.669  0.0302    0.609     0.728
-#> 6 spec     binary     0.767  0.0952    0.581     0.954
-#> 7 tss      binary     0.49  NA        NA        NA    
-#> 8 boyce    binary     0.568 NA        NA        NA
+#> 1 accuracy binary     0.670  0.0316   0.608      0.732
+#> 2 f_meas   binary     0.749  0.0136   0.723      0.776
+#> 3 kap      binary     0.243  0.102    0.0430     0.443
+#> 4 roc_auc  binary     0.709  0.0501   0.610      0.807
+#> 5 sens     binary     0.683  0.0273   0.630      0.737
+#> 6 spec     binary     0.627  0.106    0.420      0.834
+#> 7 tss      binary     0.446 NA       NA         NA    
+#> 8 boyce    binary     0.447 NA       NA         NA
 ```
 
 ``` r
@@ -231,14 +231,14 @@ ggplot() +
 e <- h3sdm_explain(f$final_model, data = dat)
 #> Preparation of a new explainer is initiated
 #>   -> model label       :  h3sdm workflow 
-#>   -> data              :  430  rows  6  cols 
-#>   -> target variable   :  430  values 
+#>   -> data              :  428  rows  6  cols 
+#>   -> target variable   :  428  values 
 #>   -> predict function  :  custom_predict 
 #>   -> predicted values  :  No value for predict function target column. (  default  )
 #>   -> model_info        :  package Model of class: workflow package unrecognized , ver. Unknown , task regression (  default  ) 
-#>   -> predicted values  :  numerical, min =  0.003968531 , mean =  0.4467184 , max =  0.9749553  
+#>   -> predicted values  :  numerical, min =  0.0008315795 , mean =  0.438915 , max =  0.9477733  
 #>   -> residual function :  difference between y and yhat (  default  )
-#>   -> residuals         :  numerical, min =  -0.9749553 , mean =  -0.1443928 , max =  0.8506566  
+#>   -> residuals         :  numerical, min =  -0.9477733 , mean =  -0.1398496 , max =  0.9009527  
 #>   A new explainer has been created!
 
 predictors_to_evaluate <- setdiff(names(e$data), c("h3_address", "x", "y", "presence"))

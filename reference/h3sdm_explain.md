@@ -51,7 +51,7 @@ and other DALEX functions.
 # \donttest{
 library(h3sdm)
 library(DALEX)
-#> Welcome to DALEX (version: 2.5.3).
+#> Welcome to DALEX (version: 2.5.4).
 #> Find examples and detailed introduction at: http://ema.drwhy.ai/
 #> Additional features will be available after installation of: ggpubr.
 #> Use 'install_dependencies()' to get all suggested dependencies
@@ -73,10 +73,10 @@ explainer <- h3sdm_explain(model, data = dat, response = "presence")
 #>   -> target variable   :  20  values 
 #>   -> predict function  :  custom_predict 
 #>   -> predicted values  :  No value for predict function target column. (  default  )
-#>   -> model_info        :  package parsnip , ver. 1.6.0 , task classification (  default  ) 
+#>   -> model_info        :  package parsnip , ver. 1.6.1 , task classification (  default  ) 
 #>   -> predicted values  :  numerical, min =  0.2388432 , mean =  0.45 , max =  0.6875722  
 #>   -> residual function :  difference between y and yhat (  default  )
-#>   -> residuals         :  numerical, min =  -0.5605912 , mean =  -4.805741e-14 , max =  0.750073  
+#>   -> residuals         :  numerical, min =  -0.5605912 , mean =  -4.806294e-14 , max =  0.750073  
 #>   A new explainer has been created!  
 feature_importance(explainer)
 #>       variable mean_dropout_loss          label

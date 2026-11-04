@@ -47,8 +47,7 @@
 - [`h3sdm_get_records_by_hexagon()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_get_records_by_hexagon.md)
   : Download Species Records and Count Occurrences per H3 Hexagon
 - [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
-  : Generate presence/pseudo-absence dataset stratified in environmental
-  space
+  : Generate presence/pseudo-absence dataset
 - [`h3sdm_pa_from_records()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa_from_records.md)
   : Generate presence/pseudo-absence dataset from user-provided records
 - [`h3sdm_predict()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predict.md)

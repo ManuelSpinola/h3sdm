@@ -1,10 +1,10 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   h3sdm: h3sdm.html
   articles/multi_model_workflow: multi_model_workflow.html
-last_built: 2026-07-05T21:42Z
+last_built: 2026-11-04T15:16Z
 urls:
   reference: https://manuelspinola.github.io/h3sdm/reference
   article: https://manuelspinola.github.io/h3sdm/articles

@@ -100,5 +100,10 @@ from all providers are then combined and clipped to the AOI.
     providers = c("gbif", "biodatacr"),
     limit     = 200
   )
+#> ! BIODATACR returned HTTP 403.
+#> ℹ The service may be temporarily unavailable.
+#> ℹ URL:
+#>   http://datos.biodiversidad.go.cr/biocache-service/occurrences/search
+#> No BiodataCR records found for Agalychnis callidryas.
 # }
 ```
