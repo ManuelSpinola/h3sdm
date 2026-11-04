@@ -30,59 +30,83 @@ export(h3sdm_stack_fit)
 export(h3sdm_workflow)
 export(h3sdm_workflow_gam)
 export(h3sdm_workflows)
-importFrom(DALEX,feature_importance)
-importFrom(DALEX,model_performance)
-importFrom(DALEX,predict_parts)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,if_else)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,select)
-importFrom(purrr,imap)
-importFrom(purrr,map2_dfr)
+importFrom(DALEX,
+  feature_importance,
+  model_performance,
+  predict_parts
+)
+importFrom(dplyr,
+  "%>%",
+  bind_rows,
+  if_else,
+  left_join,
+  mutate,
+  select
+)
+importFrom(purrr,
+  imap,
+  map2_dfr
+)
 importFrom(recipes,recipe)
-importFrom(rlang,.data)
-importFrom(rlang,eval_tidy)
-importFrom(rsample,analysis)
-importFrom(rsample,assessment)
-importFrom(sf,st_centroid)
-importFrom(sf,st_coordinates)
-importFrom(sf,st_drop_geometry)
-importFrom(sf,st_geometry)
-importFrom(sf,st_sf)
-importFrom(spatialsample,spatial_block_cv)
-importFrom(spatialsample,spatial_clustering_cv)
-importFrom(stacks,add_candidates)
-importFrom(stacks,blend_predictions)
-importFrom(stacks,control_stack_resamples)
-importFrom(stacks,fit_members)
-importFrom(stacks,stacks)
-importFrom(stats,predict)
-importFrom(stats,quantile)
-importFrom(stats,sd)
-importFrom(stats,setNames)
+importFrom(rlang,
+  .data,
+  eval_tidy
+)
+importFrom(rsample,
+  analysis,
+  assessment
+)
+importFrom(sf,
+  st_centroid,
+  st_coordinates,
+  st_drop_geometry,
+  st_geometry,
+  st_sf
+)
+importFrom(spatialsample,
+  spatial_block_cv,
+  spatial_clustering_cv
+)
+importFrom(stacks,
+  add_candidates,
+  blend_predictions,
+  control_stack_resamples,
+  fit_members,
+  stacks
+)
+importFrom(stats,
+  predict,
+  quantile,
+  sd,
+  setNames
+)
 importFrom(tibble,tibble)
-importFrom(tune,collect_metrics)
-importFrom(tune,collect_predictions)
-importFrom(tune,control_resamples)
-importFrom(tune,fit_resamples)
-importFrom(workflows,add_model)
-importFrom(workflows,add_recipe)
-importFrom(workflows,extract_fit_parsnip)
-importFrom(workflows,fit)
-importFrom(workflows,workflow)
-importFrom(yardstick,accuracy)
-importFrom(yardstick,accuracy_vec)
-importFrom(yardstick,f_meas)
-importFrom(yardstick,kap)
-importFrom(yardstick,mae)
-importFrom(yardstick,metric_set)
-importFrom(yardstick,rmse)
-importFrom(yardstick,roc_auc)
-importFrom(yardstick,roc_auc_vec)
-importFrom(yardstick,rsq)
-importFrom(yardstick,sens)
-importFrom(yardstick,sens_vec)
-importFrom(yardstick,spec)
-importFrom(yardstick,spec_vec)
+importFrom(tune,
+  collect_metrics,
+  collect_predictions,
+  control_resamples,
+  fit_resamples
+)
+importFrom(workflows,
+  add_model,
+  add_recipe,
+  extract_fit_parsnip,
+  fit,
+  workflow
+)
+importFrom(yardstick,
+  accuracy,
+  accuracy_vec,
+  f_meas,
+  kap,
+  mae,
+  metric_set,
+  rmse,
+  roc_auc,
+  roc_auc_vec,
+  rsq,
+  sens,
+  sens_vec,
+  spec,
+  spec_vec
+)
