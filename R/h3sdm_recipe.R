@@ -17,7 +17,8 @@
 #' @details
 #' This function prepares spatial H3 grid data for species distribution modeling:
 #' \itemize{
-#'   \item Extracts centroid coordinates (`x` and `y`) from MULTIPOLYGON geometries.
+#'   \item Extracts centroid coordinates (`x` and `y`) as longitude and latitude
+#'     (EPSG:4326), regardless of the CRS of `data`.
 #'   \item Removes the geometry column to create a purely tabular dataset for tidymodels.
 #'   \item Assigns roles to columns:
 #'     \itemize{
@@ -27,6 +28,9 @@
 #'     }
 #'   \item All other columns are assigned `"predictor"` role.
 #' }
+#'
+#' The data used to fit the model must also contain `x` and `y`.
+#' `h3sdm_spatial_cv()` adds them automatically.
 #'
 #' @return A `tidymodels` recipe object (class `"h3sdm_recipe"`) ready for modeling.
 #'
@@ -41,14 +45,15 @@
 #'
 #' @importFrom recipes recipe
 #' @importFrom dplyr mutate
-#' @importFrom sf st_coordinates st_centroid st_geometry st_drop_geometry
+#' @importFrom sf st_coordinates st_centroid st_geometry st_drop_geometry st_transform
 #'
 #' @export
 h3sdm_recipe <- function(data, response_col = "presence") {
   if (!inherits(data, "sf")) stop("data must be an sf object.")
 
-  centroids <- sf::st_centroid(sf::st_geometry(data))
-  coords <- sf::st_coordinates(centroids)
+  coords <- sf::st_coordinates(
+    sf::st_centroid(sf::st_transform(sf::st_geometry(data), 4326))
+  )
 
   data_no_geom <- data %>%
     sf::st_drop_geometry() %>%

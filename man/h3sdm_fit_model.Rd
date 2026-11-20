@@ -37,7 +37,7 @@ If \code{FALSE}, uses the standard control with \code{save_pred = TRUE}.}
 A list with three elements:
 \itemize{
 \item \code{cv_model}: The result of \code{fit_resamples()}.
-\item \code{final_model}: The model fitted to the entire training set (first split).
+\item \code{final_model}: The model fitted to all observations in \code{data_split}.
 \item \code{metrics}: Extended evaluation metrics (if \code{presence_data} is provided).
 }
 }
@@ -46,4 +46,9 @@ Fits a Species Distribution Model (SDM) workflow to resampling data (cross-valid
 This function is the main training step and optionally configures the results
 to be used with the 'stacks' package. Supports both classification (presence/absence)
 and regression (count-based) models, detected automatically from the workflow mode.
+}
+\details{
+For classification models, the class \code{"1"} (presence) is treated as the
+event when computing sensitivity, specificity and F1-score, regardless of the
+order of the factor levels in the response variable.
 }

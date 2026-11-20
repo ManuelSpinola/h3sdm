@@ -28,7 +28,8 @@ modeling species distributions.
 \details{
 This function prepares spatial H3 grid data for species distribution modeling:
 \itemize{
-\item Extracts centroid coordinates (\code{x} and \code{y}) from MULTIPOLYGON geometries.
+\item Extracts centroid coordinates (\code{x} and \code{y}) as longitude and latitude
+(EPSG:4326), regardless of the CRS of \code{data}.
 \item Removes the geometry column to create a purely tabular dataset for tidymodels.
 \item Assigns roles to columns:
 \itemize{
@@ -38,6 +39,9 @@ This function prepares spatial H3 grid data for species distribution modeling:
 }
 \item All other columns are assigned \code{"predictor"} role.
 }
+
+The data used to fit the model must also contain \code{x} and \code{y}.
+\code{h3sdm_spatial_cv()} adds them automatically.
 }
 \examples{
 \dontrun{

@@ -2,7 +2,8 @@
 #'
 #' Uses a fitted tidymodels workflow (from `h3sdm_fit_model` or a standalone workflow)
 #' to predict species presence probabilities or counts on a new spatial H3 grid.
-#' Automatically generates centroid coordinates (`x` and `y`) if missing.
+#' Automatically generates centroid coordinates (`x` and `y`) if missing, as
+#' longitude and latitude (EPSG:4326), regardless of the CRS of `new_data`.
 #' The `new_data` must contain the same predictor variables as used in model training.
 #' Model mode (classification or regression) is detected automatically.
 #'
@@ -24,7 +25,7 @@
 #'
 #' @seealso [h3sdm_fit_model()], [h3sdm_aoa()]
 #'
-#' @importFrom sf st_drop_geometry st_centroid st_coordinates
+#' @importFrom sf st_drop_geometry st_centroid st_coordinates st_transform st_geometry
 #' @importFrom dplyr mutate
 #' @export
 
@@ -42,7 +43,9 @@ h3sdm_predict <- function(fit_object, new_data) {
   # Add centroid coordinates if missing
   if (!all(c("x", "y") %in% names(new_data))) {
     message("Missing x and y coordinates. Creating them from polygon centroids.")
-    coords <- suppressWarnings(sf::st_coordinates(sf::st_centroid(new_data)))
+    coords <- sf::st_coordinates(
+      sf::st_centroid(sf::st_transform(sf::st_geometry(new_data), 4326))
+    )
     new_data <- new_data %>%
       dplyr::mutate(x = coords[, 1], y = coords[, 2])
   }

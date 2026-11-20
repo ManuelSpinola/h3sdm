@@ -35,27 +35,27 @@ h3sdm_stack_fit <- function(..., non_negative = TRUE, metric = NULL) {
   }
 
   # 2. Assign NAMES to the arguments (CRUCIAL for add_candidates)
-  nombres <- names(candidate_list)
-  if (is.null(nombres) || any(nombres == "")) {
-    nombres_originales <- as.character(substitute(list(...)))[-1]
-    names(candidate_list) <- nombres_originales
+  arg_names <- names(candidate_list)
+  if (is.null(arg_names) || any(arg_names == "")) {
+    original_names <- as.character(substitute(list(...)))[-1]
+    names(candidate_list) <- original_names
   }
 
   # 3. Initialize the stack and add candidates (Logic that DOES work)
-  primer_nombre <- names(candidate_list)[1]
-  primer_candidato <- candidate_list[[1]]
+  first_name <- names(candidate_list)[1]
+  first_candidate <- candidate_list[[1]]
 
   model_stack <- stacks::stacks() %>%
-    stacks::add_candidates(primer_candidato, name = primer_nombre)
+    stacks::add_candidates(first_candidate, name = first_name)
 
   # 4. Add the rest of the candidates one by one
   if (length(candidate_list) > 1) {
     for (i in 2:length(candidate_list)) {
-      nombre_actual <- names(candidate_list)[i]
-      candidato_actual <- candidate_list[[i]]
+      current_name <- names(candidate_list)[i]
+      current_candidate <- candidate_list[[i]]
 
       model_stack <- model_stack %>%
-        stacks::add_candidates(candidato_actual, name = nombre_actual)
+        stacks::add_candidates(current_candidate, name = current_name)
     }
   }
 

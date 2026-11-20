@@ -106,7 +106,7 @@ h3sdm_pa <- function(pres_sf,
   buffer_k    <- as.integer(buffer_k)
   n_pseudoabs <- as.integer(n_pseudoabs)
 
-  # Estandarizar nombre de columna de geometría
+  # Standardize the geometry column name
   sf::st_geometry(pres_sf)       <- "geometry"
   sf::st_geometry(predictors_sf) <- "geometry"
 

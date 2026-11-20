@@ -20,17 +20,21 @@
 #'   If \code{FALSE}, uses the standard control with \code{save_pred = TRUE}.
 #' @param ... Arguments passed on to other functions (e.g., to \code{tune::fit_resamples} if needed).
 #'
+#' @details
+#' For classification models, the class \code{"1"} (presence) is treated as the
+#' event when computing sensitivity, specificity and F1-score, regardless of the
+#' order of the factor levels in the response variable.
+#'
 #' @return A list with three elements:
 #' \itemize{
 #'   \item \code{cv_model}: The result of \code{fit_resamples()}.
-#'   \item \code{final_model}: The model fitted to the entire training set (first split).
+#'   \item \code{final_model}: The model fitted to all observations in \code{data_split}.
 #'   \item \code{metrics}: Extended evaluation metrics (if \code{presence_data} is provided).
 #' }
 #' @export
 #'
 #' @importFrom yardstick metric_set roc_auc accuracy sens spec f_meas kap rmse rsq mae
 #' @importFrom tune fit_resamples control_resamples
-#' @importFrom stacks control_stack_resamples
 #' @importFrom workflows fit
 #' @importFrom rsample analysis
 #' @importFrom sf st_drop_geometry
@@ -46,19 +50,28 @@ h3sdm_fit_model <- function(workflow, data_split, presence_data = NULL,
     sdm_metrics <- yardstick::metric_set(rmse, rsq, mae)
     if (is.null(truth_col)) truth_col <- "count"
     if (is.null(pred_col))  pred_col  <- ".pred"
+    # Not used for regression metrics; defined so the control call works
+    event_level <- "first"
   } else {
     sdm_metrics <- yardstick::metric_set(roc_auc, accuracy, sens, spec, f_meas, kap)
     if (is.null(truth_col)) truth_col <- "presence"
     if (is.null(pred_col))  pred_col  <- ".pred_1"
+    # Treat presence ("1") as the event for sens, spec and f_meas
+    outcome_levels <- levels(data_split$splits[[1]]$data[[truth_col]])
+    event_level <- if (outcome_levels[1] == "1") "first" else "second"
   }
 
   # 1. Dynamic control configuration
   if (for_stacking) {
-    # Control required by the stacks package
-    resamples_control <- stacks::control_stack_resamples()
+    # Same settings as stacks::control_stack_resamples(), plus event_level
+    resamples_control <- tune::control_resamples(
+      save_pred = TRUE, save_workflow = TRUE, event_level = event_level
+    )
   } else {
     # Standard control: Saves predictions for evaluation
-    resamples_control <- tune::control_resamples(save_pred = TRUE)
+    resamples_control <- tune::control_resamples(
+      save_pred = TRUE, event_level = event_level
+    )
   }
 
   # 2. Cross-validation
@@ -81,7 +94,7 @@ h3sdm_fit_model <- function(workflow, data_split, presence_data = NULL,
   final_metrics <- NULL
 
   # 4. Final model fitting
-  final_model <- workflows::fit(workflow, data = rsample::analysis(data_split$splits[[1]]))
+  final_model <- workflows::fit(workflow, data = data_split$splits[[1]]$data)
 
   # 5. Final Metrics Calculation
   if (!is.null(presence_data)) {

@@ -20,6 +20,16 @@
 #' - `"block"`: Divides the spatial domain into contiguous blocks.
 #' - `"cluster"`: Groups locations into spatial clusters before splitting.
 #'
+#' For `"block"`, `cellsize` is expressed in the units of the data's coordinate
+#' reference system. If `data` is in geographic coordinates (degrees) and
+#' `cellsize` is supplied, the function stops with an error; project the data
+#' to a metric CRS with `sf::st_transform()` first.
+#'
+#' If `data` does not contain `x` and `y` columns, they are added as the
+#' hexagon centroid longitude and latitude (EPSG:4326), regardless of the CRS
+#' of `data`. These columns are required by `h3sdm_recipe()` and
+#' `h3sdm_recipe_gam()`.
+#'
 #' @return An `rsplit` object (from `rsample`) representing the spatial CV folds.
 #'
 #' @examples
@@ -34,10 +44,31 @@
 #' }
 #'
 #' @importFrom spatialsample spatial_block_cv spatial_clustering_cv
+#' @importFrom sf st_is_longlat st_transform st_centroid st_coordinates st_geometry
 #'
 #' @export
 
 h3sdm_spatial_cv <- function(data, method = "block", v = 5, ...) {
+  if (method == "block" && "cellsize" %in% names(list(...)) &&
+      isTRUE(sf::st_is_longlat(data))) {
+    stop(
+      "data uses geographic coordinates (degrees), so 'cellsize' would be ",
+      "interpreted in degrees. Project data to a metric CRS with ",
+      "sf::st_transform() before calling h3sdm_spatial_cv().",
+      call. = FALSE
+    )
+  }
+
+  # Add centroid coordinates (longitude/latitude) if missing, so the data
+  # used for fitting contains the x and y columns expected by h3sdm recipes
+  if (!all(c("x", "y") %in% names(data))) {
+    coords <- sf::st_coordinates(
+      sf::st_centroid(sf::st_transform(sf::st_geometry(data), 4326))
+    )
+    data$x <- coords[, 1]
+    data$y <- coords[, 2]
+  }
+
   if (method == "block") {
     split <- spatialsample::spatial_block_cv(data, v = v, ...)
   } else if (method == "cluster") {

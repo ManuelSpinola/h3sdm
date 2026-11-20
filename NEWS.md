@@ -1,3 +1,51 @@
+# h3sdm 0.1.8
+
+## Bug fixes
+
+* `h3sdm_fit_model()` now fits `final_model` on all observations in
+  `data_split`. Previously it was fitted only on the analysis (training) set
+  of the first fold, so the final model ignored part of the data and depended
+  on the fold assignment. Final models fitted with earlier versions should be
+  refitted.
+
+* `h3sdm_fit_model()` now treats presence (`"1"`) as the event class when
+  computing classification metrics. Previously, because `presence` has levels
+  `c("0", "1")`, the absence class was used as the event: the reported `sens`
+  and `spec` were swapped and `f_meas` was computed for absences. `accuracy`,
+  `kap`, `roc_auc`, and the TSS and Boyce values from `h3sdm_eval_metrics()`
+  were not affected. Sensitivity, specificity and F1-score reported with
+  earlier versions should be recomputed.
+
+* `h3sdm_spatial_cv()` now stops with an informative error when
+  `method = "block"`, `cellsize` is supplied and `data` uses geographic
+  coordinates (degrees). Previously `cellsize` was silently interpreted in
+  degrees, producing blocks of the wrong size. Project the data to a metric
+  CRS with `sf::st_transform()` before creating the folds.
+
+* `h3sdm_spatial_cv()` now adds the `x` and `y` centroid coordinates when they
+  are missing from `data`. Previously the data used for cross-validation and
+  for the final fit lacked these columns, causing an error with recipes
+  created by `h3sdm_recipe()` and `h3sdm_recipe_gam()`.
+
+* `x` and `y` are now always computed as the hexagon centroid longitude and
+  latitude (EPSG:4326) in `h3sdm_spatial_cv()`, `h3sdm_recipe()`,
+  `h3sdm_recipe_gam()` and `h3sdm_predict()`, regardless of the CRS of the
+  input data. This guarantees that model fitting and prediction use the same
+  coordinate units. Previously, a model fitted on projected data and used to
+  predict on a grid in degrees (or vice versa) produced incorrect predictions
+  for spatial terms such as `s(x, y)` without any warning. Models fitted with
+  `x` and `y` in projected units should be refitted.
+
+* `h3sdm_pa()` now returns all candidate hexagons, without clustering or
+  sampling, when `n_pseudoabs` is equal to or larger than the number of
+  hexagons available for pseudo-absences.
+
+## Improvements
+
+* `h3sdm_pa()` gains a `method` argument: `"environmental"` (default, k-means
+  stratification in environmental space, as before) or `"random"` (random
+  sampling of candidate hexagons).
+
 # h3sdm 0.1.7
 
 ## Improvements

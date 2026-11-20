@@ -34,6 +34,16 @@ by ensuring that training and testing data are spatially separated.
 \item \code{"block"}: Divides the spatial domain into contiguous blocks.
 \item \code{"cluster"}: Groups locations into spatial clusters before splitting.
 }
+
+For \code{"block"}, \code{cellsize} is expressed in the units of the data's coordinate
+reference system. If \code{data} is in geographic coordinates (degrees) and
+\code{cellsize} is supplied, the function stops with an error; project the data
+to a metric CRS with \code{sf::st_transform()} first.
+
+If \code{data} does not contain \code{x} and \code{y} columns, they are added as the
+hexagon centroid longitude and latitude (EPSG:4326), regardless of the CRS
+of \code{data}. These columns are required by \code{h3sdm_recipe()} and
+\code{h3sdm_recipe_gam()}.
 }
 \examples{
 \dontrun{

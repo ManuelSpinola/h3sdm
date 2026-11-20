@@ -33,6 +33,11 @@ all variables, including the response variable and spatial coordinates.
 \item \code{predictor}: all other variables, including \code{x} and \code{y}
 for the GAM spatial smooth term (\code{s(x, y, bs = "tp")}).
 }
+
+\code{x} and \code{y} are computed as hexagon centroid longitude and
+latitude (EPSG:4326), regardless of the CRS of \code{data}. The data used
+to fit the model must also contain \code{x} and \code{y};
+\code{h3sdm_spatial_cv()} adds them automatically.
 }
 \examples{
 \donttest{

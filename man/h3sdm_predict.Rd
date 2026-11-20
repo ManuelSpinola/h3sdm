@@ -19,7 +19,8 @@ for each hexagon.
 \description{
 Uses a fitted tidymodels workflow (from \code{h3sdm_fit_model} or a standalone workflow)
 to predict species presence probabilities or counts on a new spatial H3 grid.
-Automatically generates centroid coordinates (\code{x} and \code{y}) if missing.
+Automatically generates centroid coordinates (\code{x} and \code{y}) if missing, as
+longitude and latitude (EPSG:4326), regardless of the CRS of \code{new_data}.
 The \code{new_data} must contain the same predictor variables as used in model training.
 Model mode (classification or regression) is detected automatically.
 }

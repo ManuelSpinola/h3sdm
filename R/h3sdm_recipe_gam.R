@@ -26,8 +26,13 @@
 #'     for the GAM spatial smooth term (\code{s(x, y, bs = "tp")}).
 #' }
 #'
+#' \code{x} and \code{y} are computed as hexagon centroid longitude and
+#' latitude (EPSG:4326), regardless of the CRS of \code{data}. The data used
+#' to fit the model must also contain \code{x} and \code{y};
+#' \code{h3sdm_spatial_cv()} adds them automatically.
+#'
 #' @family h3sdm_tools
-#' @importFrom sf st_centroid st_geometry st_coordinates st_drop_geometry
+#' @importFrom sf st_centroid st_geometry st_coordinates st_drop_geometry st_transform
 #' @importFrom dplyr mutate
 #' @importFrom recipes recipe
 #'
@@ -66,8 +71,9 @@
 h3sdm_recipe_gam <- function(data, response_col = "presence") {
   if (!inherits(data, "sf")) stop("data must be an sf object.")
 
-  centroids <- sf::st_centroid(sf::st_geometry(data))
-  coords <- sf::st_coordinates(centroids)
+  coords <- sf::st_coordinates(
+    sf::st_centroid(sf::st_transform(sf::st_geometry(data), 4326))
+  )
 
   data_no_geom <- data %>%
     sf::st_drop_geometry() %>%
