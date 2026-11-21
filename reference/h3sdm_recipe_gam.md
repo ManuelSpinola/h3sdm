@@ -42,6 +42,12 @@ additional preprocessing steps.
 - `predictor`: all other variables, including `x` and `y` for the GAM
   spatial smooth term (`s(x, y, bs = "tp")`).
 
+`x` and `y` are computed as hexagon centroid longitude and latitude
+(EPSG:4326), regardless of the CRS of `data`. The data used to fit the
+model must also contain `x` and `y`;
+[`h3sdm_spatial_cv()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_spatial_cv.md)
+adds them automatically.
+
 ## See also
 
 Other h3sdm_tools:

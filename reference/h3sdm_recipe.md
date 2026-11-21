@@ -37,8 +37,8 @@ modeling.
 This function prepares spatial H3 grid data for species distribution
 modeling:
 
-- Extracts centroid coordinates (`x` and `y`) from MULTIPOLYGON
-  geometries.
+- Extracts centroid coordinates (`x` and `y`) as longitude and latitude
+  (EPSG:4326), regardless of the CRS of `data`.
 
 - Removes the geometry column to create a purely tabular dataset for
   tidymodels.
@@ -52,6 +52,10 @@ modeling:
   - `x` and `y` → `"spatial_predictor"`
 
 - All other columns are assigned `"predictor"` role.
+
+The data used to fit the model must also contain `x` and `y`.
+[`h3sdm_spatial_cv()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_spatial_cv.md)
+adds them automatically.
 
 ## Examples
 

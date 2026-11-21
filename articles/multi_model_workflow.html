@@ -7,8 +7,8 @@
 <title>h3sdm workflow for multiple models • h3sdm</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
-<link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/Source_Code_Pro-0.5.0/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="h3sdm workflow for multiple models">
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">h3sdm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -192,7 +192,7 @@ conditions available in the study area. Since there are approximately
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">records</span><span class="op">$</span><span class="va">presence</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   0   1 </span></span>
-<span><span class="co">#&gt; 300 128</span></span></code></pre></div>
+<span><span class="co">#&gt; 300 129</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -335,15 +335,15 @@ performance compared to random CV.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 7</span></span></span>
 <span><span class="co">#&gt;   model         .metric .estimator  mean std_err conf_low conf_high</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> random_forest boyce   binary     0.946 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> xgboost       roc_auc binary     0.867  0.023<span style="text-decoration: underline;">2</span>    0.822     0.913</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> random_forest roc_auc binary     0.867  0.011<span style="text-decoration: underline;">0</span>    0.845     0.888</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> xgboost       boyce   binary     0.798 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> reg_log       roc_auc binary     0.711  0.052<span style="text-decoration: underline;">9</span>    0.607     0.815</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> random_forest tss     binary     0.669 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> xgboost       tss     binary     0.668 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> reg_log       boyce   binary     0.557 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> reg_log       tss     binary     0.478 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> random_forest boyce   binary     0.922 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> random_forest roc_auc binary     0.858  0.028<span style="text-decoration: underline;">8</span>    0.802     0.914</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> xgboost       roc_auc binary     0.846  0.035<span style="text-decoration: underline;">2</span>    0.777     0.915</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> xgboost       boyce   binary     0.784 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> random_forest tss     binary     0.656 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> reg_log       roc_auc binary     0.653  0.022<span style="text-decoration: underline;">4</span>    0.609     0.697</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> reg_log       boyce   binary     0.648 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> xgboost       tss     binary     0.605 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> reg_log       tss     binary     0.381 <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span></span></span></code></pre></div>
 <p>Three metrics are reported:</p>
 <ul>
 <li>
@@ -393,17 +393,17 @@ observed presences.</li>
 <span><span class="co">#&gt; 8  876d6878affffff 26.30600 1746.000 91.93986</span></span>
 <span><span class="co">#&gt; 9  8766b4ab5ffffff 20.26178 2883.596 41.66865</span></span>
 <span><span class="co">#&gt; 10 876d69c94ffffff 22.67291 2361.003 70.83282</span></span>
-<span><span class="co">#&gt;                          geometry         x         y  prediction</span></span>
-<span><span class="co">#&gt; 1  MULTIPOLYGON (((-85.61874 1... -85.61355 10.744993 0.001600000</span></span>
-<span><span class="co">#&gt; 2  MULTIPOLYGON (((-85.2204 9.... -85.21517  9.805806 0.001600000</span></span>
-<span><span class="co">#&gt; 3  MULTIPOLYGON (((-83.01133 9... -83.00602  9.806921 0.693692857</span></span>
-<span><span class="co">#&gt; 4  MULTIPOLYGON (((-83.07362 9... -83.06830  9.295924 0.004460317</span></span>
-<span><span class="co">#&gt; 5  MULTIPOLYGON (((-83.93635 9... -83.93107  9.638151 0.096382540</span></span>
-<span><span class="co">#&gt; 6  MULTIPOLYGON (((-85.04019 1... -85.03497 10.579597 0.082771429</span></span>
-<span><span class="co">#&gt; 7  MULTIPOLYGON (((-84.50184 1... -84.49660 10.874768 0.651965079</span></span>
-<span><span class="co">#&gt; 8  MULTIPOLYGON (((-85.69967 1... -85.69448 10.433590 0.001000000</span></span>
-<span><span class="co">#&gt; 9  MULTIPOLYGON (((-83.32541 9... -83.32010  9.539664 0.093955556</span></span>
-<span><span class="co">#&gt; 10 MULTIPOLYGON (((-84.94068 1... -84.93545 10.420003 0.090420635</span></span></code></pre></div>
+<span><span class="co">#&gt;                          geometry         x         y   prediction</span></span>
+<span><span class="co">#&gt; 1  MULTIPOLYGON (((-85.61874 1... -85.61355 10.744993 0.0004444444</span></span>
+<span><span class="co">#&gt; 2  MULTIPOLYGON (((-85.2204 9.... -85.21517  9.805806 0.0004444444</span></span>
+<span><span class="co">#&gt; 3  MULTIPOLYGON (((-83.01133 9... -83.00602  9.806921 0.6797404762</span></span>
+<span><span class="co">#&gt; 4  MULTIPOLYGON (((-83.07362 9... -83.06830  9.295924 0.0072269841</span></span>
+<span><span class="co">#&gt; 5  MULTIPOLYGON (((-83.93635 9... -83.93107  9.638151 0.0521119048</span></span>
+<span><span class="co">#&gt; 6  MULTIPOLYGON (((-85.04019 1... -85.03497 10.579597 0.1090500000</span></span>
+<span><span class="co">#&gt; 7  MULTIPOLYGON (((-84.50184 1... -84.49660 10.874768 0.4367000000</span></span>
+<span><span class="co">#&gt; 8  MULTIPOLYGON (((-85.69967 1... -85.69448 10.433590 0.0020000000</span></span>
+<span><span class="co">#&gt; 9  MULTIPOLYGON (((-83.32541 9... -83.32010  9.539664 0.0845523810</span></span>
+<span><span class="co">#&gt; 10 MULTIPOLYGON (((-84.94068 1... -84.93545 10.420003 0.0817277778</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="map">13. Map<a class="anchor" aria-label="anchor" href="#map"></a>
@@ -433,14 +433,14 @@ fitted random forest model.</p>
 <code class="sourceCode R"><span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/h3sdm_explain.html">h3sdm_explain</a></span><span class="op">(</span><span class="va">rf_fitted</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Preparation of a new explainer is initiated</span></span>
 <span><span class="co">#&gt;   -&gt; model label       :  h3sdm workflow </span></span>
-<span><span class="co">#&gt;   -&gt; data              :  428  rows  6  cols </span></span>
-<span><span class="co">#&gt;   -&gt; target variable   :  428  values </span></span>
+<span><span class="co">#&gt;   -&gt; data              :  429  rows  6  cols </span></span>
+<span><span class="co">#&gt;   -&gt; target variable   :  429  values </span></span>
 <span><span class="co">#&gt;   -&gt; predict function  :  custom_predict </span></span>
 <span><span class="co">#&gt;   -&gt; predicted values  :  No value for predict function target column. (  default  )</span></span>
 <span><span class="co">#&gt;   -&gt; model_info        :  package tidymodels , ver. 1.5.0 , task classification (  default  ) </span></span>
-<span><span class="co">#&gt;   -&gt; predicted values  :  numerical, min =  0 , mean =  0.382703 , max =  0.9995778  </span></span>
+<span><span class="co">#&gt;   -&gt; predicted values  :  numerical, min =  0 , mean =  0.3995092 , max =  0.9991  </span></span>
 <span><span class="co">#&gt;   -&gt; residual function :  difference between y and yhat (  default  )</span></span>
-<span><span class="co">#&gt;   -&gt; residuals         :  numerical, min =  -0.9791722 , mean =  -0.08363763 , max =  0.8172611  </span></span>
+<span><span class="co">#&gt;   -&gt; residuals         :  numerical, min =  -0.9818571 , mean =  -0.0988099 , max =  0.6905222  </span></span>
 <span><span class="co">#&gt;   A new explainer has been created!</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="feature-importance">Feature Importance<a class="anchor" aria-label="anchor" href="#feature-importance"></a>

@@ -1,5 +1,70 @@
 # Changelog
 
+## h3sdm 0.1.8
+
+### Bug fixes
+
+- [`h3sdm_fit_model()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.md)
+  now fits `final_model` on all observations in `data_split`. Previously
+  it was fitted only on the analysis (training) set of the first fold,
+  so the final model ignored part of the data and depended on the fold
+  assignment. Final models fitted with earlier versions should be
+  refitted.
+
+- [`h3sdm_fit_model()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_fit_model.md)
+  now treats presence (`"1"`) as the event class when computing
+  classification metrics. Previously, because `presence` has levels
+  `c("0", "1")`, the absence class was used as the event: the reported
+  `sens` and `spec` were swapped and `f_meas` was computed for absences.
+  `accuracy`, `kap`, `roc_auc`, and the TSS and Boyce values from
+  [`h3sdm_eval_metrics()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_eval_metrics.md)
+  were not affected. Sensitivity, specificity and F1-score reported with
+  earlier versions should be recomputed.
+
+- [`h3sdm_spatial_cv()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_spatial_cv.md)
+  now stops with an informative error when `method = "block"`,
+  `cellsize` is supplied and `data` uses geographic coordinates
+  (degrees). Previously `cellsize` was silently interpreted in degrees,
+  producing blocks of the wrong size. Project the data to a metric CRS
+  with
+  [`sf::st_transform()`](https://r-spatial.github.io/sf/reference/st_transform.html)
+  before creating the folds.
+
+- [`h3sdm_spatial_cv()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_spatial_cv.md)
+  now adds the `x` and `y` centroid coordinates when they are missing
+  from `data`. Previously the data used for cross-validation and for the
+  final fit lacked these columns, causing an error with recipes created
+  by
+  [`h3sdm_recipe()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe.md)
+  and
+  [`h3sdm_recipe_gam()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe_gam.md).
+
+- `x` and `y` are now always computed as the hexagon centroid longitude
+  and latitude (EPSG:4326) in
+  [`h3sdm_spatial_cv()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_spatial_cv.md),
+  [`h3sdm_recipe()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe.md),
+  [`h3sdm_recipe_gam()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe_gam.md)
+  and
+  [`h3sdm_predict()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_predict.md),
+  regardless of the CRS of the input data. This guarantees that model
+  fitting and prediction use the same coordinate units. Previously, a
+  model fitted on projected data and used to predict on a grid in
+  degrees (or vice versa) produced incorrect predictions for spatial
+  terms such as `s(x, y)` without any warning. Models fitted with `x`
+  and `y` in projected units should be refitted.
+
+- [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  now returns all candidate hexagons, without clustering or sampling,
+  when `n_pseudoabs` is equal to or larger than the number of hexagons
+  available for pseudo-absences.
+
+### Improvements
+
+- [`h3sdm_pa()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_pa.md)
+  gains a `method` argument: `"environmental"` (default, k-means
+  stratification in environmental space, as before) or `"random"`
+  (random sampling of candidate hexagons).
+
 ## h3sdm 0.1.7
 
 CRAN release: 2026-07-05

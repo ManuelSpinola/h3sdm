@@ -64,8 +64,13 @@ A list with three elements:
 
 - `cv_model`: The result of `fit_resamples()`.
 
-- `final_model`: The model fitted to the entire training set (first
-  split).
+- `final_model`: The model fitted to all observations in `data_split`.
 
 - `metrics`: Extended evaluation metrics (if `presence_data` is
   provided).
+
+## Details
+
+For classification models, the class `"1"` (presence) is treated as the
+event when computing sensitivity, specificity and F1-score, regardless
+of the order of the factor levels in the response variable.

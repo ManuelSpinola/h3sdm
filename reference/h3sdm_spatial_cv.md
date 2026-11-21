@@ -56,6 +56,20 @@ by ensuring that training and testing data are spatially separated.
 
 - `"cluster"`: Groups locations into spatial clusters before splitting.
 
+For `"block"`, `cellsize` is expressed in the units of the data's
+coordinate reference system. If `data` is in geographic coordinates
+(degrees) and `cellsize` is supplied, the function stops with an error;
+project the data to a metric CRS with
+[`sf::st_transform()`](https://r-spatial.github.io/sf/reference/st_transform.html)
+first.
+
+If `data` does not contain `x` and `y` columns, they are added as the
+hexagon centroid longitude and latitude (EPSG:4326), regardless of the
+CRS of `data`. These columns are required by
+[`h3sdm_recipe()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe.md)
+and
+[`h3sdm_recipe_gam()`](https://manuelspinola.github.io/h3sdm/reference/h3sdm_recipe_gam.md).
+
 ## Examples
 
 ``` r

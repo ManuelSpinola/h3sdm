@@ -3,9 +3,10 @@
 Uses a fitted tidymodels workflow (from `h3sdm_fit_model` or a
 standalone workflow) to predict species presence probabilities or counts
 on a new spatial H3 grid. Automatically generates centroid coordinates
-(`x` and `y`) if missing. The `new_data` must contain the same predictor
-variables as used in model training. Model mode (classification or
-regression) is detected automatically.
+(`x` and `y`) if missing, as longitude and latitude (EPSG:4326),
+regardless of the CRS of `new_data`. The `new_data` must contain the
+same predictor variables as used in model training. Model mode
+(classification or regression) is detected automatically.
 
 ## Usage
 
