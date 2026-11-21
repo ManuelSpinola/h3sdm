@@ -8,7 +8,11 @@
 #'
 #' The algorithm follows Meyer & Pebesma (2021). Predictor variables are
 #' extracted automatically from the model formula inside
-#' \code{fit_object}. They are standardized using z-score scaling
+#' \code{fit_object}. The spatial coordinates \code{x} and \code{y} are
+#' always excluded, even when they are model predictors (e.g. the
+#' \code{s(x, y)} term of a GAM), because the AOA measures similarity in
+#' environmental space, not geographic distance. They are standardized
+#' using z-score scaling
 #' computed from \code{train}, then optionally weighted by variable
 #' importance. The mean nearest-neighbor distance among training points
 #' (\code{trainDist_avrgmean}) is used to normalize DI values. The AOA
@@ -89,6 +93,9 @@ h3sdm_aoa <- function(newdata, train, fit_object, cv = NULL, verbose = TRUE) {
   # (presence ~ .) rather than the explicit predictor names.
   var_info  <- fit_object$final_model$pre$actions$recipe$recipe$var_info
   variables <- var_info$variable[var_info$role == "predictor"]
+
+  # Exclude spatial coordinates: the AOA measures environmental similarity
+  variables <- setdiff(variables, c("x", "y"))
 
   if (length(variables) == 0L) {
     stop("No predictor variables found in the recipe inside 'fit_object'.")

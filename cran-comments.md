@@ -8,14 +8,17 @@ centroid coordinates in the CRS of the input, while the other functions
 changed in 0.1.8 compute them as longitude and latitude. With projected
 data this produced incorrect model predictions without any warning. We
 are submitting ahead of the usual monthly cadence so that users do not
-keep fitting models with the inconsistent version. No other changes are
-included.
+keep fitting models with the inconsistent version. It also includes a
+small fix in `h3sdm_aoa()`, which included the spatial coordinates in the
+Dissimilarity Index for GAM models.
 
 ## Changes in 0.1.9
 
 * `h3sdm_data()`: `x` and `y` are now computed as centroid longitude and
   latitude (EPSG:4326), consistent with `h3sdm_spatial_cv()`,
   `h3sdm_recipe()`, `h3sdm_recipe_gam()` and `h3sdm_predict()`.
+* `h3sdm_aoa()`: the spatial coordinates `x` and `y` are always excluded
+  from the Dissimilarity Index.
 
 ## R CMD check results
 

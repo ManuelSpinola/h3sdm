@@ -10,6 +10,14 @@
   produced incorrect predictions for spatial terms such as `s(x, y)`.
   Models fitted with h3sdm 0.1.8 on projected data should be refitted.
 
+* `h3sdm_aoa()` now always excludes the spatial coordinates `x` and `y` from
+  the Dissimilarity Index. Previously, with recipes from `h3sdm_recipe_gam()`
+  (where `x` and `y` are predictors for the `s(x, y)` term), the coordinates
+  were included, so geographic distance to the training data counted as
+  environmental dissimilarity. The AOA now measures similarity in
+  environmental space only, for all model types. AOA results for GAM models
+  from earlier versions should be recomputed.
+
 # h3sdm 0.1.8
 
 ## Bug fixes

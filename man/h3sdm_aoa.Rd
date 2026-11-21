@@ -47,7 +47,11 @@ are available in a single \code{sf} object ready for mapping.
 \details{
 The algorithm follows Meyer & Pebesma (2021). Predictor variables are
 extracted automatically from the model formula inside
-\code{fit_object}. They are standardized using z-score scaling
+\code{fit_object}. The spatial coordinates \code{x} and \code{y} are
+always excluded, even when they are model predictors (e.g. the
+\code{s(x, y)} term of a GAM), because the AOA measures similarity in
+environmental space, not geographic distance. They are standardized
+using z-score scaling
 computed from \code{train}, then optionally weighted by variable
 importance. The mean nearest-neighbor distance among training points
 (\code{trainDist_avrgmean}) is used to normalize DI values. The AOA
