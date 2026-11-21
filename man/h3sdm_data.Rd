@@ -13,11 +13,12 @@ h3sdm_data(pa_sf, predictors_sf)
 }
 \value{
 An \code{sf} object containing species presence–absence, environmental predictor variables,
-and centroid coordinates for each hexagon cell.
+and centroid coordinates (longitude and latitude) for each hexagon cell.
 }
 \description{
 Combines species presence–absence data with environmental predictors.
-It also calculates centroid coordinates (x and y) for each hexagon grid cell.
+It also calculates centroid coordinates (x and y) for each hexagon grid cell,
+as longitude and latitude (EPSG:4326), regardless of the CRS of the input.
 }
 \examples{
 \dontrun{

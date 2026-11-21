@@ -30,27 +30,27 @@
 #' @export
 
 h3sdm_predictors <- function(...) {
-  # Recibir todos los objetos sf como lista
+  # Collect all sf objects in a list
   sf_list <- list(...)
 
-  # Filtrar NULLs
+  # Drop NULL inputs
   sf_list <- sf_list[!sapply(sf_list, is.null)]
 
-  # Validar que haya al menos uno
+  # Check that at least one object was provided
   if (length(sf_list) == 0) stop("At least one sf object must be provided.")
 
-  # Validar que todos sean sf
+  # Check that all inputs are sf objects
   if (!all(sapply(sf_list, inherits, "sf"))) {
     stop("All inputs must be sf objects.")
   }
 
-  # Determinar la clave de unión
+  # Choose the join key
   join_key <- if ("h3_address" %in% names(sf_list[[1]])) "h3_address" else "ID"
 
-  # Empezar con el primer sf
+  # Start from the first sf object
   combined_sf <- sf_list[[1]]
 
-  # Iterar sobre el resto y hacer left_join sin geometría
+  # Left-join the remaining objects without their geometry
   if (length(sf_list) > 1) {
     for (i in 2:length(sf_list)) {
       combined_sf <- dplyr::left_join(
@@ -61,7 +61,7 @@ h3sdm_predictors <- function(...) {
     }
   }
 
-  # Asegurar que la geometría sea MULTIPOLYGON
+  # Make sure the geometry is MULTIPOLYGON
   combined_sf <- sf::st_cast(combined_sf, "MULTIPOLYGON")
 
   return(combined_sf)
