@@ -15,7 +15,7 @@ are available in a single sf object ready for mapping."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">h3sdm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,7 +110,11 @@ training data; larger values indicate increasing dissimilarity.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The algorithm follows Meyer &amp; Pebesma (2021). Predictor variables are
 extracted automatically from the model formula inside
-<code>fit_object</code>. They are standardized using z-score scaling
+<code>fit_object</code>. The spatial coordinates <code>x</code> and <code>y</code> are
+always excluded, even when they are model predictors (e.g. the
+<code>s(x, y)</code> term of a GAM), because the AOA measures similarity in
+environmental space, not geographic distance. They are standardized
+using z-score scaling
 computed from <code>train</code>, then optionally weighted by variable
 importance. The mean nearest-neighbor distance among training points
 (<code>trainDist_avrgmean</code>) is used to normalize DI values. The AOA

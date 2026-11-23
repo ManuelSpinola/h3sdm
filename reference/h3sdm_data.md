@@ -2,7 +2,8 @@
 
 Combines species presence–absence data with environmental predictors. It
 also calculates centroid coordinates (x and y) for each hexagon grid
-cell.
+cell, as longitude and latitude (EPSG:4326), regardless of the CRS of
+the input.
 
 ## Usage
 
@@ -27,7 +28,8 @@ h3sdm_data(pa_sf, predictors_sf)
 ## Value
 
 An `sf` object containing species presence–absence, environmental
-predictor variables, and centroid coordinates for each hexagon cell.
+predictor variables, and centroid coordinates (longitude and latitude)
+for each hexagon cell.
 
 ## Examples
 

@@ -63,8 +63,11 @@ The input `newdata` `sf` object with two additional columns:
 ## Details
 
 The algorithm follows Meyer & Pebesma (2021). Predictor variables are
-extracted automatically from the model formula inside `fit_object`. They
-are standardized using z-score scaling computed from `train`, then
+extracted automatically from the model formula inside `fit_object`. The
+spatial coordinates `x` and `y` are always excluded, even when they are
+model predictors (e.g. the `s(x, y)` term of a GAM), because the AOA
+measures similarity in environmental space, not geographic distance.
+They are standardized using z-score scaling computed from `train`, then
 optionally weighted by variable importance. The mean nearest-neighbor
 distance among training points (`trainDist_avrgmean`) is used to
 normalize DI values. The AOA threshold is the maximum cross-validated

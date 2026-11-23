@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">h3sdm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,15 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.8" id="h3sdm-018">h3sdm 0.1.8<a class="anchor" aria-label="anchor" href="#h3sdm-018"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.9" id="h3sdm-019">h3sdm 0.1.9<a class="anchor" aria-label="anchor" href="#h3sdm-019"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-1-9">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-9"></a></h3>
+<ul><li><p><code><a href="../reference/h3sdm_data.html">h3sdm_data()</a></code> now computes the <code>x</code> and <code>y</code> centroid coordinates as longitude and latitude (EPSG:4326), regardless of the CRS of the input, like the other functions changed in 0.1.8. In 0.1.8, when <code><a href="../reference/h3sdm_data.html">h3sdm_data()</a></code> was used with projected data, the model was fitted with <code>x</code> and <code>y</code> in projected units while <code><a href="../reference/h3sdm_predict.html">h3sdm_predict()</a></code> computed them in degrees, which produced incorrect predictions for spatial terms such as <code>s(x, y)</code>. Models fitted with h3sdm 0.1.8 on projected data should be refitted.</p></li>
+<li><p><code><a href="../reference/h3sdm_aoa.html">h3sdm_aoa()</a></code> now always excludes the spatial coordinates <code>x</code> and <code>y</code> from the Dissimilarity Index. Previously, with recipes from <code><a href="../reference/h3sdm_recipe_gam.html">h3sdm_recipe_gam()</a></code> (where <code>x</code> and <code>y</code> are predictors for the <code>s(x, y)</code> term), the coordinates were included, so geographic distance to the training data counted as environmental dissimilarity. The AOA now measures similarity in environmental space only, for all model types. AOA results for GAM models from earlier versions should be recomputed.</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.8" id="h3sdm-018">h3sdm 0.1.8<a class="anchor" aria-label="anchor" href="#h3sdm-018"></a></h2><p class="text-muted">CRAN release: 2026-11-21</p>
 <div class="section level3">
 <h3 id="bug-fixes-0-1-8">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-8"></a></h3>
 <ul><li><p><code><a href="../reference/h3sdm_fit_model.html">h3sdm_fit_model()</a></code> now fits <code>final_model</code> on all observations in <code>data_split</code>. Previously it was fitted only on the analysis (training) set of the first fold, so the final model ignored part of the data and depended on the fold assignment. Final models fitted with earlier versions should be refitted.</p></li>
